@@ -220,10 +220,15 @@ main() {
         exit 0
     fi
 
-    check_git_clean "$PLUGIN_ROOT"
-
     local current
     current="$(manifest_get "$manifest" version)"
+    if [[ "$current" == "$version" ]]; then
+        echo "✓ already at v$version (manifest matches target). Nothing to do."
+        echo "  To force re-fetch, manually clear .vendor-manifest.json version field."
+        exit 0
+    fi
+
+    check_git_clean "$PLUGIN_ROOT"
     confirm_or_abort "$current" "$version"
 
     SYNC_TMP="$(mktemp -d)"
