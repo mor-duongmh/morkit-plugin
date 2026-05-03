@@ -16,7 +16,7 @@ I'll create a change with artifacts:
 - design.md (how)
 - tasks.md (implementation steps)
 
-When ready to implement, run /opsx:apply
+When ready to implement, run /spec:apply
 
 ---
 
@@ -35,13 +35,13 @@ When ready to implement, run /opsx:apply
 
 2. **Create the change directory**
    ```bash
-   openspec new change "<name>"
+   npx -y @fission-ai/openspec@latest new change "<name>"
    ```
-   This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
+   This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`. All OpenSpec CLI calls in this skill MUST go through `npx -y @fission-ai/openspec@latest` — do not assume a global `openspec` binary exists.
 
 3. **Get the artifact build order**
    ```bash
-   openspec status --change "<name>" --json
+   npx -y @fission-ai/openspec@latest status --change "<name>" --json
    ```
    Parse the JSON to get:
    - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
@@ -56,7 +56,7 @@ When ready to implement, run /opsx:apply
    a. **For each artifact that is `ready` (dependencies satisfied)**:
       - Get instructions:
         ```bash
-        openspec instructions <artifact-id> --change "<name>" --json
+        npx -y @fission-ai/openspec@latest instructions <artifact-id> --change "<name>" --json
         ```
       - The instructions JSON includes:
         - `context`: Project background (constraints for you - do NOT include in output)
@@ -71,7 +71,7 @@ When ready to implement, run /opsx:apply
       - Show brief progress: "Created <artifact-id>"
 
    b. **Continue until all `applyRequires` artifacts are complete**
-      - After creating each artifact, re-run `openspec status --change "<name>" --json`
+      - After creating each artifact, re-run `npx -y @fission-ai/openspec@latest status --change "<name>" --json`
       - Check if every artifact ID in `applyRequires` has `status: "done"` in the artifacts array
       - Stop when all `applyRequires` artifacts are done
 
@@ -81,7 +81,7 @@ When ready to implement, run /opsx:apply
 
 5. **Show final status**
    ```bash
-   openspec status --change "<name>"
+   npx -y @fission-ai/openspec@latest status --change "<name>"
    ```
 
 **Output**
@@ -89,8 +89,13 @@ When ready to implement, run /opsx:apply
 After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx:apply` or ask me to implement to start working on the tasks."
+- What's ready: "All artifacts created! `tasks.md` đã có Superpowers header (Goal/Architecture/Tech Stack) + Files block + TDD steps — sẵn sàng cho Superpowers."
+- Use the **AskUserQuestion tool** to let the user pick an implementation path:
+  - **`/spec:apply`** — native OpenSpec runner, tuần tự task theo thứ tự
+  - **`/superpowers:executing-plans`** — TDD discipline với 1 agent (recommended cho plan ngắn)
+  - **`/superpowers:subagent-driven-development`** — parallel subagents (recommended khi plan có ≥3 task groups độc lập về Files block)
+
+  Nếu user chưa biết chọn gì, default đề xuất `/superpowers:subagent-driven-development` cho plan có nhiều task groups và `/superpowers:executing-plans` cho plan đơn giản.
 
 **Artifact Creation Guidelines**
 

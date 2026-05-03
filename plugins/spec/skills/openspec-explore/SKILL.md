@@ -83,8 +83,10 @@ You have full context of the OpenSpec system. Use it naturally, don't force it.
 
 At the start, quickly check what exists:
 ```bash
-openspec list --json
+npx -y @fission-ai/openspec@latest list --json
 ```
+
+**Note:** All OpenSpec CLI calls in this skill MUST go through `npx -y @fission-ai/openspec@latest` — do not assume a global `openspec` binary exists.
 
 This tells you:
 - If there are active changes
@@ -201,7 +203,7 @@ You: [reads codebase]
 
 **User is stuck mid-implementation:**
 ```
-User: /opsx:explore add-auth-system
+User: /spec:explore add-auth-system
       The OAuth integration is more complex than expected
 
 You: [reads change artifacts]
