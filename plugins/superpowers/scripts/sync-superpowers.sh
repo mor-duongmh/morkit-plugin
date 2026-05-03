@@ -111,11 +111,107 @@ check_git_clean() {
     fi
 }
 
+download_tarball() {
+    local version="$1" dest="$2"
+    local url="https://github.com/obra/superpowers/archive/refs/tags/v${version}.tar.gz"
+    echo "Downloading $url"
+    if ! curl -fsSL "$url" -o "$dest"; then
+        echo "Download failed for $url" >&2
+        exit 1
+    fi
+}
+
+verify_or_record_sha256() {
+    # Args: tarball_path manifest_path target_version
+    # Prints the actual sha as last line for caller to capture.
+    local tarball="$1" manifest="$2" version="$3"
+    local actual
+    actual="$(compute_sha256 "$tarball")"
+    local recorded_version recorded_sha
+    recorded_version="$(manifest_get "$manifest" version)"
+    recorded_sha="$(manifest_get "$manifest" tarball_sha256)"
+    if [[ "$recorded_version" == "$version" && "$recorded_sha" != "null" ]]; then
+        if [[ "$actual" != "$recorded_sha" ]]; then
+            echo "SHA256 mismatch for v$version!" >&2
+            echo "  expected: $recorded_sha" >&2
+            echo "  actual:   $actual" >&2
+            exit 1
+        fi
+        echo "✓ SHA256 verified: $actual" >&2
+    else
+        echo "✓ SHA256 computed (first sync of v$version): $actual" >&2
+    fi
+    echo "$actual"
+}
+
+extract_tarball() {
+    local tarball="$1" dest="$2"
+    mkdir -p "$dest"
+    tar -xzf "$tarball" -C "$dest"
+    local extracted_root
+    extracted_root="$(find "$dest" -mindepth 1 -maxdepth 1 -type d | head -1)"
+    echo "$extracted_root"
+}
+
+wipe_vendored_layer() {
+    local plugin_root="$1"
+    rm -rf "$plugin_root/skills" "$plugin_root/commands" "$plugin_root/agents" "$plugin_root/LICENSE"
+}
+
+copy_vendored_layer() {
+    local src="$1" plugin_root="$2"
+    for path in skills commands agents LICENSE; do
+        if [[ -e "$src/$path" ]]; then
+            cp -R "$src/$path" "$plugin_root/$path"
+        fi
+    done
+}
+
+apply_overlay() {
+    local plugin_root="$1"
+    local overlay="$plugin_root/overlay"
+    [[ -d "$overlay" ]] || return 0
+    local applied=0
+    for sub in skills commands agents; do
+        [[ -d "$overlay/$sub" ]] || continue
+        cp -R "$overlay/$sub/." "$plugin_root/$sub/"
+        applied=$((applied + 1))
+    done
+    if [[ "$applied" -gt 0 ]]; then
+        echo "✓ Applied overlay layer"
+    fi
+}
+
+update_manifest() {
+    local manifest="$1" version="$2" sha="$3"
+    local url="https://github.com/obra/superpowers/archive/refs/tags/v${version}.tar.gz"
+    local now
+    now="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+    manifest_set "$manifest" version "$version"
+    manifest_set "$manifest" tarball_url "$url"
+    manifest_set "$manifest" tarball_sha256 "$sha"
+    manifest_set "$manifest" fetched_at "$now"
+}
+
+confirm_or_abort() {
+    local current="$1" target="$2"
+    echo
+    echo "Sync vendored Superpowers layer"
+    echo "  Current: ${current}"
+    echo "  Target:  ${target}"
+    read -r -p "Continue? [y/N]: " ans
+    if [[ "$ans" != "y" && "$ans" != "Y" ]]; then
+        echo "Aborted by user."
+        exit 0
+    fi
+}
+
 main() {
     parse_args "$@"
     PLUGIN_ROOT="$(plugin_root)"
     require_commands curl tar jq git
 
+    local manifest="$PLUGIN_ROOT/.vendor-manifest.json"
     local version
     version="$(resolve_version)"
 
@@ -126,7 +222,36 @@ main() {
 
     check_git_clean "$PLUGIN_ROOT"
 
-    echo "(real sync not yet implemented — see Task 6+)"
+    local current
+    current="$(manifest_get "$manifest" version)"
+    confirm_or_abort "$current" "$version"
+
+    SYNC_TMP="$(mktemp -d)"
+    trap 'rm -rf "${SYNC_TMP:-}"' EXIT
+    local tmp="$SYNC_TMP"
+
+    local tarball="$tmp/superpowers-v${version}.tar.gz"
+    download_tarball "$version" "$tarball"
+
+    local sha
+    sha="$(verify_or_record_sha256 "$tarball" "$manifest" "$version" | tail -1)"
+
+    local extract_dir="$tmp/extract"
+    local extracted
+    extracted="$(extract_tarball "$tarball" "$extract_dir")"
+
+    wipe_vendored_layer "$PLUGIN_ROOT"
+    copy_vendored_layer "$extracted" "$PLUGIN_ROOT"
+    apply_overlay "$PLUGIN_ROOT"
+    update_manifest "$manifest" "$version" "$sha"
+
+    echo
+    echo "✓ Vendored layer synced to v$version"
+    echo "  SHA256: $sha"
+    echo
+    echo "Suggested commit:"
+    echo "  git add plugins/superpowers/{skills,commands,agents,LICENSE,.vendor-manifest.json}"
+    echo "  git commit -m \"chore(superpowers): vendor upstream v$version\""
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
