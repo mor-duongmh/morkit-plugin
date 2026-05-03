@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mor-duongmh",
-  "description": "Mor's Claude Code plugin marketplace — customized Superpowers workflows for the Mor team.",
+  "description": "Mor's Claude Code plugin marketplace — spec-driven workflows + vendored Superpowers.",
   "owner": {
     "name": "duongmh",
     "email": "duongmh@mor.com.vn"
@@ -12,10 +12,19 @@
       "description": "Mor's spec-driven workflow with superpowers-driven schema. Artifacts are TDD-ready and consumable by Superpowers executing-plans and subagent-driven-development.",
       "source": "./plugins/spec",
       "category": "development",
-      "author": {
-        "name": "Mor"
-      },
+      "author": { "name": "Mor" },
       "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/spec"
+    },
+    {
+      "name": "superpowers",
+      "description": "Mor's vendored fork of obra/superpowers — same skills as upstream, pinned and synced via script. Replaces upstream superpowers@obra in this marketplace.",
+      "source": "./plugins/superpowers",
+      "category": "development",
+      "author": {
+        "name": "Jesse Vincent (upstream) / Mor (vendoring)",
+        "email": "duongmh@mor.com.vn"
+      },
+      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/superpowers"
     }
   ]
 }
