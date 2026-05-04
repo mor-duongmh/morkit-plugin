@@ -92,3 +92,32 @@ npx -y ctx7 docs "<library-id>" "<topic>"
 When you encounter a library API you're not 100% certain about — query Context7 first, then proceed. Cheaper than discovering the bug at test time or rewriting after.
 
 *This overlay is maintained by `mor-duongmh/claude-plugins`; not part of upstream `obra/superpowers`.*
+
+---
+
+## Pre-flight: developer review checklist must be approved (Mor overlay)
+
+**BEFORE starting any work in this skill** — especially before reading the plan, dispatching subagents, or making any code change — verify the OpenSpec change has an approved review checklist.
+
+```bash
+# Detect most recent non-archive change
+CHANGE_DIR="$(find openspec/changes -mindepth 1 -maxdepth 1 -type d ! -name 'archive' \
+                -exec stat -f "%m %N" {} \; 2>/dev/null \
+              | sort -rn | head -1 | awk '{print $2}')"
+CHECKLIST="$CHANGE_DIR/review-checklist.md"
+
+if [ ! -f "$CHECKLIST" ]; then
+    echo "✗ STOP: $CHECKLIST does not exist. Run /spec:review."
+    exit 1
+fi
+if ! grep -qE '^[[:space:]]*Overall Decision:[[:space:]]*OK[[:space:]]*$' "$CHECKLIST"; then
+    echo "✗ STOP: $CHECKLIST not approved. Set 'Overall Decision: OK' first."
+    exit 1
+fi
+```
+
+Skip this gate ONLY when there is no `openspec/changes/` folder in the project (this skill is being used outside the spec-driven workflow).
+
+The plugin's PreToolUse hook also enforces this at the harness level. This skill-level check is defense-in-depth: if the hook is bypassed (e.g., disabled in user settings), this check still refuses to proceed.
+
+*This pre-flight requirement is added by the Mor overlay, not part of upstream Superpowers.*

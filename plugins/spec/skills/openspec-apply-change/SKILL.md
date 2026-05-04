@@ -15,6 +15,28 @@ Implement tasks from an OpenSpec change.
 
 **Steps**
 
+0. **Pre-flight: developer review checklist must be approved (human gate)**
+
+   Before doing ANY work, verify the change has an approved review checklist. The plugin's PreToolUse hook also enforces this at the harness level — this skill-level check is the second line of defense (defense in depth).
+
+   ```bash
+   CHANGE_DIR="openspec/changes/<name>"   # or detect most-recent active
+   CHECKLIST="$CHANGE_DIR/review-checklist.md"
+
+   if [ ! -f "$CHECKLIST" ]; then
+       echo "✗ Cannot proceed: $CHECKLIST does not exist."
+       echo "  Run /spec:review to generate it."
+       exit 1
+   fi
+   if ! grep -qE '^[[:space:]]*Overall Decision:[[:space:]]*OK[[:space:]]*$' "$CHECKLIST"; then
+       echo "✗ Cannot proceed: $CHECKLIST not approved."
+       echo "  Open it, complete the review, set 'Overall Decision: OK', re-run."
+       exit 1
+   fi
+   ```
+
+   STOP here if either check fails — do not select a change, do not read context, do not begin implementation. Tell the user what's missing and how to resolve. Only proceed past Step 0 when both conditions hold.
+
 1. **Select the change**
 
    If a name is provided, use it. Otherwise:

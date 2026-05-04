@@ -84,18 +84,33 @@ When ready to implement, run /spec:apply
    npx -y @fission-ai/openspec@latest status --change "<name>"
    ```
 
+6. **Generate the developer review checklist (human gate).**
+
+   Run the bundled helper to create `review-checklist.md` for this change:
+   ```bash
+   "${CLAUDE_PLUGIN_ROOT}/scripts/generate-checklist.sh" "openspec/changes/<name>"
+   ```
+
+   The script auto-detects the variant (BE/FE × Feature/BugFix/Refactor) from `proposal.md` + `tasks.md`, fetches the Mor Developer Review Checklist from the canonical Google Doc (with 24h cache fallback), and writes a populated checklist with `Overall Decision: PENDING`.
+
+   This step is REQUIRED. Until the human flips the decision to `OK`, the plugin's PreToolUse hook will refuse `/spec:apply`, `/superpowers:executing-plans`, and `/superpowers:subagent-driven-development` for this change.
+
+   If the script fails (network down, variant detection ambiguous), report the error and tell the user to run `/spec:review` manually with `--variant` override.
+
 **Output**
 
-After completing all artifacts, summarize:
+After completing all artifacts AND the review checklist, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! `tasks.md` đã có Superpowers header (Goal/Architecture/Tech Stack) + Files block + TDD steps — sẵn sàng cho Superpowers."
-- Use the **AskUserQuestion tool** to let the user pick an implementation path:
+- The path of the generated `review-checklist.md` and detected variant
+- Clear next-step instruction:
+  > "Open `<path>/review-checklist.md`, tick the items honestly, fill the Review Summary, then change `Overall Decision: PENDING` → `Overall Decision: OK`. The plugin's hook blocks all implementation skills for this change until you do."
+- Use the **AskUserQuestion tool** to let the user pick an implementation path FOR LATER (after they approve the checklist):
   - **`/spec:apply`** — native OpenSpec runner, tuần tự task theo thứ tự
   - **`/superpowers:executing-plans`** — TDD discipline với 1 agent (recommended cho plan ngắn)
   - **`/superpowers:subagent-driven-development`** — parallel subagents (recommended khi plan có ≥3 task groups độc lập về Files block)
 
-  Nếu user chưa biết chọn gì, default đề xuất `/superpowers:subagent-driven-development` cho plan có nhiều task groups và `/superpowers:executing-plans` cho plan đơn giản.
+  Nếu user chưa biết chọn gì, default đề xuất `/superpowers:subagent-driven-development` cho plan có nhiều task groups và `/superpowers:executing-plans` cho plan đơn giản. Remind that NONE of these will run until the checklist's `Overall Decision: OK`.
 
 **Artifact Creation Guidelines**
 

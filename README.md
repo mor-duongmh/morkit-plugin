@@ -48,10 +48,18 @@ ls ~/.claude/plugins/data/spec/.tools-setup-* 2>/dev/null
                                 ▼
    ┌─────────────────────────────────────────────────────────────────┐
    │  /spec:propose                                                   │
-   │    → proposal.md  (what & why)                                   │
-   │    → design.md    (how + Tech Stack — verified via Context7)     │
-   │    → tasks.md     (Superpowers header + Files block + TDD steps) │
+   │    → proposal.md         (what & why)                            │
+   │    → design.md           (how + Tech Stack — verified via Context7)│
+   │    → tasks.md            (Superpowers header + Files + TDD)      │
+   │    → review-checklist.md (auto-generated: BE/FE × Feat/Bug/Refactor)│
    └────────────────────────────┬────────────────────────────────────┘
+                                ▼
+              🚦 HUMAN GATE — review-checklist.md
+                    Tick items, fill summary,
+                    set "Overall Decision: OK"
+                                │
+              [Plugin's PreToolUse hook + skill-level check
+               BLOCK every implementation skill until OK]
                                 ▼
        ┌────────────────────────┼────────────────────────┐
        ▼                        ▼                        ▼
@@ -64,6 +72,9 @@ ls ~/.claude/plugins/data/spec/.tools-setup-* 2>/dev/null
    │  /spec:archive          (after merge)                            │
    └─────────────────────────────────────────────────────────────────┘
 ```
+
+> Need to regenerate or refresh the checklist for an existing change?
+> Run **`/spec:review`** (auto-detects variant) or **`/spec:review --variant FE-BugFix --refresh`**.
 
 ## Plugins
 
@@ -78,8 +89,9 @@ ls ~/.claude/plugins/data/spec/.tools-setup-* 2>/dev/null
 |---------|--------|----------|
 | `/spec:setup [path]` | spec | Cài schema vào project |
 | `/spec:explore` | spec | Suy nghĩ trước khi implement |
-| `/spec:propose [desc]` | spec | Sinh proposal + design + tasks (TDD) |
-| `/spec:apply [name]` | spec | Native runner thực thi tasks |
+| `/spec:propose [desc]` | spec | Sinh proposal + design + tasks (TDD) **+ review-checklist** |
+| `/spec:review [name]` | spec | (Re)generate developer review checklist (human gate) |
+| `/spec:apply [name]` | spec | Native runner thực thi tasks (blocked nếu checklist chưa OK) |
 | `/spec:archive [name]` | spec | Đóng change sau merge |
 | `/superpowers:brainstorm` | superpowers | Brainstorming skill |
 | `/superpowers:write-plan` | superpowers | Writing-plans skill |
@@ -100,6 +112,29 @@ Project có `openspec/` nhưng chưa cài schema → plugin gợi ý `/spec:setu
 ```bash
 touch openspec/.spec-setup-skip
 ```
+
+## Plan review gate (human checkpoint between propose and implement)
+
+Sau `/spec:propose`, plugin tự sinh `openspec/changes/<name>/review-checklist.md` từ canonical [Mor Developer Review Checklist Google Doc](https://docs.google.com/document/d/184wY2N2WOUExmZrClvHCfcRCnSQsJYvav6gc6JwL6xc) — auto-detect variant (BE/FE × Feature/BugFix/Refactor), fetch live (cache 24h), điền meta header, mặc định `Overall Decision: PENDING`.
+
+**Hai layer enforcement:**
+
+| Layer | Cơ chế | Khi nào fire |
+|-------|--------|-------------|
+| **PreToolUse hook** | `pre-tool-checklist-gate.sh` — Claude Code harness chặn tool call | Khi Claude invoke `Skill openspec-apply-change` / `executing-plans` / `subagent-driven-development` |
+| **Skill content** | Mỗi skill có pre-flight check ở Step 0 — refuse to proceed | Khi skill tự đọc nội dung của mình |
+
+Nếu một layer bị bypass (rare), layer kia vẫn block → defense-in-depth.
+
+**Override variant:** `/spec:review --variant FE-BugFix` (BE-Feature, BE-BugFix, BE-Refactor, FE-Feature, FE-BugFix, FE-Refactor)
+**Refresh source:** `/spec:review --refresh` (force re-fetch Google Doc, bypass cache)
+
+Khi review xong, sửa file:
+```diff
+- Overall Decision: PENDING
++ Overall Decision: OK
+```
+→ Implementation skills mở khoá.
 
 ## Companion tools (Context7 + RTK)
 
