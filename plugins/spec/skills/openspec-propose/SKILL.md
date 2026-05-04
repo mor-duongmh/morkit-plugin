@@ -110,8 +110,12 @@ After completing all artifacts, summarize:
 **Library research with Context7 (when filling Tech Stack)**
 
 The `superpowers-driven` schema requires `design.md` to declare an explicit `## Tech Stack` section. Before listing a library/framework with version, verify it via Context7 — this prevents hallucinated APIs and stale version numbers:
-- **MCP (preferred):** `mcp__context7__resolve-library-id` then `mcp__context7__query-docs`
-- **CLI fallback:** `npx -y @upstash/context7-cli query-docs "<library> <topic>"`
+- **MCP path (preferred when Context7 MCP installed):** call `mcp__context7__resolve-library-id` (`libraryName` + `query`) → take the best Context7 ID like `/reactjs/react.dev` → call `mcp__context7__query-docs` (`libraryId` + `query`) for the actual docs. Retry once with `researchMode: true` if shallow. Skip step 1 if user gave you `/org/project`.
+- **CLI fallback (lazy via npx):**
+  ```bash
+  npx -y ctx7 library "<library-name>" "<topic>"   # Step 1: resolve to Context7 ID
+  npx -y ctx7 docs "<library-id>" "<topic>"         # Step 2: query docs for that ID
+  ```
 
 Apply the same check inside `tasks.md`: when a TDD step calls a library API (e.g., "Implement using `@aws-sdk/client-s3` v3 PutObjectCommand"), confirm the API shape via Context7 first. Cheaper than rewriting tasks later.
 

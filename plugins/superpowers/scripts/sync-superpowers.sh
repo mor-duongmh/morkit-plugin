@@ -168,13 +168,23 @@ copy_vendored_layer() {
 }
 
 apply_overlay() {
+    # Apply Mor overlay on top of vendored layer.
+    # Skips overlay tracking metadata (.overlay-meta.json) so it doesn't end up
+    # in the live skills/ tree where Claude Code's plugin loader would see it.
     local plugin_root="$1"
     local overlay="$plugin_root/overlay"
     [[ -d "$overlay" ]] || return 0
     local applied=0
     for sub in skills commands agents; do
         [[ -d "$overlay/$sub" ]] || continue
-        cp -R "$overlay/$sub/." "$plugin_root/$sub/"
+        # Iterate every file in overlay/<sub>, skipping .overlay-meta.json,
+        # and copy each into the matching live path. cp -p preserves perms.
+        while IFS= read -r -d '' src; do
+            local rel="${src#$overlay/$sub/}"
+            local dst="$plugin_root/$sub/$rel"
+            mkdir -p "$(dirname "$dst")"
+            cp -p "$src" "$dst"
+        done < <(find "$overlay/$sub" -type f ! -name '.overlay-meta.json' -print0)
         applied=$((applied + 1))
     done
     if [[ "$applied" -gt 0 ]]; then

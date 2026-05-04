@@ -157,15 +157,18 @@ After saving the plan, offer execution choice:
 
 When this skill needs accurate, version-specific library/framework documentation (Tech Stack design, API verification, debugging library behaviour, writing tests against a library API), prefer **Context7** over generic web search to avoid hallucinated APIs from stale training data.
 
-**MCP (preferred when available):**
-```
-Tool call: mcp__context7__query-docs
-(use mcp__context7__resolve-library-id first if you don't know the canonical lib ID)
-```
+**MCP path (preferred when Context7 MCP installed) — two tool calls:**
+
+1. `mcp__context7__resolve-library-id` with `libraryName` (e.g. `"React"`) + `query` (the topic) → returns Context7 IDs like `/reactjs/react.dev`. Skip this step if the user already gave you an ID in `/org/project` form.
+2. `mcp__context7__query-docs` with `libraryId` (from step 1) + `query` (be specific). Retry once with `researchMode: true` if the first answer is too shallow. Each tool ≤ 3 calls per question.
 
 **CLI fallback (no setup needed; uses npx cache):**
 ```bash
-npx -y @upstash/context7-cli query-docs "<library> <topic>"
+# Step 1 — resolve the library to a Context7 ID
+npx -y ctx7 library "<library-name>" "<topic>"   # e.g. "React" "hooks" → /reactjs/react.dev
+
+# Step 2 — query docs for that ID
+npx -y ctx7 docs "<library-id>" "<topic>"
 ```
 
 When you encounter a library API you're not 100% certain about — query Context7 first, then proceed. Cheaper than discovering the bug at test time or rewriting after.

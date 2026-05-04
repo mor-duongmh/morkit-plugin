@@ -76,8 +76,12 @@ Implement tasks from an OpenSpec change.
    - Continue to next task
 
    **Verify library APIs with Context7 before implementing:** When a task calls a specific library/framework API you're not 100% certain about (signature, options, return shape), look it up via Context7 first to avoid hallucinated APIs:
-   - **MCP (preferred):** `mcp__context7__query-docs`
-   - **CLI fallback:** `npx -y @upstash/context7-cli query-docs "<library> <topic>"`
+   - **MCP path (preferred when Context7 MCP installed):** `mcp__context7__resolve-library-id` (`libraryName` + `query`) → pick a Context7 ID like `/vercel/next.js` → `mcp__context7__query-docs` (`libraryId` + `query`). Retry once with `researchMode: true` if shallow.
+   - **CLI fallback (lazy via npx):**
+     ```bash
+     npx -y ctx7 library "<library-name>" "<topic>"   # Step 1: resolve to Context7 ID
+     npx -y ctx7 docs "<library-id>" "<topic>"         # Step 2: query docs for that ID
+     ```
 
    This is cheaper than discovering the bug at test time.
 

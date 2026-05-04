@@ -2,8 +2,9 @@
 # Mor spec plugin — first-run companion tools check.
 #
 # Behaviour:
-#   - Context7: nothing to install ahead of time. Skills invoke `npx -y @upstash/context7-cli`
-#     lazily; npm caches it on first use. We just acknowledge readiness.
+#   - Context7: nothing to install ahead of time. Skills invoke `npx -y ctx7 library`
+#     and `npx -y ctx7 docs` lazily; npm caches the package on first use.
+#     We just acknowledge readiness.
 #   - RTK: cannot be installed silently (system binary, modifies user's
 #     ~/.claude/settings.json via `rtk init -g`). We emit a one-time prompt
 #     for Claude to ask the user; we never run the installer ourselves.
@@ -50,7 +51,7 @@ cat <<EOF
 <mor-companion-tools-first-run>
 Mor plugin lần đầu chạy — kiểm tra companion tools:
 
-- **Context7** (research API/library docs): $([ "$have_ctx7_mcp" -eq 1 ] && echo '✓ MCP đã cấu hình' || echo 'sẵn sàng dùng lazy qua \`npx -y @upstash/context7-cli\` (không cần setup trước)')
+- **Context7** (research API/library docs): $([ "$have_ctx7_mcp" -eq 1 ] && echo '✓ MCP đã cấu hình' || echo 'sẵn sàng dùng lazy qua \`npx -y ctx7 library\` + \`npx -y ctx7 docs\` (không cần setup trước)')
 - **RTK** (giảm 60-90% tokens trên bash): $([ "$have_rtk" -eq 1 ] && echo '✓ đã cài' || echo '✗ chưa cài')
 
 $( [ "$have_rtk" -eq 0 ] && cat <<'INNER'
