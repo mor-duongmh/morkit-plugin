@@ -16,12 +16,61 @@ Yêu cầu: [Claude Code](https://docs.anthropic.com/claude/docs/claude-code) + 
 
 > `superpowers@mor-duongmh` là bản vendored fork của [obra/superpowers](https://github.com/obra/superpowers). Cùng plugin name → không cài đồng thời với upstream.
 
+## Verify install
+
+Sau 3 lệnh trên, kiểm tra mọi thứ đúng:
+
+```bash
+# 1. Marketplace có cả 2 plugin
+ls ~/.claude/plugins/marketplaces/mor-duongmh
+
+# 2. Skills available trong session — gõ trong Claude Code:
+#    "List skills with namespace superpowers:"
+#    Phải thấy 14 skills (brainstorming, executing-plans, ...)
+#    "List skills with namespace spec:" → 5 skills (openspec-*, spec-setup)
+
+# 3. Slash commands available
+#    /spec:setup --help     → in usage
+#    /superpowers:brainstorm → invoke brainstorming skill
+
+# 4. Companion tools state (sau session đầu tiên)
+ls ~/.claude/plugins/data/spec/.tools-setup-* 2>/dev/null
+# .tools-setup-done   = đã setup (RTK đã cài hoặc skip)
+# .tools-setup-skip   = "don't ask again"
+```
+
+## Workflow at a glance
+
+```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │  /spec:explore         (optional — think before committing)      │
+   └────────────────────────────┬────────────────────────────────────┘
+                                ▼
+   ┌─────────────────────────────────────────────────────────────────┐
+   │  /spec:propose                                                   │
+   │    → proposal.md  (what & why)                                   │
+   │    → design.md    (how + Tech Stack — verified via Context7)     │
+   │    → tasks.md     (Superpowers header + Files block + TDD steps) │
+   └────────────────────────────┬────────────────────────────────────┘
+                                ▼
+       ┌────────────────────────┼────────────────────────┐
+       ▼                        ▼                        ▼
+   /spec:apply       /superpowers:execute-plan    /superpowers:
+   (native runner)    (single agent, TDD)          subagent-driven-
+                                                    development
+                                                    (parallel agents)
+                                ▼
+   ┌─────────────────────────────────────────────────────────────────┐
+   │  /spec:archive          (after merge)                            │
+   └─────────────────────────────────────────────────────────────────┘
+```
+
 ## Plugins
 
 | Plugin | Mục đích |
 |--------|----------|
 | [`spec`](./plugins/spec) | Spec-driven workflow trên OpenSpec với schema `superpowers-driven`. Artifacts plug thẳng vào Superpowers. |
-| [`superpowers`](./plugins/superpowers) | Vendored fork của obra/superpowers, sync qua script. Mor customizations qua `overlay/`. |
+| [`superpowers`](./plugins/superpowers) | Vendored fork của obra/superpowers, sync qua script. **6 high-ROI skills (`brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `systematic-debugging`, `test-driven-development`) đã được overlay với Context7 research guidance** — agent sẽ tự verify library API thay vì hallucinate. Custom thêm qua `overlay/`. |
 
 ## Slash commands
 
@@ -61,6 +110,8 @@ Hai tool optional làm tăng chất lượng research và giảm token consumpti
 | **[Context7](https://github.com/upstash/context7)** | Trả về docs/API version-specific cho library, tránh hallucinated calls | **Lazy via npx** — không cần cài trước. Skill gọi `npx -y @upstash/context7-cli query-docs ...` khi cần. Nếu user đã setup MCP (`mcp.context7.com`), plugin tự ưu tiên dùng MCP. |
 | **[RTK](https://github.com/rtk-ai/rtk)** | Rewrite + nén output Bash → giảm 60-90% tokens | **Ask once** — session đầu tiên, plugin hỏi user qua AskUserQuestion: cài RTK ngay không? User chọn `Yes`/`Skip`/`Don't ask again`. Không tự cài silent. |
 
+> **🎯 Context7 đã active trong 6 high-ROI Superpowers skills sau khi cài** — `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `systematic-debugging`, `test-driven-development`. Khi gặp library API không chắc chắn, agent sẽ tự gọi Context7 (qua MCP nếu có, fallback `npx`) thay vì đoán. Cộng với 3 Mor skills (`/spec:explore`, `/spec:propose`, `/spec:apply`) → **9 skills tổng có Context7 guidance built-in**.
+
 State files trong `~/.claude/plugins/data/spec/`:
 - `.tools-setup-done` — đã setup hoặc skip
 - `.tools-setup-skip` — không hỏi nữa
@@ -87,6 +138,17 @@ cd plugins/superpowers
 ```
 
 Customization → đọc [plugins/superpowers/overlay/README.md](plugins/superpowers/overlay/README.md).
+
+> ⚠️ **Reconcile overlay khi sync upstream version mới.** 6 skills đang có overlay (`brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `systematic-debugging`, `test-driven-development`). Overlay dùng full-file replace mode → nếu upstream cập nhật chính SKILL.md của 6 skills này, sync sẽ ghi đè bản upstream bằng overlay (giữ Mor's customization, mất upstream changes).
+>
+> **Sau mỗi sync version mới:**
+> 1. Xem `.overlay-meta.json` mỗi overlay → ghi `based_on_upstream_version` cũ.
+> 2. Diff manually giữa upstream new vs overlay để biết upstream sửa gì cần merge vào.
+> 3. Cập nhật `overlay/skills/<name>/SKILL.md` với upstream changes + giữ Mor's appended block.
+> 4. Update `.overlay-meta.json` → `based_on_upstream_version` thành version mới.
+> 5. Run `sync-superpowers.sh` lại để apply overlay đã reconcile.
+>
+> Drift detection tự động — defer cho v2 sync script.
 
 ## Troubleshooting
 
