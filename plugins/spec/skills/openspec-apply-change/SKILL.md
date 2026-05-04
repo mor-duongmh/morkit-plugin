@@ -75,6 +75,12 @@ Implement tasks from an OpenSpec change.
    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
    - Continue to next task
 
+   **Verify library APIs with Context7 before implementing:** When a task calls a specific library/framework API you're not 100% certain about (signature, options, return shape), look it up via Context7 first to avoid hallucinated APIs:
+   - **MCP (preferred):** `mcp__context7__query-docs`
+   - **CLI fallback:** `npx -y @upstash/context7-cli query-docs "<library> <topic>"`
+
+   This is cheaper than discovering the bug at test time.
+
    **Pause if:**
    - Task is unclear → ask for clarification
    - Implementation reveals a design issue → suggest updating artifacts

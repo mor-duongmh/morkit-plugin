@@ -52,6 +52,30 @@ Project có `openspec/` nhưng chưa cài schema → plugin gợi ý `/spec:setu
 touch openspec/.spec-setup-skip
 ```
 
+## Companion tools (Context7 + RTK)
+
+Hai tool optional làm tăng chất lượng research và giảm token consumption — plugin tự dò khi mở session đầu tiên và xử lý lịch sự:
+
+| Tool | Vai trò | Cài kiểu nào |
+|------|---------|-------------|
+| **[Context7](https://github.com/upstash/context7)** | Trả về docs/API version-specific cho library, tránh hallucinated calls | **Lazy via npx** — không cần cài trước. Skill gọi `npx -y @upstash/context7-cli query-docs ...` khi cần. Nếu user đã setup MCP (`mcp.context7.com`), plugin tự ưu tiên dùng MCP. |
+| **[RTK](https://github.com/rtk-ai/rtk)** | Rewrite + nén output Bash → giảm 60-90% tokens | **Ask once** — session đầu tiên, plugin hỏi user qua AskUserQuestion: cài RTK ngay không? User chọn `Yes`/`Skip`/`Don't ask again`. Không tự cài silent. |
+
+State files trong `~/.claude/plugins/data/spec/`:
+- `.tools-setup-done` — đã setup hoặc skip
+- `.tools-setup-skip` — không hỏi nữa
+
+Cài RTK thủ công bất kỳ lúc nào:
+```bash
+curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
+rtk init -g
+```
+
+Cài Context7 dạng MCP (full features qua OAuth):
+```bash
+npx -y ctx7 setup
+```
+
 ## Sync upstream Superpowers
 
 ```bash

@@ -44,6 +44,15 @@ Depending on what the user brings, you might:
 - Identify patterns already in use
 - Surface hidden complexity
 
+**Research libraries with context7 (preferred over WebSearch for accuracy)**
+When the discussion involves a specific library, framework, or SDK and you need current API/version/docs, use Context7 — it pulls version-specific docs straight from upstream and prevents hallucinated APIs from stale training data:
+- **MCP (preferred when available):** call tool `mcp__context7__query-docs` (or `mcp__context7__resolve-library-id` to find the canonical lib ID first)
+- **CLI fallback (no setup needed, lazy via npx):**
+  ```bash
+  npx -y @upstash/context7-cli query-docs "<library-name> <topic>"
+  ```
+Use Context7 BEFORE making claims about library behaviour — it's much cheaper to verify than to be wrong.
+
 **Compare options**
 - Brainstorm multiple approaches
 - Build comparison tables

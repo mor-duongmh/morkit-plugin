@@ -107,6 +107,14 @@ After completing all artifacts, summarize:
   - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
   - These guide what you write, but should never appear in the output
 
+**Library research with Context7 (when filling Tech Stack)**
+
+The `superpowers-driven` schema requires `design.md` to declare an explicit `## Tech Stack` section. Before listing a library/framework with version, verify it via Context7 — this prevents hallucinated APIs and stale version numbers:
+- **MCP (preferred):** `mcp__context7__resolve-library-id` then `mcp__context7__query-docs`
+- **CLI fallback:** `npx -y @upstash/context7-cli query-docs "<library> <topic>"`
+
+Apply the same check inside `tasks.md`: when a TDD step calls a library API (e.g., "Implement using `@aws-sdk/client-s3` v3 PutObjectCommand"), confirm the API shape via Context7 first. Cheaper than rewriting tasks later.
+
 **Guardrails**
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
