@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mor-duongmh",
-  "description": "Mor's Claude Code plugin marketplace — spec-driven workflows + vendored Superpowers + deep code review.",
+  "description": "Mor's Claude Code plugin marketplace — spec-driven workflows + vendored Superpowers + deep code review + BrSE document generation.",
   "owner": {
     "name": "duongmh",
     "email": "duongmh@mor.com.vn"
@@ -36,6 +36,17 @@
         "email": "duongmh@mor.com.vn"
       },
       "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/deep-review"
+    },
+    {
+      "name": "docs-hero",
+      "description": "BrSE document generation suite (SRS + API + DB) for ITO Japan offshore. Init/update/sync with conflict-minimal diff engine. Synergizes with spec plugin: /spec:propose → /docs-hero:update --from-openspec.",
+      "source": "./plugins/docs-hero",
+      "category": "documentation",
+      "author": {
+        "name": "Mor (Hai Duong)",
+        "email": "duongmh@mor.com.vn"
+      },
+      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/docs-hero"
     }
   ]
 }
