@@ -83,6 +83,7 @@ ls ~/.claude/plugins/data/spec/.tools-setup-* 2>/dev/null
 | [`spec`](./plugins/spec) | Spec-driven workflow trên OpenSpec với schema `superpowers-driven`. Artifacts plug thẳng vào Superpowers. |
 | [`superpowers`](./plugins/superpowers) | Vendored fork của obra/superpowers, sync qua script. **6 high-ROI skills (`brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `systematic-debugging`, `test-driven-development`) đã được overlay với Context7 research guidance** — agent sẽ tự verify library API thay vì hallucinate. Custom thêm qua `overlay/`. |
 | [`deep-review`](./plugins/deep-review) | Multi-language deep code review agent: chạy 5 specialist subagents (risk, security, pattern, tests, convention) song song trên git diff hoặc PR. Powered by [code-review-graph](https://github.com/tirth8205/code-review-graph) MCP (bundled qua `uvx`). Ưu tiên `CLAUDE.md` của project hơn language profile mặc định. |
+| [`docs-hero`](./plugins/docs-hero) | BrSE document generation: SRS + API + DB cho ITO Japan offshore. Init/update/sync với conflict-minimal diff engine. Synergy với `spec`: `/spec:propose` → `/docs-hero:update --from-openspec`. Python venv tại `~/.claude/plugins/data/docs-hero/.venv` (one-time `/docs-hero:setup`). |
 
 ## Slash commands
 
@@ -99,6 +100,12 @@ ls ~/.claude/plugins/data/spec/.tools-setup-* 2>/dev/null
 | `/superpowers:execute-plan` | superpowers | Executing-plans skill |
 | `/deep-review [target]` | deep-review | Chạy deep code review trên PR hoặc git diff (5 subagents song song) |
 | `/deep-review-doctor` | deep-review | Kiểm tra trạng thái cài đặt deep-review (uvx, code-review-graph, gh, graph build) |
+| `/docs-hero:setup` | docs-hero | Bootstrap Python venv (~30-60s, one-time) |
+| `/docs-hero:init` | docs-hero | Generate fresh SRS + API docs + DB design from ProjectModel JSON |
+| `/docs-hero:update` | docs-hero | Apply OpenSpec change or brainstorm plan to docs (preserves manual edits) |
+| `/docs-hero:sync` | docs-hero | Scan codebase, propose changes to API + DB docs (read-only) |
+| `/docs-hero:apply-sync` | docs-hero | Apply user-approved sync proposal (ticked checkboxes) |
+| `/docs-hero:doctor` | docs-hero | Health-check installation |
 
 Workflow điển hình: `/spec:propose` → `tasks.md` ready-for-Superpowers → `/superpowers:execute-plan` (hoặc `subagent-driven-development`).
 Code review tự động: sau khi implement, chạy `/deep-review --diff` hoặc `/deep-review <PR-number>` để có bảng đánh giá đầy đủ về risk · security · pattern · tests · convention.
