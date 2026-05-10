@@ -47,6 +47,8 @@ else:
 _SRS_SCRIPTS = _SKILLS_ROOT / "generate-srs" / "scripts"
 _API_SCRIPTS = _SKILLS_ROOT / "generate-api-docs" / "scripts"
 _DB_SCRIPTS = _SKILLS_ROOT / "generate-db-design" / "scripts"
+_ARCH_SCRIPTS = _SKILLS_ROOT / "generate-system-architecture" / "scripts"
+_STD_SCRIPTS = _SKILLS_ROOT / "generate-code-standards" / "scripts"
 
 PYTHON = sys.executable
 
@@ -153,6 +155,26 @@ def run_init(
         ])
         results.append(StepResult("db", ok, str(db_out), msg))
 
+    if "arch" in outputs:
+        arch_out = docs_dir / "system-architecture.md"
+        ok, msg = _run([
+            PYTHON, str(_ARCH_SCRIPTS / "render_system_architecture.py"),
+            "--project-model", str(project_model),
+            "--language", language,
+            "--output", str(arch_out),
+        ])
+        results.append(StepResult("arch", ok, str(arch_out), msg))
+
+    if "standards" in outputs:
+        std_out = docs_dir / "code-standards.md"
+        ok, msg = _run([
+            PYTHON, str(_STD_SCRIPTS / "render_code_standards.py"),
+            "--project-model", str(project_model),
+            "--language", language,
+            "--output", str(std_out),
+        ])
+        results.append(StepResult("standards", ok, str(std_out), msg))
+
     return results
 
 
@@ -163,6 +185,10 @@ _DOC_FILES = {
     "srs": "srs.md",
     "api": "api-docs.md",
     "db": "database-design.md",
+    "arch": "system-architecture.md",
+    "standards": "code-standards.md",
+    # NOTE: "summary" + "guidelines" join in PR-C; "guidelines" intentionally
+    # has no entry here because design-guidelines.md does not support sync.
 }
 
 
