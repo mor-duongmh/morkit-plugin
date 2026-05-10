@@ -255,6 +255,159 @@ def test_delta_change_accepts_new_entity_types():
         Change(op="ADD", entity_type=et, entity_id=f"{et}-001")
 
 
+def test_arch_entities_instantiate():
+    """System Architecture entities (CMP/LAY/INX/QG)."""
+    from lib.normalized_schema import Component, Interaction, Layer, QualityGoal
+
+    cmp = Component(
+        id="CMP-001",
+        name="auth-svc",
+        kind="service",
+        responsibility="JWT issuance",
+        tech=["NestJS", "Postgres"],
+        depends_on=["CMP-002"],
+    )
+    assert cmp.kind == "service"
+    assert "CMP-002" in cmp.depends_on
+
+    lay = Layer(id="LAY-001", name="Domain", component_ids=["CMP-001"])
+    assert lay.component_ids == ["CMP-001"]
+
+    inx = Interaction(id="INX-001", from_id="CMP-001", to_id="CMP-002", protocol="http")
+    assert inx.protocol == "http"
+
+    qg = QualityGoal(id="QG-001", name="Low latency", priority=Priority.HIGH)
+    assert qg.priority == Priority.HIGH
+
+
+def test_standards_entities_instantiate():
+    """Code Standards entities (LNT/NAM/CMT/FMT)."""
+    from lib.normalized_schema import (
+        CommitPolicy,
+        FormattingRule,
+        LintConfig,
+        NamingConvention,
+    )
+
+    lc = LintConfig(
+        id="LNT-001",
+        tool="eslint",
+        config_path=".eslintrc.json",
+        extends=["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+        rules_summary={"no-unused-vars": "error"},
+    )
+    assert lc.tool == "eslint"
+    assert len(lc.extends) == 2
+
+    nc = NamingConvention(id="NAM-001", scope="function", pattern="camelCase", example="getUser")
+    assert nc.scope == "function"
+
+    cp = CommitPolicy(
+        id="CMT-001",
+        style="conventional",
+        allowed_types=["feat", "fix", "docs"],
+        scope_required=False,
+    )
+    assert cp.style == "conventional"
+
+    fr_ = FormattingRule(id="FMT-001", tool="ruff", option="line-length", value="100")
+    assert fr_.value == "100"
+
+
+def test_summary_entities_instantiate():
+    """Codebase Summary entities (RPO/TCH/PKG/MOD). RPO is a singleton."""
+    from lib.normalized_schema import ModuleEntry, PackageInfo, RepoOverview, TechStackItem
+
+    ro = RepoOverview(name="morkit", primary_language="Python", loc_total=12345)
+    assert ro.id == "RPO-001"  # default singleton ID
+
+    # Reject any non-RPO-001 ID
+    with pytest.raises(Exception):
+        RepoOverview(id="RPO-002", name="x")
+
+    ts = TechStackItem(id="TCH-001", category="framework", name="NestJS", confidence="declared")
+    assert ts.confidence == "declared"
+
+    pkg = PackageInfo(id="PKG-001", name="@morkit/api", path="apps/api", manager="npm", dep_count=42)
+    assert pkg.dep_count == 42
+
+    me = ModuleEntry(id="MOD-001", path="src/main.ts", loc=120, language="TypeScript", is_entry_point=True)
+    assert me.is_entry_point is True
+
+
+def test_guidelines_entities_instantiate():
+    """Design Guidelines entities (DPR/PTN/ADR)."""
+    from lib.normalized_schema import ADR, DesignPrinciple, PatternGuideline
+
+    dp = DesignPrinciple(
+        id="DPR-001",
+        name="Fail fast",
+        statement="Surface invalid state at the boundary.",
+        rationale="Avoids silent corruption downstream.",
+        examples=["validate inputs at API edge"],
+    )
+    assert dp.name == "Fail fast"
+
+    pg = PatternGuideline(
+        id="PTN-001",
+        name="Repository",
+        category="domain",
+        when_to_use="Persistence aggregate root",
+        when_to_avoid="Trivial CRUD without invariants",
+    )
+    assert pg.category == "domain"
+
+    adr = ADR(
+        id="ADR-001",
+        title="Use Postgres for OLTP",
+        status="accepted",
+        context="…",
+        decision="Postgres 15",
+        consequences="Adds ops burden",
+    )
+    assert adr.status == "accepted"
+
+
+def test_project_model_holds_new_entities():
+    """ProjectModel exposes list fields for all new entity groups."""
+    from lib.normalized_schema import (
+        ADR,
+        Component,
+        DesignPrinciple,
+        LintConfig,
+        NamingConvention,
+        RepoOverview,
+        TechStackItem,
+    )
+
+    pm = ProjectModel(
+        meta=ProjectMeta(project_name="T"),
+        components=[Component(id="CMP-001", name="api", kind="service")],
+        lint_configs=[LintConfig(id="LNT-001", tool="ruff", config_path="pyproject.toml")],
+        naming_conventions=[NamingConvention(id="NAM-001", scope="class", pattern="PascalCase")],
+        repo_overview=RepoOverview(name="t", loc_total=1),
+        tech_stack=[TechStackItem(id="TCH-001", category="language", name="Python")],
+        design_principles=[DesignPrinciple(id="DPR-001", name="KISS")],
+        adrs=[ADR(id="ADR-001", title="x", decision="y")],
+    )
+    assert pm.components[0].id == "CMP-001"
+    assert pm.lint_configs[0].tool == "ruff"
+    assert pm.repo_overview.id == "RPO-001"
+    assert pm.adrs[0].title == "x"
+
+
+def test_delta_change_accepts_arch_standards_summary_guidelines_types():
+    """Delta supports CMP/LAY/INX/QG/LNT/NAM/CMT/FMT/RPO/TCH/PKG/MOD/DPR/PTN/ADR."""
+    new_types = (
+        "CMP", "LAY", "INX", "QG",
+        "LNT", "NAM", "CMT", "FMT",
+        "RPO", "TCH", "PKG", "MOD",
+        "DPR", "PTN", "ADR",
+    )
+    for et in new_types:
+        Change(op="ADD", entity_type=et, entity_id=f"{et}-001")
+
+
 def test_load_missing_required_field_raises():
     with tempfile.TemporaryDirectory() as td:
         path = Path(td) / "m.json"

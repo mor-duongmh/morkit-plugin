@@ -50,11 +50,19 @@ _DB_SCRIPTS = _SKILLS_ROOT / "generate-db-design" / "scripts"
 
 PYTHON = sys.executable
 
-# Filter rules — entity_types each sub-skill cares about
+# Filter rules — entity_types each sub-skill cares about.
+# Adding a key here lets `update` mode route changes to the right doc, but
+# does NOT wire up `init` rendering — each sub-skill needs its own block in
+# run_init() and an entry in _DOC_FILES (init is added in PR-B/PR-C; SCOPES
+# is reserved here so the schema/Change.entity_type stay consistent).
 SCOPES: dict[str, set[str]] = {
     "srs": {"FR", "NFR", "SCREEN", "DATA", "INT"},
     "api": {"ENDPOINT", "ERROR_CODE", "WEBHOOK", "AUTH_CONFIG", "RATE_LIMIT"},
     "db": {"TABLE", "INDEX", "REL", "ENUM"},
+    "arch": {"CMP", "LAY", "INX", "QG"},
+    "standards": {"LNT", "NAM", "CMT", "FMT"},
+    "summary": {"RPO", "TCH", "PKG", "MOD"},
+    "guidelines": {"DPR", "PTN", "ADR"},
 }
 
 

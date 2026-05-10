@@ -748,6 +748,184 @@ class ConstraintsRisks(_Base):
     risks: list[Risk] = Field(default_factory=list)
 
 
+# --- System Architecture (arc42-lite) ---
+
+
+class Component(_Entity):
+    """Building block in the system — service / library / app / etc.
+
+    Used by `generate-system-architecture` (arc42 §5 Building Block View).
+    `depends_on` references other Component IDs to drive the Mermaid graph.
+    """
+
+    id: str = Field(pattern=r"^CMP-[A-Z0-9_-]+$")
+    name: str
+    kind: Literal[
+        "service", "library", "app", "frontend", "worker", "datastore", "external"
+    ] = "service"
+    path: Optional[str] = None
+    responsibility: str = ""
+    tech: list[str] = Field(default_factory=list)
+    depends_on: list[str] = Field(default_factory=list)  # CMP-NNN refs
+
+
+class Layer(_Entity):
+    """Logical grouping of Components (e.g. presentation / domain / data)."""
+
+    id: str = Field(pattern=r"^LAY-[A-Z0-9_-]+$")
+    name: str
+    description: str = ""
+    component_ids: list[str] = Field(default_factory=list)  # CMP-NNN refs
+
+
+class Interaction(_Entity):
+    """Edge in the runtime view (arc42 §6) — protocol-tagged Component → Component."""
+
+    id: str = Field(pattern=r"^INX-[A-Z0-9_-]+$")
+    from_id: str  # CMP-NNN
+    to_id: str  # CMP-NNN
+    protocol: Literal["http", "grpc", "queue", "db", "fs", "internal"] = "http"
+    description: str = ""
+
+
+class QualityGoal(_Entity):
+    """arc42 §1.2 quality goal (e.g. "high availability", "low latency")."""
+
+    id: str = Field(pattern=r"^QG-[A-Z0-9_-]+$")
+    name: str
+    priority: Priority = Priority.MID
+    description: str = ""
+
+
+# --- Code Standards ---
+
+
+class LintConfig(_Entity):
+    """Detected lint/format tool config (eslint, ruff, prettier, ...)."""
+
+    id: str = Field(pattern=r"^LNT-[A-Z0-9_-]+$")
+    tool: str
+    config_path: str
+    rules_summary: dict[str, str] = Field(default_factory=dict)
+    extends: list[str] = Field(default_factory=list)
+
+
+class NamingConvention(_Entity):
+    """Single naming rule for a code-element scope."""
+
+    id: str = Field(pattern=r"^NAM-[A-Z0-9_-]+$")
+    scope: Literal["file", "class", "function", "var", "const", "branch"] = "var"
+    pattern: str = ""
+    example: str = ""
+
+
+class CommitPolicy(_Entity):
+    """Conventional Commits / gitmoji / custom commit-message policy."""
+
+    id: str = Field(pattern=r"^CMT-[A-Z0-9_-]+$")
+    style: Literal["conventional", "gitmoji", "custom"] = "conventional"
+    allowed_types: list[str] = Field(default_factory=list)
+    scope_required: bool = False
+    example: str = ""
+
+
+class FormattingRule(_Entity):
+    """One key-value formatting setting (e.g. ruff line-length=100)."""
+
+    id: str = Field(pattern=r"^FMT-[A-Z0-9_-]+$")
+    tool: str
+    option: str
+    value: str
+    source_path: Optional[str] = None
+
+
+# --- Codebase Summary ---
+
+
+class RepoOverview(_Entity):
+    """Singleton — top-level repo facts. Always uses ID `RPO-001`."""
+
+    id: str = Field(default="RPO-001", pattern=r"^RPO-001$")
+    name: str = ""
+    description: str = ""
+    primary_language: Optional[str] = None
+    loc_total: int = 0
+    vcs: str = "git"
+    license: Optional[str] = None
+
+
+class TechStackItem(_Entity):
+    """One detected/declared tech-stack entry."""
+
+    id: str = Field(pattern=r"^TCH-[A-Z0-9_-]+$")
+    category: Literal[
+        "language", "framework", "db", "infra", "ci", "test", "build"
+    ] = "framework"
+    name: str = ""
+    version: Optional[str] = None
+    confidence: Literal["detected", "declared"] = "detected"
+
+
+class PackageInfo(_Entity):
+    """One package/workspace (npm/pip/cargo/go/maven/gem)."""
+
+    id: str = Field(pattern=r"^PKG-[A-Z0-9_-]+$")
+    name: str = ""
+    path: str = ""
+    manager: str = ""
+    version: Optional[str] = None
+    dep_count: int = 0
+
+
+class ModuleEntry(_Entity):
+    """One module/file in the codebase summary."""
+
+    id: str = Field(pattern=r"^MOD-[A-Z0-9_-]+$")
+    path: str = ""
+    loc: int = 0
+    language: Optional[str] = None
+    is_entry_point: bool = False
+    purpose: Optional[str] = None
+
+
+# --- Design Guidelines ---
+
+
+class DesignPrinciple(_Entity):
+    """High-level design principle (e.g. "fail fast", "single source of truth")."""
+
+    id: str = Field(pattern=r"^DPR-[A-Z0-9_-]+$")
+    name: str
+    statement: str = ""
+    rationale: str = ""
+    examples: list[str] = Field(default_factory=list)
+
+
+class PatternGuideline(_Entity):
+    """A pattern (creational/structural/behavioral/arch/domain) with usage guidance."""
+
+    id: str = Field(pattern=r"^PTN-[A-Z0-9_-]+$")
+    name: str
+    category: Literal[
+        "creational", "structural", "behavioral", "arch", "domain"
+    ] = "arch"
+    when_to_use: str = ""
+    when_to_avoid: str = ""
+
+
+class ADR(_Entity):
+    """Architecture Decision Record (MADR-style)."""
+
+    id: str = Field(pattern=r"^ADR-[A-Z0-9_-]+$")
+    title: str
+    status: Literal["proposed", "accepted", "deprecated", "superseded"] = "accepted"
+    date: Optional[str] = None
+    context: str = ""
+    decision: str = ""
+    consequences: str = ""
+    superseded_by: Optional[str] = None  # ADR-NNN ref
+
+
 # --- Top-level ---
 
 
@@ -775,6 +953,25 @@ class ProjectModel(_Base):
     api: ApiSpec = Field(default_factory=ApiSpec)
     constraints_risks: ConstraintsRisks = Field(default_factory=ConstraintsRisks)
     glossary: list[GlossaryEntry] = Field(default_factory=list)
+    # System Architecture (arc42-lite)
+    components: list[Component] = Field(default_factory=list)
+    layers: list[Layer] = Field(default_factory=list)
+    interactions: list[Interaction] = Field(default_factory=list)
+    quality_goals: list[QualityGoal] = Field(default_factory=list)
+    # Code Standards
+    lint_configs: list[LintConfig] = Field(default_factory=list)
+    naming_conventions: list[NamingConvention] = Field(default_factory=list)
+    commit_policies: list[CommitPolicy] = Field(default_factory=list)
+    formatting_rules: list[FormattingRule] = Field(default_factory=list)
+    # Codebase Summary
+    repo_overview: Optional[RepoOverview] = None  # singleton RPO-001
+    tech_stack: list[TechStackItem] = Field(default_factory=list)
+    packages: list[PackageInfo] = Field(default_factory=list)
+    modules: list[ModuleEntry] = Field(default_factory=list)
+    # Design Guidelines
+    design_principles: list[DesignPrinciple] = Field(default_factory=list)
+    pattern_guidelines: list[PatternGuideline] = Field(default_factory=list)
+    adrs: list[ADR] = Field(default_factory=list)
 
 
 # --- Delta ---
@@ -791,6 +988,14 @@ class Change(_Base):
         "TABLE", "INDEX", "REL", "ENUM",
         # API
         "ENDPOINT", "ERROR_CODE", "WEBHOOK", "AUTH_CONFIG", "RATE_LIMIT",
+        # System Architecture
+        "CMP", "LAY", "INX", "QG",
+        # Code Standards
+        "LNT", "NAM", "CMT", "FMT",
+        # Codebase Summary
+        "RPO", "TCH", "PKG", "MOD",
+        # Design Guidelines
+        "DPR", "PTN", "ADR",
     ]
     entity_id: str
     payload: Optional[dict[str, Any]] = None
