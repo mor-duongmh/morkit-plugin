@@ -1,60 +1,19 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mor-duongmh",
-  "description": "Mor's Claude Code plugin marketplace — spec-driven workflows + vendored Superpowers + deep code review + BrSE document generation.",
+  "description": "Mor's Claude Code plugin marketplace — single all-in-one toolkit (morkit) consolidating spec workflow, vendored Superpowers, deep code review, and BrSE document generation under a unified /morkit:* namespace.",
   "owner": {
     "name": "duongmh",
     "email": "duongmh@mor.com.vn"
   },
   "plugins": [
     {
-      "name": "mor-stack",
-      "description": "Meta-plugin — install Mor's full stack (mor-kit + superpowers + deep-review + docs-hero) in one command. Use this when you want everything; otherwise install individual plugins as needed.",
-      "source": "./plugins/mor-stack",
-      "category": "meta",
-      "author": { "name": "Mor" },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/mor-stack"
-    },
-    {
-      "name": "mor-kit",
-      "description": "Mor's spec-driven workflow toolkit. Self-contained scaffold of proposal/design/tasks under mor-kit/changes/<name>/, with Google-Doc-driven review-checklist gate. Pairs with superpowers (brainstorming, executing-plans, subagent-driven-development) without duplication.",
-      "source": "./plugins/mor-kit",
+      "name": "morkit",
+      "description": "Mor's all-in-one Claude Code toolkit. Consolidates spec workflow (propose/review/archive) + brainstorming/execute/TDD skills (vendored from obra/superpowers) + 5-specialist code review (deep-review) + BrSE doc generation (docs-hero) under a single /morkit:* namespace. One command installs everything.",
+      "source": "./plugins/morkit",
       "category": "development",
       "author": { "name": "Mor" },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/mor-kit"
-    },
-    {
-      "name": "superpowers",
-      "description": "Mor's vendored fork of obra/superpowers — same skills as upstream, pinned and synced via script. Replaces upstream superpowers@obra in this marketplace.",
-      "source": "./plugins/superpowers",
-      "category": "development",
-      "author": {
-        "name": "Jesse Vincent (upstream) / Mor (vendoring)",
-        "email": "duongmh@mor.com.vn"
-      },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/superpowers"
-    },
-    {
-      "name": "deep-review",
-      "description": "Multi-language deep code review agent: risk · security · design pattern · test coverage · convention. Powered by code-review-graph MCP. Honors project CLAUDE.md as the highest source of truth.",
-      "source": "./plugins/deep-review",
-      "category": "code-review",
-      "author": {
-        "name": "Mor (Hai Duong)",
-        "email": "duongmh@mor.com.vn"
-      },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/deep-review"
-    },
-    {
-      "name": "docs-hero",
-      "description": "BrSE document generation suite (SRS + API + DB) for ITO Japan offshore. Init/update/sync with conflict-minimal diff engine. Synergizes with spec plugin: /spec:propose → /docs-hero:update --from-openspec.",
-      "source": "./plugins/docs-hero",
-      "category": "documentation",
-      "author": {
-        "name": "Mor (Hai Duong)",
-        "email": "duongmh@mor.com.vn"
-      },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/docs-hero"
+      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/morkit"
     }
   ]
 }

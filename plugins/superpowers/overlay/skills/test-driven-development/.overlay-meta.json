@@ -1,6 +1,0 @@
-{
-  "overlay_path": "skills/test-driven-development",
-  "based_on_upstream_version": "5.0.7",
-  "created_at": "2026-05-04T04:27:49Z",
-  "note": "Append Context7 library research section. Compatible with sync apply_overlay (full SKILL.md replace mode)."
-}
