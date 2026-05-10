@@ -84,6 +84,16 @@ digraph process {
 }
 ```
 
+## Pre-Implementation Validation (run once per session, before any subagent dispatch)
+
+**Before extracting tasks and dispatching the first implementer**, read the project's reference docs (when present in `./docs/`) so every implementer subagent inherits the same conventions, structure, and architecture context:
+
+- `docs/codebase-summary.md` — repo layout, tech stack, entry points (where things live)
+- `docs/code-standards.md` — naming, formatting, lint, commit conventions (how to write things)
+- `docs/system-architecture.md` — components, layers, interactions (how things fit together)
+
+If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect (use `/morkit:init` for that). When dispatching an implementer subagent, **paste the relevant excerpts** (not the whole file) into the prompt's context block — the subagent has no inherited context. If a doc conflicts with the plan, surface the conflict to your human partner before dispatching.
+
 ## Model Selection
 
 Use the least powerful model that can handle each role to conserve cost and increase speed.

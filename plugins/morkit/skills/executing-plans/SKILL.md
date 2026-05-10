@@ -21,6 +21,16 @@ Load plan, review critically, execute all tasks, report when complete.
 3. If concerns: Raise them with your human partner before starting
 4. If no concerns: Create TodoWrite and proceed
 
+### Step 1.5: Pre-Implementation Validation
+
+**Before writing any code, read the project's reference docs (when present in `./docs/`)** so your implementation matches the codebase's stated conventions, structure, and architecture:
+
+- `docs/codebase-summary.md` — repo layout, tech stack, entry points (where things live)
+- `docs/code-standards.md` — naming, formatting, lint, commit conventions (how to write things)
+- `docs/system-architecture.md` — components, layers, interactions (how things fit together)
+
+If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect (use `/morkit:init` for that). If a doc exists but conflicts with the plan, surface the conflict to your human partner before proceeding.
+
 ### Step 2: Execute Tasks
 
 For each task:
