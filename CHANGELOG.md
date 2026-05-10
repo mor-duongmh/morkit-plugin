@@ -2,7 +2,73 @@
 
 All notable changes to the Mor claude-plugins marketplace are tracked here.
 
-## [mor-kit@1.0.0] — 2026-05-10
+## [morkit@1.0.0] — 2026-05-10
+
+**Major consolidation:** All 4 separate plugins merged into ONE plugin called `morkit`. Every skill, agent, and slash command now lives under the unified `/morkit:*` namespace.
+
+```
+/plugin add marketplace github:mor-duongmh/claude-plugins
+/plugin install morkit@mor-duongmh
+```
+
+### Breaking changes
+
+- **One plugin instead of 4.** Previous separate plugins (`mor-kit`, `superpowers`, `deep-review`, `docs-hero`, `mor-stack`) are gone. All functionality merged into `plugins/morkit/`.
+- **Unified namespace:** all slash commands renamed:
+  - `/mor-kit:propose|review|archive` → `/morkit:propose|review|archive`
+  - `/superpowers:brainstorm|write-plan|execute-plan` → `/morkit:brainstorming|writing-plans|executing-plans`
+  - `/deep-review[-doctor|-post]` → `/morkit:deep-review[-doctor|-post]`
+  - `/docs-hero:setup|init|update|sync|apply-sync|doctor` → `/morkit:setup|init|update|sync|apply-sync|doctor`
+- **Folder convention:** `mor-kit/changes/` → `morkit/output/spec/`. Marker `.mor-kit` → `.morkit`. Env override `MOR_KIT_ROOT` → `MORKIT_ROOT`. Bash function `mor_kit_root` → `morkit_root`.
+- **Marketplace.json:** single entry `morkit` (was 5 entries: mor-stack, mor-kit, superpowers, deep-review, docs-hero).
+- **Hook matchers:** updated to gate `morkit:executing-plans` and `morkit:subagent-driven-development` (legacy `superpowers:executing-plans` still recognized for transition grace).
+- **Vendored superpowers sync workflow REMOVED.** `sync-superpowers.sh` and the overlay system no longer applicable in single-plugin mode. Future upstream changes must be merged manually into `plugins/morkit/skills/`.
+
+### What was kept
+
+- All 22 skills (3 from mor-kit + 14 from superpowers + 1 from deep-review + 4 from docs-hero) — all under `/morkit:*`
+- All 9 agents (1 from superpowers + 7 from deep-review + 1 from docs-hero)
+- All 15 slash commands
+- Schema validation (R1–R6) via `validate-tasks.sh`
+- Plan review gate with PreToolUse hook + skill-level pre-flight (defense-in-depth)
+- Context7 + RTK companion tools wiring
+- Migration helper for OpenSpec users (`migrate-from-openspec.sh`)
+- 137 test assertions across 10 test files (cross-platform CI matrix)
+
+### Migration from previous separate plugins
+
+```
+# Uninstall old plugins (if installed)
+/plugin uninstall mor-kit@mor-duongmh
+/plugin uninstall superpowers@mor-duongmh
+/plugin uninstall deep-review@mor-duongmh
+/plugin uninstall docs-hero@mor-duongmh
+/plugin uninstall mor-stack@mor-duongmh
+
+# Install consolidated morkit
+/plugin install morkit@mor-duongmh
+```
+
+For projects with `mor-kit/changes/` data: rename folder manually `mv mor-kit/changes morkit/output/spec && mv morkit/output/spec/.mor-kit morkit/output/spec/.morkit`.
+
+For projects with `openspec/changes/` data: run `migrate-from-openspec.sh`.
+
+### Why consolidate?
+
+- **Unified namespace** — `/morkit:*` for everything; users don't need to remember which plugin owns what
+- **Single install** — one `/plugin install` command vs four
+- **Single version line** — bug fixes ship together; no version compatibility matrix between plugins
+- **Simpler marketplace** — one entry instead of five
+
+### Trade-offs accepted
+
+- Loss of upstream `obra/superpowers` sync — overlay/sync system was tied to plugin name `superpowers`. Future upstream changes are now manual merge work.
+- Larger single plugin — users who only want spec workflow still install code-review + doc-generation skills. Disk footprint increases marginally.
+- All 4 sub-tools tied together — bug in any sub-tool may delay release of others.
+
+---
+
+## [mor-kit@1.0.0] — 2026-05-10 — UNRELEASED, superseded by morkit@1.0.0
 
 **Plugin rename:** `spec@mor-duongmh` → `mor-kit@mor-duongmh`. Marketplace install:
 
@@ -137,5 +203,5 @@ The hook has a 1-version dual-read fallback. Even without migrating, `/spec:appl
 
 ### Files
 
-- Plan: [`docs/superpowers/plans/2026-05-10-spec-self-contained.md`](docs/superpowers/plans/2026-05-10-spec-self-contained.md)
+- Plan: [`morkit/output/plans/2026-05-10-spec-self-contained.md`](morkit/output/plans/2026-05-10-spec-self-contained.md)
 - Design: [`docs/superpowers/specs/2026-05-10-spec-self-contained-design.md`](docs/superpowers/specs/2026-05-10-spec-self-contained-design.md)
