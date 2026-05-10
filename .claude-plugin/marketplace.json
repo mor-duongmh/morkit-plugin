@@ -8,12 +8,12 @@
   },
   "plugins": [
     {
-      "name": "spec",
-      "description": "Mor's spec-driven workflow with superpowers-driven schema. Artifacts are TDD-ready and consumable by Superpowers executing-plans and subagent-driven-development.",
-      "source": "./plugins/spec",
+      "name": "mor-kit",
+      "description": "Mor's spec-driven workflow toolkit. Self-contained scaffold of proposal/design/tasks under mor-kit/changes/<name>/, with Google-Doc-driven review-checklist gate. Pairs with superpowers (brainstorming, executing-plans, subagent-driven-development) without duplication.",
+      "source": "./plugins/mor-kit",
       "category": "development",
       "author": { "name": "Mor" },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/spec"
+      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/mor-kit"
     },
     {
       "name": "superpowers",

@@ -304,26 +304,42 @@ When you encounter a library API you're not 100% certain about — query Context
 ---
 ## Pre-flight: developer review checklist must be approved (Mor overlay)
 
-**BEFORE starting any work in this skill** — especially before reading the plan, dispatching subagents, or making any code change — verify the OpenSpec change has an approved review checklist.
+**BEFORE starting any work in this skill** — especially before reading the plan, dispatching subagents, or making any code change — verify the active spec change has an approved review checklist.
+
+This skill mirrors the dual-read logic of the plugin's `pre-tool-checklist-gate.sh` hook: it looks for `${MOR_KIT_ROOT:-mor-kit/changes}/` first, then falls back to legacy `openspec/changes/` (with deprecation warning).
 
 ```bash
-# Detect most recent non-archive change
-CHANGE_DIR="$(find openspec/changes -mindepth 1 -maxdepth 1 -type d ! -name 'archive' \
-                -exec stat -f "%m %N" {} \; 2>/dev/null \
-              | sort -rn | head -1 | awk '{print $2}')"
-CHECKLIST="$CHANGE_DIR/review-checklist.md"
+# Resolve folder convention (v2 primary, v1 legacy fallback)
+PRIMARY="${MOR_KIT_ROOT:-mor-kit/changes}"
+LEGACY="openspec/changes"
 
-if [ ! -f "$CHECKLIST" ]; then
-    echo "✗ STOP: $CHECKLIST does not exist. Run /spec:review."
-    exit 1
+CHANGES_DIR=""
+if [ -d "$PRIMARY" ]; then
+    CHANGES_DIR="$PRIMARY"
+elif [ -d "$LEGACY" ]; then
+    CHANGES_DIR="$LEGACY"
+    echo "⚠ Using legacy $LEGACY/. Run \${CLAUDE_PLUGIN_ROOT}/scripts/migrate-from-openspec.sh." >&2
 fi
-if ! grep -qE '^[[:space:]]*Overall Decision:[[:space:]]*OK[[:space:]]*$' "$CHECKLIST"; then
-    echo "✗ STOP: $CHECKLIST not approved. Set 'Overall Decision: OK' first."
-    exit 1
+
+if [ -n "$CHANGES_DIR" ]; then
+    CHANGE_DIR="$(find "$CHANGES_DIR" -mindepth 1 -maxdepth 1 -type d \
+                    ! -name 'archive' ! -name '.mor-kit' -print0 2>/dev/null \
+                  | xargs -0 -I{} sh -c 'stat -f "%m %N" "$1" 2>/dev/null || stat -c "%Y %n" "$1"' _ {} \
+                  | sort -rn | head -1 | awk '{print $2}')"
+    CHECKLIST="$CHANGE_DIR/review-checklist.md"
+
+    if [ -n "$CHANGE_DIR" ] && [ ! -f "$CHECKLIST" ]; then
+        echo "✗ STOP: $CHECKLIST does not exist. Run /mor-kit:review."
+        exit 1
+    fi
+    if [ -n "$CHANGE_DIR" ] && ! grep -qE '^[[:space:]]*Overall Decision:[[:space:]]+OK[[:space:]]*$' "$CHECKLIST"; then
+        echo "✗ STOP: $CHECKLIST not approved. Set 'Overall Decision: OK' first."
+        exit 1
+    fi
 fi
 ```
 
-Skip this gate ONLY when there is no `openspec/changes/` folder in the project (this skill is being used outside the spec-driven workflow).
+Skip this gate ONLY when there is **neither** `${MOR_KIT_ROOT:-mor-kit/changes}/` **nor** `openspec/changes/` folder in the project (this skill is being used outside the spec-driven workflow).
 
 The plugin's PreToolUse hook also enforces this at the harness level. This skill-level check is defense-in-depth: if the hook is bypassed (e.g., disabled in user settings), this check still refuses to proceed.
 

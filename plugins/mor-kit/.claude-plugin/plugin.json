@@ -1,0 +1,21 @@
+{
+  "name": "mor-kit",
+  "version": "1.0.0",
+  "description": "Mor's spec-driven workflow toolkit. Self-contained scaffolding of proposal/design/tasks under mor-kit/changes/<name>/, plus Google-Doc-driven review-checklist gate. Pairs with superpowers (brainstorming, executing-plans, subagent-driven-development) without duplication.",
+  "author": {
+    "name": "Mor",
+    "email": "duong@mor.company"
+  },
+  "homepage": "https://github.com/mor-duongmh/claude-plugins",
+  "repository": "https://github.com/mor-duongmh/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "mor",
+    "kit",
+    "spec",
+    "superpowers",
+    "tdd",
+    "planning",
+    "self-contained"
+  ]
+}
