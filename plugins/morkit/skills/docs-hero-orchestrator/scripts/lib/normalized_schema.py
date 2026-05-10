@@ -758,7 +758,7 @@ class Component(_Entity):
     `depends_on` references other Component IDs to drive the Mermaid graph.
     """
 
-    id: str = Field(pattern=r"^CMP-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^CMP-[A-Za-z0-9_-]+$")
     name: str
     kind: Literal[
         "service", "library", "app", "frontend", "worker", "datastore", "external"
@@ -772,7 +772,7 @@ class Component(_Entity):
 class Layer(_Entity):
     """Logical grouping of Components (e.g. presentation / domain / data)."""
 
-    id: str = Field(pattern=r"^LAY-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^LAY-[A-Za-z0-9_-]+$")
     name: str
     description: str = ""
     component_ids: list[str] = Field(default_factory=list)  # CMP-NNN refs
@@ -781,7 +781,7 @@ class Layer(_Entity):
 class Interaction(_Entity):
     """Edge in the runtime view (arc42 §6) — protocol-tagged Component → Component."""
 
-    id: str = Field(pattern=r"^INX-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^INX-[A-Za-z0-9_-]+$")
     from_id: str  # CMP-NNN
     to_id: str  # CMP-NNN
     protocol: Literal["http", "grpc", "queue", "db", "fs", "internal"] = "http"
@@ -791,7 +791,7 @@ class Interaction(_Entity):
 class QualityGoal(_Entity):
     """arc42 §1.2 quality goal (e.g. "high availability", "low latency")."""
 
-    id: str = Field(pattern=r"^QG-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^QG-[A-Za-z0-9_-]+$")
     name: str
     priority: Priority = Priority.MID
     description: str = ""
@@ -803,7 +803,7 @@ class QualityGoal(_Entity):
 class LintConfig(_Entity):
     """Detected lint/format tool config (eslint, ruff, prettier, ...)."""
 
-    id: str = Field(pattern=r"^LNT-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^LNT-[A-Za-z0-9_-]+$")
     tool: str
     config_path: str
     rules_summary: dict[str, str] = Field(default_factory=dict)
@@ -813,7 +813,7 @@ class LintConfig(_Entity):
 class NamingConvention(_Entity):
     """Single naming rule for a code-element scope."""
 
-    id: str = Field(pattern=r"^NAM-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^NAM-[A-Za-z0-9_-]+$")
     scope: Literal["file", "class", "function", "var", "const", "branch"] = "var"
     pattern: str = ""
     example: str = ""
@@ -822,7 +822,7 @@ class NamingConvention(_Entity):
 class CommitPolicy(_Entity):
     """Conventional Commits / gitmoji / custom commit-message policy."""
 
-    id: str = Field(pattern=r"^CMT-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^CMT-[A-Za-z0-9_-]+$")
     style: Literal["conventional", "gitmoji", "custom"] = "conventional"
     allowed_types: list[str] = Field(default_factory=list)
     scope_required: bool = False
@@ -832,7 +832,7 @@ class CommitPolicy(_Entity):
 class FormattingRule(_Entity):
     """One key-value formatting setting (e.g. ruff line-length=100)."""
 
-    id: str = Field(pattern=r"^FMT-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^FMT-[A-Za-z0-9_-]+$")
     tool: str
     option: str
     value: str
@@ -857,7 +857,7 @@ class RepoOverview(_Entity):
 class TechStackItem(_Entity):
     """One detected/declared tech-stack entry."""
 
-    id: str = Field(pattern=r"^TCH-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^TCH-[A-Za-z0-9_-]+$")
     category: Literal[
         "language", "framework", "db", "infra", "ci", "test", "build"
     ] = "framework"
@@ -869,7 +869,7 @@ class TechStackItem(_Entity):
 class PackageInfo(_Entity):
     """One package/workspace (npm/pip/cargo/go/maven/gem)."""
 
-    id: str = Field(pattern=r"^PKG-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^PKG-[A-Za-z0-9_-]+$")
     name: str = ""
     path: str = ""
     manager: str = ""
@@ -880,7 +880,7 @@ class PackageInfo(_Entity):
 class ModuleEntry(_Entity):
     """One module/file in the codebase summary."""
 
-    id: str = Field(pattern=r"^MOD-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^MOD-[A-Za-z0-9_-]+$")
     path: str = ""
     loc: int = 0
     language: Optional[str] = None
@@ -894,7 +894,7 @@ class ModuleEntry(_Entity):
 class DesignPrinciple(_Entity):
     """High-level design principle (e.g. "fail fast", "single source of truth")."""
 
-    id: str = Field(pattern=r"^DPR-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^DPR-[A-Za-z0-9_-]+$")
     name: str
     statement: str = ""
     rationale: str = ""
@@ -904,7 +904,7 @@ class DesignPrinciple(_Entity):
 class PatternGuideline(_Entity):
     """A pattern (creational/structural/behavioral/arch/domain) with usage guidance."""
 
-    id: str = Field(pattern=r"^PTN-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^PTN-[A-Za-z0-9_-]+$")
     name: str
     category: Literal[
         "creational", "structural", "behavioral", "arch", "domain"
@@ -916,7 +916,7 @@ class PatternGuideline(_Entity):
 class ADR(_Entity):
     """Architecture Decision Record (MADR-style)."""
 
-    id: str = Field(pattern=r"^ADR-[A-Z0-9_-]+$")
+    id: str = Field(pattern=r"^ADR-[A-Za-z0-9_-]+$")
     title: str
     status: Literal["proposed", "accepted", "deprecated", "superseded"] = "accepted"
     date: Optional[str] = None
