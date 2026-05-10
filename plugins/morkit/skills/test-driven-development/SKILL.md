@@ -13,6 +13,16 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Violating the letter of the rules is violating the spirit of the rules.**
 
+## Pre-Implementation Validation (once per session, before the first RED)
+
+**Before writing the first test**, read the project's reference docs (when present in `./docs/`) so test names, file locations, and assertion style match the codebase's conventions:
+
+- `docs/codebase-summary.md` — where tests live, test framework in use, entry points
+- `docs/code-standards.md` — naming conventions for test files / functions, lint rules tests must pass
+- `docs/system-architecture.md` — component boundaries (helps decide unit vs integration scope)
+
+If a doc is missing, skip it silently — do NOT block and do NOT generate it as a side effect (use `/morkit:init` for that). If a doc conflicts with the test you're about to write (e.g. naming convention says `test_xxx` but the existing test file uses `xxx_spec`), follow the existing file's convention and flag the conflict to your human partner.
+
 ## When to Use
 
 **Always:**
