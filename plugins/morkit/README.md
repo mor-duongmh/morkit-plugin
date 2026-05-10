@@ -96,21 +96,6 @@ Hai lớp gate:
 
 Run `bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-tasks.sh --explain` để xem chi tiết.
 
-## Đã có OpenSpec sẵn?
-
-Plugin **không động vào** `openspec/` của ngươi. Lần đầu mở Claude Code, plugin gợi ý migrate (chỉ gợi ý). Khi muốn:
-
-```bash
-bash ${CLAUDE_PLUGIN_ROOT}/scripts/migrate-from-openspec.sh --dry-run
-bash ${CLAUDE_PLUGIN_ROOT}/scripts/migrate-from-openspec.sh
-```
-
-Script chỉ `mv openspec/changes` → `morkit/output/spec`, không chạm `openspec/specs/` hay file khác.
-
-Tắt gợi ý: `touch openspec/.spec-migration-skip`.
-
-Hook có dual-read fallback nên dù chưa migrate, gate vẫn enforce trên `openspec/changes/`.
-
 ## Tests
 
 ```bash

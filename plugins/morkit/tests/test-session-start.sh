@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # test-session-start.sh — tests for hooks/session-start.sh
-# Coverage: 5 cases per Appendix B § 8.
+#
+# Hook is now minimal: only delegates to first-run-tools.sh. Migration
+# suggestion was removed in v1 (was in v0 design).
 
 set -uo pipefail
 
@@ -10,57 +12,35 @@ HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 HOOK="$TEST_PLUGIN_ROOT/hooks/session-start.sh"
 
-# 8.1 — legacy openspec/changes/ residual → suggest migration
+# 8.1 — Hook exits 0 cleanly even when first-run-tools fails or absent
 case_8_1() {
     local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
-    mkdir -p openspec/changes/foo
-    local out; out=$(bash "$HOOK" 2>/dev/null)
-    assert_contains "$out" "spec-migration-suggestion" "8.1 emits migration suggestion"
+    bash "$HOOK" >/dev/null 2>&1
+    local rc=$?
+    assert_equal "$rc" 0 "8.1 hook exits 0 on clean project"
     cd /; rm -rf "$tmp"
 }
 
-# 8.2 — already migrated (morkit/output/spec/ exists) → quiet
+# 8.2 — Hook does NOT emit migration suggestion (removed in v1)
 case_8_2() {
     local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
-    mkdir -p morkit/output/spec/foo
-    mkdir -p openspec/changes/foo  # both — should NOT suggest because primary exists
+    mkdir -p openspec/changes/foo
     local out; out=$(bash "$HOOK" 2>/dev/null)
-    assert_not_contains "$out" "spec-migration-suggestion" "8.2 quiet when migrated"
+    assert_not_contains "$out" "spec-migration-suggestion" "8.2 no migration suggestion (removed)"
     cd /; rm -rf "$tmp"
 }
 
-# 8.3 — clean project (neither folder) → quiet
+# 8.3 — Hook does NOT block session (always exit 0)
 case_8_3() {
     local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
-    local out; out=$(bash "$HOOK" 2>/dev/null)
-    assert_not_contains "$out" "spec-migration-suggestion" "8.3 quiet on clean"
-    cd /; rm -rf "$tmp"
-}
-
-# 8.4 — RSpec project (spec/ but no morkit/output/spec/) → quiet
-case_8_4() {
-    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
-    mkdir -p spec/models
-    echo "# rspec" > spec/models/x_spec.rb
-    local out; out=$(bash "$HOOK" 2>/dev/null)
-    assert_not_contains "$out" "spec-migration-suggestion" "8.4 RSpec coexistence quiet"
-    cd /; rm -rf "$tmp"
-}
-
-# 8.5 — skip marker mutes
-case_8_5() {
-    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
     mkdir -p openspec/changes/foo
-    touch openspec/.spec-migration-skip
-    local out; out=$(bash "$HOOK" 2>/dev/null)
-    assert_not_contains "$out" "spec-migration-suggestion" "8.5 skip marker mutes"
+    bash "$HOOK" >/dev/null 2>&1
+    assert_equal "$?" 0 "8.3 hook exits 0 even with legacy openspec residual"
     cd /; rm -rf "$tmp"
 }
 
 case_8_1
 case_8_2
 case_8_3
-case_8_4
-case_8_5
 
 exit_with_status

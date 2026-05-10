@@ -144,31 +144,6 @@ npx -y ctx7 setup
 
 ---
 
-## 7. Đã có OpenSpec sẵn trong dự án?
-
-Yên tâm — plugin **không động vào** dự án của bạn cho tới khi bạn cho phép.
-
-- ✅ File OpenSpec hiện tại (`openspec/changes/`, `openspec/specs/`, `openspec.yaml`...) **vẫn nguyên vẹn**.
-- 🔔 Lần đầu mở Claude Code, plugin **gợi ý migrate** (chỉ gợi ý — không tự chạy).
-- 🤝 Nếu chưa muốn migrate: plugin vẫn hoạt động với `openspec/changes/` (dual-read mode) + warning nhẹ.
-- 🚀 Khi muốn migrate, chạy 1 lệnh:
-
-  ```bash
-  bash ${CLAUDE_PLUGIN_ROOT}/scripts/migrate-from-openspec.sh --dry-run    # xem trước
-  bash ${CLAUDE_PLUGIN_ROOT}/scripts/migrate-from-openspec.sh              # thực thi
-  ```
-
-  Script chỉ làm 3 việc: `mv openspec/changes` → `morkit/output/spec`, giữ `archive/`, tạo marker `.morkit`.
-
-- 🤐 Tắt gợi ý migrate vĩnh viễn:
-  ```bash
-  touch openspec/.spec-migration-skip
-  ```
-
-> Plugin **không yêu cầu uninstall OpenSpec CLI** — bạn vẫn dùng `npx openspec` cho việc khác nếu muốn.
-
----
-
-## 8. License
+## 7. License
 
 [MIT](LICENSE) © Mor.
