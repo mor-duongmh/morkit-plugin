@@ -201,7 +201,3 @@ The hook has a 1-version dual-read fallback. Even without migrating, `/spec:appl
 - `/spec:doctor` diagnostic command for residual `openspec/`, conflict markers, env mismatch
 - Drift detection for upstream Superpowers skill renames
 
-### Files
-
-- Plan: [`morkit/output/plans/2026-05-10-spec-self-contained.md`](morkit/output/plans/2026-05-10-spec-self-contained.md)
-- Design: [`docs/superpowers/specs/2026-05-10-spec-self-contained-design.md`](docs/superpowers/specs/2026-05-10-spec-self-contained-design.md)
