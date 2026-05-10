@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# pre-tool-checklist-gate.sh — block superpowers implementation skills when the
+# pre-tool-checklist-gate.sh — block plan-execution implementation skills when the
 # active morkit change's review-checklist.md is missing or not marked
 # "Overall Decision: OK".
 #

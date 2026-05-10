@@ -43,7 +43,7 @@ Cài xong là dùng được — không cần setup gì thêm trong project.
 | `/morkit:review [name]` | Tạo lại review-checklist từ Google Doc |
 | `/morkit:archive [name]` | Đóng change sau merge |
 
-### Brainstorm + execute (từ superpowers vendored)
+### Brainstorm + execute (brainstorm/plan/execute, vendored)
 14 skills under `/morkit:` namespace. Most-used:
 - `/morkit:brainstorming` — suy nghĩ + investigate codebase, không code
 - `/morkit:writing-plans` — viết plan từ ý tưởng
@@ -52,7 +52,7 @@ Cài xong là dùng được — không cần setup gì thêm trong project.
 - `/morkit:test-driven-development` — TDD discipline
 - `/morkit:systematic-debugging` — debug có hệ thống
 
-Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-review, receiving-code-review, dispatching-parallel-agents, verification-before-completion, writing-skills, using-superpowers.
+Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-review, receiving-code-review, dispatching-parallel-agents, verification-before-completion, writing-skills, using-morkit.
 
 ### Code review (từ deep-review)
 | Command | Việc |

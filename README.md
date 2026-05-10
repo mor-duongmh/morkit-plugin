@@ -127,7 +127,7 @@ Hai tool nâng chất lượng research và giảm token. Plugin xử lý lịch
 | **[Context7](https://github.com/upstash/context7)** | Trả docs/API version-specific cho library, agent không cần đoán | **Lazy** — plugin tự `npx -y ctx7` khi cần. MCP optional. |
 | **[RTK](https://github.com/rtk-ai/rtk)** | Nén output bash, giảm 60-90% token | **Hỏi 1 lần** session đầu — bạn chọn `Yes`/`Skip`/`Don't ask again`. |
 
-> 🎯 Context7 đã active trong 6 superpowers skill + 3 spec-workflow skill — agent sẽ tự gọi Context7 thay vì đoán API.
+> 🎯 Context7 đã active trong 6 brainstorm/execute skills + 3 spec-workflow skill — agent sẽ tự gọi Context7 thay vì đoán API.
 
 Cài RTK thủ công:
 

@@ -2,7 +2,7 @@
 name: "morkit:propose"
 description: Propose a new spec change - create the change folder and generate all artifacts (proposal, design, TDD-ready tasks, review-checklist) in one step. Self-contained — no OpenSpec dependency.
 category: Workflow
-tags: [spec, propose, superpowers, scaffold]
+tags: [spec, propose, scaffold]
 ---
 
 Invoke the `propose` skill using the Skill tool. Pass through any arguments the user provided.
