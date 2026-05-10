@@ -1,0 +1,24 @@
+{
+  "name": "mor-stack",
+  "version": "1.0.0",
+  "description": "Meta-plugin — install Mor's full Claude Code stack in one command: mor-kit (spec workflow), superpowers (brainstorm/execute), deep-review (code review), docs-hero (doc generation). Use this when you want everything; otherwise install individual plugins as needed.",
+  "author": {
+    "name": "Mor",
+    "email": "duong@mor.company"
+  },
+  "homepage": "https://github.com/mor-duongmh/claude-plugins",
+  "repository": "https://github.com/mor-duongmh/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "mor",
+    "stack",
+    "meta",
+    "bundle"
+  ],
+  "dependencies": [
+    "mor-kit",
+    "superpowers",
+    "deep-review",
+    "docs-hero"
+  ]
+}

@@ -8,6 +8,14 @@
   },
   "plugins": [
     {
+      "name": "mor-stack",
+      "description": "Meta-plugin — install Mor's full stack (mor-kit + superpowers + deep-review + docs-hero) in one command. Use this when you want everything; otherwise install individual plugins as needed.",
+      "source": "./plugins/mor-stack",
+      "category": "meta",
+      "author": { "name": "Mor" },
+      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/mor-stack"
+    },
+    {
       "name": "mor-kit",
       "description": "Mor's spec-driven workflow toolkit. Self-contained scaffold of proposal/design/tasks under mor-kit/changes/<name>/, with Google-Doc-driven review-checklist gate. Pairs with superpowers (brainstorming, executing-plans, subagent-driven-development) without duplication.",
       "source": "./plugins/mor-kit",

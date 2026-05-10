@@ -17,5 +17,8 @@
     "tdd",
     "planning",
     "self-contained"
+  ],
+  "dependencies": [
+    "superpowers"
   ]
 }

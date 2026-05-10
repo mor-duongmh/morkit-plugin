@@ -6,15 +6,31 @@
 
 ---
 
-## 1. Cài đặt (3 dòng)
+## 1. Cài đặt
 
-Yêu cầu: [Claude Code](https://docs.anthropic.com/claude/docs/claude-code) và Node.js ≥ 18.
+Yêu cầu: [Claude Code](https://docs.anthropic.com/claude/docs/claude-code) ≥ v2.1.110 (cho `dependencies` feature) và Node.js ≥ 18.
+
+### 🚀 Cài full stack (1 lệnh)
 
 ```
 /plugin add marketplace github:mor-duongmh/claude-plugins
-/plugin install mor-kit@mor-duongmh
-/plugin install superpowers@mor-duongmh
+/plugin install mor-stack@mor-duongmh
 ```
+
+Lệnh `mor-stack` auto-install cả 4 plugin: **mor-kit + superpowers + deep-review + docs-hero**.
+
+### 🎯 Cài cherry-pick (chỉ phần cần)
+
+Nếu chỉ muốn một số plugin:
+
+```
+/plugin add marketplace github:mor-duongmh/claude-plugins
+/plugin install mor-kit@mor-duongmh           # spec workflow + auto pulls superpowers
+/plugin install deep-review@mor-duongmh        # optional: code review
+/plugin install docs-hero@mor-duongmh          # optional: BrSE doc generation
+```
+
+`mor-kit` tự kéo `superpowers` về (do dependency declaration). `deep-review` và `docs-hero` orthogonal, cài riêng nếu cần.
 
 Cài xong là dùng được luôn — không cần setup gì thêm trong từng project.
 
@@ -24,6 +40,7 @@ Cài xong là dùng được luôn — không cần setup gì thêm trong từng
 
 | Plugin | Để làm gì | Khi nào dùng |
 |---|---|---|
+| **[`mor-stack`](./plugins/mor-stack)** | Meta-plugin — cài full bộ 4 plugin trong 1 lệnh | Muốn nhanh + đầy đủ |
 | **[`mor-kit`](./plugins/mor-kit)** | Tạo proposal/design/tasks và checklist review | Mỗi khi bắt đầu một feature/bug/refactor mới |
 | **[`superpowers`](./plugins/superpowers)** | Brainstorm, viết plan, thực thi plan, debug, TDD | Suy nghĩ trước khi code và khi triển khai |
 | **[`deep-review`](./plugins/deep-review)** | Code review tự động bằng 5 chuyên gia AI song song (risk, security, pattern, tests, convention) | Sau khi code xong, trước khi merge PR |
