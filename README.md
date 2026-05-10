@@ -26,7 +26,7 @@ Một plugin chứa 4 nhóm chức năng dưới namespace `/morkit:*`:
 | Nhóm | Bao gồm | Để làm gì |
 |---|---|---|
 | **Spec workflow** | `propose`, `review`, `archive` | Scaffold proposal/design/tasks + review-checklist gate |
-| **Superpowers** (vendored) | `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `test-driven-development`, `systematic-debugging`, +8 skills khác | Brainstorm, viết plan, thực thi plan, debug, TDD |
+| **Plan & build** | `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `test-driven-development`, `systematic-debugging`, +8 skills khác | Brainstorm, viết plan, thực thi plan, debug, TDD |
 | **Code review** | `deep-review`, `deep-review-doctor`, `deep-review-post` | Review code bằng 5 chuyên gia AI song song |
 | **Doc generation** | `setup`, `init`, `update`, `sync`, `apply-sync`, `doctor` | Sinh SRS + API + DB doc cho ITO Japan offshore |
 
@@ -64,7 +64,7 @@ Bước 3 là **chốt chặn của con người**. Plugin chặn `/morkit:execu
 | `/morkit:review [tên]` | Tạo lại review-checklist từ Google Doc |
 | `/morkit:archive [tên]` | Đóng change sau merge |
 
-### Superpowers (brainstorm, plan, execute, debug, TDD)
+### Plan & build (brainstorm, plan, execute, debug, TDD)
 14 skills under `/morkit:*` namespace. Most-used:
 - `/morkit:brainstorming` — suy nghĩ + investigate codebase, không code
 - `/morkit:writing-plans` — viết plan từ ý tưởng
