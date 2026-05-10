@@ -65,11 +65,25 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | Command | Việc |
 |---|---|
 | `/morkit:setup` | Bootstrap Python venv (~30-60s, 1 lần) |
-| `/morkit:init` | Sinh fresh SRS + API + DB từ ProjectModel JSON |
+| `/morkit:init` | Sinh fresh docs từ ProjectModel JSON — chọn 1+ trong 7 outputs |
 | `/morkit:update` | Apply change/plan vào doc |
-| `/morkit:sync` | Scan codebase, đề xuất update API+DB doc |
+| `/morkit:sync` | Scan codebase, đề xuất update (API / DB / arch / standards / summary) |
 | `/morkit:apply-sync` | Apply đề xuất từ sync |
 | `/morkit:doctor` | Health-check docs-hero |
+
+#### `/morkit:init` outputs (multi-select gate)
+
+| Flag | Doc generated | Standard | Sync? |
+|---|---|---|---|
+| `srs` | `docs/srs.md` + `docs/screen-specs/SCREEN-*.md` | BrSE ITO Japan (13 sections) | ❌ |
+| `api` | `docs/api-docs.md` | REST + cURL + error codes | ✅ |
+| `db` | `docs/database-design.md` | Tables + Mermaid ERD | ✅ |
+| `arch` | `docs/system-architecture.md` | [arc42](https://docs.arc42.org/home/) lite (8 sections) + Mermaid components | ✅ |
+| `standards` | `docs/code-standards.md` | [Conventional Commits](https://www.conventionalcommits.org/) + auto-extracted lint/format | ✅ |
+| `summary` | `docs/codebase-summary.md` | README-style (tech stack / layout / packages / LOC) | ✅ |
+| `guidelines` | `docs/design-guidelines.md` + `docs/adr/{id}-{slug}.md` | [MADR](https://adr.github.io/madr/) ADRs + Principles + Patterns | ❌ (manual) |
+
+`/morkit:init` always asks via AskUserQuestion (multi-select) which outputs to generate before invoking renderers. Codebase-driven outputs (`api`, `db`, `arch`, `standards`, `summary`) also support a 2-step sync flow (`/morkit:sync` → user ticks proposal → `/morkit:apply-sync`).
 
 ## Plan review gate
 

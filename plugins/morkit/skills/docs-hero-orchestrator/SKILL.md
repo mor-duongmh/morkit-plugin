@@ -1,19 +1,37 @@
 ---
 name: docs-hero
-description: "Generate or update full project documentation suite (SRS + API Docs + DB Design) following BrSE standards for ITO Japan. Single entry point orchestrating 3 sub-skills with conflict-minimal updates from OpenSpec changes or brainstorm plans. Supports init / update / sync."
+description: "Generate or update full project documentation suite (SRS / API / DB / system-architecture / code-standards / codebase-summary / design-guidelines — user picks via /morkit:init multi-select gate). Orchestrates 7 sub-skills with conflict-minimal updates from OpenSpec changes, brainstorm plans, or codebase scans. Standards: BrSE ITO Japan (SRS), arc42-lite (arch), Conventional Commits (standards), MADR (guidelines). Supports init / update / sync."
 category: documentation
-keywords: [docs, srs, api, database, brse, openspec, ito, japan]
+keywords: [docs, srs, api, database, arch, standards, codebase, adr, brse, openspec, arc42, madr, conventional-commits, ito, japan]
 argument-hint: "init|update|sync|apply-sync|rebuild-meta [options]"
 metadata:
   author: docs-hero
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # Docs Hero Orchestrator
 
-Single entry point for the documentation generation pipeline. Coordinates three
-sub-skills (`generate-srs`, `generate-api-docs`, `generate-db-design`) with shared
-parsers, the diff engine, atomic write, and a session lock.
+Single entry point for the documentation generation pipeline. Coordinates seven
+sub-skills (`generate-srs`, `generate-api-docs`, `generate-db-design`,
+`generate-system-architecture`, `generate-code-standards`,
+`generate-codebase-summary`, `generate-design-guidelines`) with shared parsers,
+the diff engine, atomic write, and a session lock.
+
+## Outputs at a glance
+
+| Flag | Doc | Standard | Update | Sync |
+|---|---|---|---|---|
+| `srs` | `docs/srs.md` (+ `screen-specs/SCREEN-*.md`) | BrSE ITO Japan | ✅ | ❌ |
+| `api` | `docs/api-docs.md` | REST + cURL + errors | ✅ | ✅ |
+| `db` | `docs/database-design.md` | Tables + Mermaid ERD | ✅ | ✅ |
+| `arch` | `docs/system-architecture.md` | arc42-lite + Mermaid | ✅ | ✅ |
+| `standards` | `docs/code-standards.md` | Conventional Commits + auto-style | ✅ | ✅ |
+| `summary` | `docs/codebase-summary.md` | README-style | ✅ | ✅ |
+| `guidelines` | `docs/design-guidelines.md` (+ `adr/{id}-{slug}.md`) | MADR | ✅ | ❌ (manual) |
+
+`guidelines` does not participate in `update` flow's auto-iteration (it's
+omitted from `_DOC_FILES`); use explicit `--from-plan` / `--from-openspec`
+deltas with `entity_type ∈ {DPR, PTN, ADR}` to push changes manually.
 
 ## Environment (plugin context)
 
@@ -32,6 +50,10 @@ ORCH_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/docs-hero-orchestrator/scripts"
 SRS_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-srs/scripts"
 API_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-api-docs/scripts"
 DB_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-db-design/scripts"
+ARCH_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-system-architecture/scripts"
+STD_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-code-standards/scripts"
+SUM_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-codebase-summary/scripts"
+GUI_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-design-guidelines/scripts"
 
 # Project paths (always relative to user's cwd, NOT plugin root)
 PROJECT_DOCS_DIR="${PWD}/docs"
@@ -60,12 +82,14 @@ test -d "$VENV" || { echo "ERROR: venv missing. Run /morkit:setup first." >&2; e
 ## Routing Logic
 
 Parse first arg:
-- `init` → init flow (collect inputs → parse → render all 3 docs)
-- `update` → parse `--from-{plan,openspec}` → Delta → diff engine → apply
-- `sync` → fan out to sub-skills' `*_sync_propose.py` (no doc mutation)
+- `init` → init flow (collect inputs → parse → user picks subset of 7 outputs → render)
+- `update` → parse `--from-{plan,openspec}` → Delta → diff engine → apply (iterates `_DOC_FILES`; `guidelines` is intentionally excluded)
+- `sync` → fan out to sub-skills' `*_sync_propose.py` for `api`/`db`/`arch`/`standards`/`summary` (no doc mutation; `srs` and `guidelines` skip)
 - `apply-sync` → call sub-skill's `*_sync_apply.py` to convert proposal → Delta → run update
 - `rebuild-meta` → meta-manager rebuild
 - empty → AskUserQuestion (5 operations)
+
+Allowed `--outputs` values: `srs`, `api`, `db`, `arch`, `standards`, `summary`, `guidelines` (comma-separated, multi-select).
 
 ## Init Flow
 

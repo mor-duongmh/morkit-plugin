@@ -1,6 +1,6 @@
 ---
-description: Generate fresh docs (SRS / API / DB — user picks which) from a ProjectModel JSON. Outputs to ./docs/ in current project. Single-language (JP|EN|VN).
-argument-hint: "--project-model <path> --language <JP|EN|VN> [--outputs srs,api,db]"
+description: Generate fresh docs (SRS / API / DB / system-architecture / code-standards / codebase-summary / design-guidelines — user picks which) from a ProjectModel JSON. Outputs to ./docs/ in current project. Single-language (JP|EN|VN).
+argument-hint: "--project-model <path> --language <JP|EN|VN> [--outputs srs,api,db,arch,standards,summary,guidelines]"
 ---
 
 Pre-flight check:
@@ -24,13 +24,21 @@ Question template:
   - label: "SRS", description: "Software Requirements Specification (BrSE template, 13 sections + screen specs)"
   - label: "API docs", description: "REST endpoints + cURL samples + error codes"
   - label: "DB design", description: "Tables, indexes, Mermaid ERD"
+  - label: "System Architecture", description: "arc42-lite (8 sections) + Mermaid component diagram"
+  - label: "Code Standards", description: "Conventional Commits + auto-extracted lint/format rules"
+  - label: "Codebase Summary", description: "README-style: tech stack, repo layout, packages, entry points, LOC by language"
+  - label: "Design Guidelines", description: "Design Principles + Patterns + ADRs (MADR format)"
 
 Map the user's selection to the `--outputs` flag:
 - SRS → `srs`
 - API docs → `api`
 - DB design → `db`
+- System Architecture → `arch`
+- Code Standards → `standards`
+- Codebase Summary → `summary`
+- Design Guidelines → `guidelines`
 
-Join selected codes with commas (e.g. `srs,api` or `srs,api,db`). If the user selects nothing valid, abort with a message and ask again — do NOT fall back to a default.
+Join selected codes with commas (e.g. `srs,api,arch` or `srs,api,db,arch,standards,summary,guidelines`). If the user selects nothing valid, abort with a message and ask again — do NOT fall back to a default.
 
 If `--outputs` WAS provided on the command line, skip the question and use the provided value verbatim.
 
@@ -59,9 +67,16 @@ Use the **Skill tool** to invoke `docs-hero-orchestrator` with mode `init`, pass
 8. Generate aggregate report; Claude then appends a "Gaps & Risks" section copying the unresolved entries (placeholder + assumption) from `docs-plan.md`.
 9. Spawn the `docs-hero` QA agent for cross-reference + BrSE-quality validation. The agent verifies every blocker/warning gap in `docs-plan.md` is either resolved or explicitly carried forward as `<TBD: …>`, and cross-checks that the Implementation Status snapshot in SRS §3 matches the project-model values.
 
-Output files:
-- `morkit/output/docs/srs.md`
-- `morkit/output/docs/api-docs.md`
-- `morkit/output/docs/database-design.md`
-- `docs/screen-specs/SCREEN-*.md` (per FR with screens)
-- `.docs-hero-meta.json` (sidecar, gitignored)
+Output files (per selected output):
+
+| Output flag | File(s) written |
+|---|---|
+| `srs` | `docs/srs.md` + `docs/screen-specs/SCREEN-*.md` (per screen) |
+| `api` | `docs/api-docs.md` |
+| `db` | `docs/database-design.md` |
+| `arch` | `docs/system-architecture.md` |
+| `standards` | `docs/code-standards.md` |
+| `summary` | `docs/codebase-summary.md` |
+| `guidelines` | `docs/design-guidelines.md` + `docs/adr/{ADR-id}-{slug}.md` (per ADR) |
+
+Sidecar: `.docs-hero-meta.json` (gitignored).

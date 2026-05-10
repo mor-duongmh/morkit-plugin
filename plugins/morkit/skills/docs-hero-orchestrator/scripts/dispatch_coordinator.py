@@ -49,6 +49,8 @@ _API_SCRIPTS = _SKILLS_ROOT / "generate-api-docs" / "scripts"
 _DB_SCRIPTS = _SKILLS_ROOT / "generate-db-design" / "scripts"
 _ARCH_SCRIPTS = _SKILLS_ROOT / "generate-system-architecture" / "scripts"
 _STD_SCRIPTS = _SKILLS_ROOT / "generate-code-standards" / "scripts"
+_SUM_SCRIPTS = _SKILLS_ROOT / "generate-codebase-summary" / "scripts"
+_GUI_SCRIPTS = _SKILLS_ROOT / "generate-design-guidelines" / "scripts"
 
 PYTHON = sys.executable
 
@@ -175,6 +177,28 @@ def run_init(
         ])
         results.append(StepResult("standards", ok, str(std_out), msg))
 
+    if "summary" in outputs:
+        sum_out = docs_dir / "codebase-summary.md"
+        ok, msg = _run([
+            PYTHON, str(_SUM_SCRIPTS / "render_codebase_summary.py"),
+            "--project-model", str(project_model),
+            "--language", language,
+            "--output", str(sum_out),
+        ])
+        results.append(StepResult("summary", ok, str(sum_out), msg))
+
+    if "guidelines" in outputs:
+        gui_out = docs_dir / "design-guidelines.md"
+        adr_dir = docs_dir / "adr"
+        ok, msg = _run([
+            PYTHON, str(_GUI_SCRIPTS / "render_design_guidelines.py"),
+            "--project-model", str(project_model),
+            "--language", language,
+            "--output", str(gui_out),
+            "--adr-dir", str(adr_dir),
+        ])
+        results.append(StepResult("guidelines", ok, str(gui_out), msg))
+
     return results
 
 
@@ -187,8 +211,9 @@ _DOC_FILES = {
     "db": "database-design.md",
     "arch": "system-architecture.md",
     "standards": "code-standards.md",
-    # NOTE: "summary" + "guidelines" join in PR-C; "guidelines" intentionally
-    # has no entry here because design-guidelines.md does not support sync.
+    "summary": "codebase-summary.md",
+    # "guidelines" intentionally omitted — design-guidelines.md is manual
+    # only (no sync mode), so update flow does not iterate it.
 }
 
 
