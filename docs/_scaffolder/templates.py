@@ -186,7 +186,7 @@ def page_shell(title, breadcrumb_html, body_html):
   {body_html}
   <div class="footer">
     <a href="../index.html">← Về tổng quan</a>
-    <a href="../docs.html">Tình huống sử dụng</a>
+    <a href="../docs.html">Use cases</a>
     <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
   </div>
 </main>
@@ -293,7 +293,7 @@ def overview_page(*, sections_html):
   </div>
   {body}
   <div class="footer">
-    <a href="docs.html">Xem tình huống sử dụng →</a>
+    <a href="docs.html">Use cases →</a>
     <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
     <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank" rel="noopener">README</a>
   </div>

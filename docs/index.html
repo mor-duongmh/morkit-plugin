@@ -164,10 +164,10 @@ td code { font-size: 12px; }
   <table>
     <thead><tr><th>Nhóm</th><th>Bao gồm</th><th>Để làm gì</th></tr></thead>
     <tbody>
-      <tr><td><strong>Viết spec</strong></td><td><a href="commands/propose.html"><code>/morkit:propose</code></a>, <a href="commands/review.html"><code>/morkit:review</code></a>, <a href="commands/archive.html"><code>/morkit:archive</code></a></td><td>Tự sinh proposal, design, tasks và checklist để bạn duyệt trước khi cho code chạy.</td></tr>
-      <tr><td><strong>Lên kế hoạch và làm</strong></td><td><a href="skills/brainstorming.html"><code>brainstorming</code></a>, <a href="skills/writing-plans.html"><code>writing-plans</code></a>, <a href="skills/executing-plans.html"><code>executing-plans</code></a>, <a href="skills/subagent-driven-development.html"><code>subagent-driven-development</code></a>, <a href="skills/test-driven-development.html"><code>test-driven-development</code></a>, <a href="skills/systematic-debugging.html"><code>systematic-debugging</code></a>, <a href="skills/dispatching-parallel-agents.html"><code>dispatching-parallel-agents</code></a>, <a href="skills/using-git-worktrees.html"><code>using-git-worktrees</code></a>, <a href="skills/finishing-a-development-branch.html"><code>finishing-a-development-branch</code></a>, <a href="skills/verification-before-completion.html"><code>verification-before-completion</code></a>, <a href="skills/requesting-code-review.html"><code>requesting-code-review</code></a>, <a href="skills/receiving-code-review.html"><code>receiving-code-review</code></a>, <a href="skills/writing-skills.html"><code>writing-skills</code></a></td><td>Suy nghĩ ý tưởng, viết kế hoạch, chạy kế hoạch từng bước, viết test trước, debug có hệ thống và xin review.</td></tr>
-      <tr><td><strong>Review code</strong></td><td><a href="commands/deep-review.html"><code>/morkit:deep-review</code></a>, <a href="commands/deep-review-doctor.html"><code>/morkit:deep-review-doctor</code></a>, <a href="commands/deep-review-post.html"><code>/morkit:deep-review-post</code></a></td><td>Review code chuyên sâu bằng 5 chuyên gia AI chạy song song.</td></tr>
-      <tr><td><strong>Sinh tài liệu</strong></td><td><a href="commands/setup.html"><code>/morkit:setup</code></a>, <a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/update.html"><code>/morkit:update</code></a>, <a href="commands/sync.html"><code>/morkit:sync</code></a>, <a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a>, <a href="commands/doctor.html"><code>/morkit:doctor</code></a></td><td>Tự sinh tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc...</td></tr>
+      <tr><td><strong>Spec workflow</strong></td><td><a href="commands/propose.html"><code>/morkit:propose</code></a>, <a href="commands/review.html"><code>/morkit:review</code></a>, <a href="commands/archive.html"><code>/morkit:archive</code></a></td><td>Tự sinh proposal, design, tasks và checklist để bạn duyệt trước khi cho code chạy.</td></tr>
+      <tr><td><strong>Plan &amp; build</strong></td><td><a href="skills/brainstorming.html"><code>brainstorming</code></a>, <a href="skills/writing-plans.html"><code>writing-plans</code></a>, <a href="skills/executing-plans.html"><code>executing-plans</code></a>, <a href="skills/subagent-driven-development.html"><code>subagent-driven-development</code></a>, <a href="skills/test-driven-development.html"><code>test-driven-development</code></a>, <a href="skills/systematic-debugging.html"><code>systematic-debugging</code></a>, <a href="skills/dispatching-parallel-agents.html"><code>dispatching-parallel-agents</code></a>, <a href="skills/using-git-worktrees.html"><code>using-git-worktrees</code></a>, <a href="skills/finishing-a-development-branch.html"><code>finishing-a-development-branch</code></a>, <a href="skills/verification-before-completion.html"><code>verification-before-completion</code></a>, <a href="skills/requesting-code-review.html"><code>requesting-code-review</code></a>, <a href="skills/receiving-code-review.html"><code>receiving-code-review</code></a>, <a href="skills/writing-skills.html"><code>writing-skills</code></a></td><td>Suy nghĩ ý tưởng, viết plan, chạy plan từng bước, viết test trước, debug có hệ thống và xin review.</td></tr>
+      <tr><td><strong>Code review</strong></td><td><a href="commands/deep-review.html"><code>/morkit:deep-review</code></a>, <a href="commands/deep-review-doctor.html"><code>/morkit:deep-review-doctor</code></a>, <a href="commands/deep-review-post.html"><code>/morkit:deep-review-post</code></a></td><td>Review code chuyên sâu bằng 5 chuyên gia AI chạy song song.</td></tr>
+      <tr><td><strong>Doc generation</strong></td><td><a href="commands/setup.html"><code>/morkit:setup</code></a>, <a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/update.html"><code>/morkit:update</code></a>, <a href="commands/sync.html"><code>/morkit:sync</code></a>, <a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a>, <a href="commands/doctor.html"><code>/morkit:doctor</code></a></td><td>Tự sinh tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc...</td></tr>
     </tbody>
   </table>
   <p class="lede" style="font-size:14px;">Tổng cộng <strong>22 skill + 9 agent chuyên trách + 15 slash command</strong>, tất cả đều có tiền tố <code>/morkit:</code>.</p>
@@ -195,7 +195,7 @@ td code { font-size: 12px; }
     </tbody>
   </table>
 
-  <h2>4. Hai công cụ đi kèm (Context7 + RTK)</h2>
+  <h2>4. Companion tools (Context7 + RTK)</h2>
   <p>Hai công cụ giúp agent trả lời chính xác hơn và tiết kiệm token. Plugin không cài lặng lẽ — sẽ hỏi bạn trước.</p>
   <table>
     <thead><tr><th>Công cụ</th><th>Vai trò</th><th>Cách cài</th></tr></thead>
@@ -224,7 +224,7 @@ rtk init -g</code></pre>
 
 
   <div class="footer">
-    <a href="docs.html">Xem tình huống sử dụng →</a>
+    <a href="docs.html">Use cases →</a>
     <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
     <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank" rel="noopener">README</a>
   </div>

@@ -51,10 +51,10 @@ GROUPS = {
 }
 
 GROUP_LABELS = {
-    "spec":        "Viết spec",
-    "plan-build":  "Lên kế hoạch và làm",
-    "code-review": "Review code",
-    "doc-gen":     "Sinh tài liệu",
+    "spec":        "Spec workflow",
+    "plan-build":  "Plan & build",
+    "code-review": "Code review",
+    "doc-gen":     "Doc generation",
     "misc":        "Khác",
 }
 

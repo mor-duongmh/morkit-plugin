@@ -187,10 +187,10 @@ def render_overview() -> str:
         return f'<a href="commands/{slug}.html"><code>/morkit:{slug}</code></a>'
 
     groups_rows = [
-        ("Viết spec",
+        ("Spec workflow",
          ", ".join(link_cmd(s) for s in ["propose", "review", "archive"]),
          "Tự sinh proposal, design, tasks và checklist để bạn duyệt trước khi cho code chạy."),
-        ("Lên kế hoạch và làm",
+        ("Plan &amp; build",
          ", ".join(link_skill(s) for s in [
             "brainstorming", "writing-plans", "executing-plans",
             "subagent-driven-development", "test-driven-development",
@@ -200,11 +200,11 @@ def render_overview() -> str:
             "requesting-code-review", "receiving-code-review",
             "writing-skills",
          ]),
-         "Suy nghĩ ý tưởng, viết kế hoạch, chạy kế hoạch từng bước, viết test trước, debug có hệ thống và xin review."),
-        ("Review code",
+         "Suy nghĩ ý tưởng, viết plan, chạy plan từng bước, viết test trước, debug có hệ thống và xin review."),
+        ("Code review",
          ", ".join(link_cmd(s) for s in ["deep-review", "deep-review-doctor", "deep-review-post"]),
          "Review code chuyên sâu bằng 5 chuyên gia AI chạy song song."),
-        ("Sinh tài liệu",
+        ("Doc generation",
          ", ".join(link_cmd(s) for s in ["setup", "init", "update", "sync", "apply-sync", "doctor"]),
          "Tự sinh tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc..."),
     ]
@@ -261,7 +261,7 @@ def render_overview() -> str:
     </tbody>
   </table>
 
-  <h2>4. Hai công cụ đi kèm (Context7 + RTK)</h2>
+  <h2>4. Companion tools (Context7 + RTK)</h2>
   <p>Hai công cụ giúp agent trả lời chính xác hơn và tiết kiệm token. Plugin không cài lặng lẽ — sẽ hỏi bạn trước.</p>
   <table>
     <thead><tr><th>Công cụ</th><th>Vai trò</th><th>Cách cài</th></tr></thead>
