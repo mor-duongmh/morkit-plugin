@@ -66,12 +66,15 @@ Bước 3 là **chốt chặn của con người**. Plugin chặn `/morkit:execu
 
 ### Plan & build (brainstorm, plan, execute, debug, TDD)
 14 skills under `/morkit:*` namespace. Most-used:
-- `/morkit:brainstorming` — suy nghĩ + investigate codebase, không code
-- `/morkit:writing-plans` — viết plan từ ý tưởng
-- `/morkit:executing-plans` — thực thi plan từng bước (bị review-gate chặn)
-- `/morkit:subagent-driven-development` — parallel agents, fast iteration
-- `/morkit:test-driven-development` — TDD discipline
-- `/morkit:systematic-debugging` — debug có hệ thống
+
+| Command | Việc |
+|---|---|
+| `/morkit:brainstorming` | Suy nghĩ + investigate codebase, không code |
+| `/morkit:writing-plans` | Viết plan từ ý tưởng |
+| `/morkit:executing-plans` | Thực thi plan từng bước (bị review-gate chặn) |
+| `/morkit:subagent-driven-development` | Parallel agents, fast iteration |
+| `/morkit:test-driven-development` | TDD discipline |
+| `/morkit:systematic-debugging` | Debug có hệ thống |
 
 ### Code review
 | Command | Việc |
