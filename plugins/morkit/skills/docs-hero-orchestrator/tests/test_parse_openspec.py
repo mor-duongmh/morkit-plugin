@@ -124,3 +124,40 @@ def test_empty_change_folder_returns_empty_delta():
         base.mkdir(parents=True)
         delta = parse_openspec_change(Path(td) / "openspec", "empty-change")
     assert delta.changes == []
+
+
+# ─────────────────────────────────────────────────────────────────────
+# morkit layout tests — /morkit:propose writes to <root>/spec/<name>/
+# instead of OpenSpec's <root>/changes/<name>/.
+# ─────────────────────────────────────────────────────────────────────
+
+
+def _build_morkit_change_folder(tmpdir: Path, change_name: str, spec_content: str) -> Path:
+    """morkit layout: <root>/spec/<change_name>/ instead of <root>/changes/<change_name>/."""
+    root = tmpdir / "morkit" / "output"
+    base = root / "spec" / change_name
+    (base / "specs").mkdir(parents=True)
+    (base / "proposal.md").write_text("# Why\n\nAdd OAuth.\n", encoding="utf-8")
+    (base / "specs" / "auth.md").write_text(spec_content, encoding="utf-8")
+    return root
+
+
+def test_morkit_layout_list_changes():
+    """list_changes() finds folders under both <root>/changes/ and <root>/spec/."""
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        (tmp / "root" / "changes" / "legacy-openspec-change").mkdir(parents=True)
+        (tmp / "root" / "spec" / "morkit-change-001").mkdir(parents=True)
+        (tmp / "root" / "spec" / "morkit-change-002").mkdir(parents=True)
+        result = list_changes(tmp / "root")
+        assert result == ["legacy-openspec-change", "morkit-change-001", "morkit-change-002"]
+
+
+def test_morkit_layout_parse_change():
+    """parse_openspec_change() handles morkit layout (<root>/spec/<name>/)."""
+    with tempfile.TemporaryDirectory() as td:
+        root = _build_morkit_change_folder(Path(td), "editor-wire-v1", SAMPLE_SPEC)
+        delta = parse_openspec_change(root, "editor-wire-v1")
+    add_changes = [c for c in delta.changes if c.op == "ADD"]
+    assert len(add_changes) == 2
+    assert add_changes[0].payload["name"] == "System SHALL support OAuth2 login"

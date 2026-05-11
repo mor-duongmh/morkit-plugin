@@ -17,7 +17,7 @@ Numbering: DPR-001 (DesignPrinciple), PTN-001 (PatternGuideline), ADR-001
 
 > This document is **manual** — there is no codebase sync. Add / edit
 > entries in the ProjectModel JSON, then re-run `/morkit:init` (or
-> `/morkit:update`) to regenerate.
+> `/morkit:update-doc`) to regenerate.
 
 ---
 

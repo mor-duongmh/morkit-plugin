@@ -1,187 +1,334 @@
 ---
 name: brainstorming
-description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+description: Enter explore mode - a thinking partner for exploring ideas, investigating problems, and clarifying requirements. Use when the user wants to think through something before or during a change.
 ---
 
-# Brainstorming Ideas Into Designs
+Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes.
 
-Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
+**IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create morkit artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing.
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
+**This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore.
 
-<HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
-</HARD-GATE>
+---
 
-## Anti-Pattern: "This Is Too Simple To Need A Design"
+## The Stance
 
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+- **Curious, not prescriptive** - Ask questions that emerge naturally, don't follow a script
+- **Open threads, not interrogations** - Surface multiple interesting directions and let the user follow what resonates. Don't funnel them through a single path of questions.
+- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking
+- **Adaptive** - Follow interesting threads, pivot when new information emerges
+- **Patient** - Don't rush to conclusions, let the shape of the problem emerge
+- **Grounded** - Explore the actual codebase when relevant, don't just theorize
 
-## Checklist
+---
 
-You MUST create a task for each of these items and complete them in order:
+## What You Might Do
 
-1. **Explore project context** — check files, docs, recent commits
-2. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a clarifying question. See the Visual Companion section below.
-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `morkit/output/specs/YYYY-MM-DD-<topic>-design.md` and commit
-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+Depending on what the user brings, you might:
 
-## Process Flow
+**Explore the problem space**
+- Ask clarifying questions that emerge from what they said
+- Challenge assumptions
+- Reframe the problem
+- Find analogies
 
-```dot
-digraph brainstorming {
-    "Explore project context" [shape=box];
-    "Visual questions ahead?" [shape=diamond];
-    "Offer Visual Companion\n(own message, no other content)" [shape=box];
-    "Ask clarifying questions" [shape=box];
-    "Propose 2-3 approaches" [shape=box];
-    "Present design sections" [shape=box];
-    "User approves design?" [shape=diamond];
-    "Write design doc" [shape=box];
-    "Spec self-review\n(fix inline)" [shape=box];
-    "User reviews spec?" [shape=diamond];
-    "Invoke writing-plans skill" [shape=doublecircle];
+**Investigate the codebase**
+- Map existing architecture relevant to the discussion
+- Find integration points
+- Identify patterns already in use
+- Surface hidden complexity
 
-    "Explore project context" -> "Visual questions ahead?";
-    "Visual questions ahead?" -> "Offer Visual Companion\n(own message, no other content)" [label="yes"];
-    "Visual questions ahead?" -> "Ask clarifying questions" [label="no"];
-    "Offer Visual Companion\n(own message, no other content)" -> "Ask clarifying questions";
-    "Ask clarifying questions" -> "Propose 2-3 approaches";
-    "Propose 2-3 approaches" -> "Present design sections";
-    "Present design sections" -> "User approves design?";
-    "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Spec self-review\n(fix inline)";
-    "Spec self-review\n(fix inline)" -> "User reviews spec?";
-    "User reviews spec?" -> "Write design doc" [label="changes requested"];
-    "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
-}
+**Research libraries with Context7 (preferred over WebSearch for accuracy)**
+When the discussion involves a specific library, framework, or SDK and you need current API/version/docs, use Context7 — it pulls version-specific docs straight from upstream and prevents hallucinated APIs from stale training data:
+- **MCP path (preferred when Context7 MCP installed):**
+  1. `mcp__context7__resolve-library-id` with `libraryName` + `query` → returns Context7 IDs (e.g. `/reactjs/react.dev`). Skip if user already gave you `/org/project`.
+  2. `mcp__context7__query-docs` with that `libraryId` + `query` → returns docs. Retry once with `researchMode: true` if too shallow. Each tool ≤ 3 calls per question.
+- **CLI fallback (no setup needed, lazy via npx):**
+  ```bash
+  # Step 1 — resolve to Context7 ID
+  npx -y ctx7 library "<library-name>" "<topic>"
+  # Step 2 — query docs for that ID
+  npx -y ctx7 docs "<library-id>" "<topic>"
+  ```
+Use Context7 BEFORE making claims about library behaviour — it's much cheaper to verify than to be wrong.
+
+**Compare options**
+- Brainstorm multiple approaches
+- Build comparison tables
+- Sketch tradeoffs
+- Recommend a path (if asked)
+
+**Visualize**
+```
+┌─────────────────────────────────────────┐
+│     Use ASCII diagrams liberally        │
+├─────────────────────────────────────────┤
+│                                         │
+│      ┌────────┐         ┌────────┐      │
+│      │ State  │────────▶│ State  │      │
+│      │   A    │         │   B    │      │
+│      └────────┘         └────────┘      │
+│                                         │
+│   System diagrams, state machines,      │
+│   data flows, architecture sketches,    │
+│   dependency graphs, comparison tables  │
+│                                         │
+└─────────────────────────────────────────┘
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
-
-## The Process
-
-**Understanding the idea:**
-
-- Check out the current project state first (files, docs, recent commits)
-- Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
-- If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
-- For appropriately-scoped projects, ask questions one at a time to refine the idea
-- Prefer multiple choice questions when possible, but open-ended is fine too
-- Only one question per message - if a topic needs more exploration, break it into multiple questions
-- Focus on understanding: purpose, constraints, success criteria
-
-**Exploring approaches:**
-
-- Propose 2-3 different approaches with trade-offs
-- Present options conversationally with your recommendation and reasoning
-- Lead with your recommended option and explain why
-
-**Presenting the design:**
-
-- Once you believe you understand what you're building, present the design
-- Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
-- Ask after each section whether it looks right so far
-- Cover: architecture, components, data flow, error handling, testing
-- Be ready to go back and clarify if something doesn't make sense
-
-**Design for isolation and clarity:**
-
-- Break the system into smaller units that each have one clear purpose, communicate through well-defined interfaces, and can be understood and tested independently
-- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
-- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
-- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
-
-**Working in existing codebases:**
-
-- Explore the current structure before proposing changes. Follow existing patterns.
-- Where existing code has problems that affect the work (e.g., a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.
-- Don't propose unrelated refactoring. Stay focused on what serves the current goal.
-
-## After the Design
-
-**Documentation:**
-
-- Write the validated design (spec) to `morkit/output/specs/YYYY-MM-DD-<topic>-design.md`
-  - (User preferences for spec location override this default)
-- Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
-
-**Spec Self-Review:**
-After writing the spec document, look at it with fresh eyes:
-
-1. **Placeholder scan:** Any "TBD", "TODO", incomplete sections, or vague requirements? Fix them.
-2. **Internal consistency:** Do any sections contradict each other? Does the architecture match the feature descriptions?
-3. **Scope check:** Is this focused enough for a single implementation plan, or does it need decomposition?
-4. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
-
-Fix any issues inline. No need to re-review — just fix and move on.
-
-**User Review Gate:**
-After the spec review loop passes, ask the user to review the written spec before proceeding:
-
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
-
-Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
-
-**Implementation:**
-
-- Invoke the writing-plans skill to create a detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
-
-## Key Principles
-
-- **One question at a time** - Don't overwhelm with multiple questions
-- **Multiple choice preferred** - Easier to answer than open-ended when possible
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
-- **Explore alternatives** - Always propose 2-3 approaches before settling
-- **Incremental validation** - Present design, get approval before moving on
-- **Be flexible** - Go back and clarify when something doesn't make sense
-
-## Visual Companion
-
-A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
-
-**Offering the companion:** When you anticipate that upcoming questions will involve visual content (mockups, layouts, diagrams), offer it once for consent:
-> "Some of what we're working on might be easier to explain if I can show it to you in a web browser. I can put together mockups, diagrams, comparisons, and other visuals as we go. This feature is still new and can be token-intensive. Want to try it? (Requires opening a local URL)"
-
-**This offer MUST be its own message.** Do not combine it with clarifying questions, context summaries, or any other content. The message should contain ONLY the offer above and nothing else. Wait for the user's response before continuing. If they decline, proceed with text-only brainstorming.
-
-**Per-question decision:** Even after the user accepts, decide FOR EACH QUESTION whether to use the browser or the terminal. The test: **would the user understand this better by seeing it than reading it?**
-
-- **Use the browser** for content that IS visual — mockups, wireframes, layout comparisons, architecture diagrams, side-by-side visual designs
-- **Use the terminal** for content that is text — requirements questions, conceptual choices, tradeoff lists, A/B/C/D text options, scope decisions
-
-A question about a UI topic is not automatically a visual question. "What does personality mean in this context?" is a conceptual question — use the terminal. "Which wizard layout works better?" is a visual question — use the browser.
-
-If they agree to the companion, read the detailed guide before proceeding:
-`skills/brainstorming/visual-companion.md`
+**Surface risks and unknowns**
+- Identify what could go wrong
+- Find gaps in understanding
+- Suggest spikes or investigations
 
 ---
 
-## Library research with Context7 (Mor overlay)
+## morkit Awareness
 
-When this skill needs accurate, version-specific library/framework documentation (Tech Stack design, API verification, debugging library behaviour, writing tests against a library API), prefer **Context7** over generic web search to avoid hallucinated APIs from stale training data.
+You have full context of the morkit spec system. Use it naturally, don't force it.
 
-**MCP path (preferred when Context7 MCP installed) — two tool calls:**
+### Check for context
 
-1. `mcp__context7__resolve-library-id` with `libraryName` (e.g. `"React"`) + `query` (the topic) → returns Context7 IDs like `/reactjs/react.dev`. Skip this step if the user already gave you an ID in `/org/project` form.
-2. `mcp__context7__query-docs` with `libraryId` (from step 1) + `query` (be specific). Retry once with `researchMode: true` if the first answer is too shallow. Each tool ≤ 3 calls per question.
-
-**CLI fallback (no setup needed; uses npx cache):**
+At the start, quickly check what exists:
 ```bash
-# Step 1 — resolve the library to a Context7 ID
-npx -y ctx7 library "<library-name>" "<topic>"   # e.g. "React" "hooks" → /reactjs/react.dev
-
-# Step 2 — query docs for that ID
-npx -y ctx7 docs "<library-id>" "<topic>"
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/list-changes.sh" --json
 ```
 
-When you encounter a library API you're not 100% certain about — query Context7 first, then proceed. Cheaper than discovering the bug at test time or rewriting after.
+This tells you:
+- If there are active changes under `${MORKIT_ROOT:-morkit/output/spec}/`
+- Their names, schemas, and status
+- What the user might be working on
 
+### Session output (required at session end)
+
+Every brainstorming session ends with a design log written to:
+`${MORKIT_ROOT:-morkit/output}/specs/YYYY-MM-DD-<topic>-design.md`
+
+This is **required at session end** — the log is the input artifact for
+downstream commands (`/morkit:propose`, `/morkit:init`, function list
+discussions). Before saving, confirm with the user:
+
+> "Đã đủ shape để wrap up. Save design log vào
+>  `morkit/output/specs/<date>-<topic>-design.md`?"
+
+On user OK, write the file using this template:
+
+```markdown
+# Design Log — <topic>
+date: YYYY-MM-DD
+inputs: <list of files/links consulted>
+
+## Problem framing
+<crystallized understanding>
+
+## Approaches considered
+<approaches + tradeoffs + which one picked + why>
+
+## Decisions
+<decisions made during session>
+
+## Open questions
+<unresolved threads>
+
+## Next step
+<e.g. /morkit:propose <name>, /morkit:init SRS, etc.>
+```
+
+During the session, do NOT persist intermediate snippets without asking.
+Only the final design log is auto-offered at session end.
+
+### When no change exists
+
+Think freely. When insights crystallize, you might offer:
+
+- "This feels solid enough to start a change. Want me to run `/morkit:propose`?"
+- Or keep exploring - no pressure to formalize
+
+### When a change exists
+
+If the user mentions a change or you detect one is relevant:
+
+1. **Read existing artifacts for context**
+   - `morkit/output/spec/<name>/proposal.md`
+   - `morkit/output/spec/<name>/design.md`
+   - `morkit/output/spec/<name>/tasks.md`
+   - `morkit/output/spec/<name>/review-checklist.md`
+   - etc.
+
+2. **Reference them naturally in conversation**
+   - "Your design mentions using Redis, but we just realized SQLite fits better..."
+   - "The proposal scopes this to premium users, but we're now thinking everyone..."
+
+3. **Offer to capture when decisions are made**
+
+    | Insight Type               | Where to Capture               |
+    |----------------------------|--------------------------------|
+    | New requirement discovered | `specs/<capability>/spec.md`   |
+    | Requirement changed        | `specs/<capability>/spec.md`   |
+    | Design decision made       | `design.md`                    |
+    | Scope changed              | `proposal.md`                  |
+    | New work identified        | `tasks.md`                     |
+    | Assumption invalidated     | Relevant artifact              |
+
+   Example offers:
+   - "That's a design decision. Capture it in design.md?"
+   - "This is a new requirement. Add it to specs?"
+   - "This changes scope. Update the proposal?"
+
+4. **The user decides** - Offer and move on. Don't pressure. Don't auto-capture.
+
+---
+
+## What You Don't Have To Do
+
+- Follow a script
+- Ask the same questions every time
+- Produce a specific artifact
+- Reach a conclusion
+- Stay on topic if a tangent is valuable
+- Be brief (this is thinking time)
+
+---
+
+## Handling Different Entry Points
+
+**User brings a vague idea:**
+```
+User: I'm thinking about adding real-time collaboration
+
+You: Real-time collab is a big space. Let me think about this...
+
+      COLLABORATION SPECTRUM
+      ════════════════════════════════════════════
+
+      Awareness          Coordination         Sync
+          │                   │                 │
+          ▼                   ▼                 ▼
+      ┌────────┐         ┌────────┐        ┌────────┐
+      │Presence│         │Cursors │        │  CRDT  │
+      │  "3    │         │ Multi  │        │Conflict│
+      │online" │         │ select │        │  free  │
+      └────────┘         └────────┘        └────────┘
+          │                   │                 │
+       trivial            moderate           complex
+
+      Where's your head at?
+```
+
+**User brings a specific problem:**
+```
+User: The auth system is a mess
+
+You: [reads codebase]
+
+     ┌─────────────────────────────────────────────┐
+     │              CURRENT AUTH FLOW              │
+     └─────────────────────────────────────────────┘
+                        │
+          ┌─────────────┼─────────────┐
+          ▼             ▼             ▼
+     ┌─────────┐  ┌─────────┐  ┌─────────┐
+     │ Google  │  │  GitHub │  │  Email  │
+     │  OAuth  │  │  OAuth  │  │  Magic  │
+     └────┬────┘  └────┬────┘  └────┬────┘
+          │             │             │
+          └─────────────┼─────────────┘
+                        ▼
+                  ┌───────────┐
+                  │  Session  │
+                  └─────┬─────┘
+                        │
+                        ▼
+                  ┌───────────┐
+                  │   Perms   │
+                  └───────────┘
+
+     I see three tangles. Which one's burning?
+```
+
+**User is stuck mid-implementation:**
+```
+User: /morkit:brainstorming add-auth-system
+      The OAuth integration is more complex than expected
+
+You: [reads change artifacts]
+
+     You're on task 4: "Implement OAuth flow"
+
+     Let me trace what's involved...
+
+     [draws diagram, explores options, suggests paths]
+
+     Want to update the design to reflect this?
+     Or add a spike task to investigate?
+```
+
+**User wants to compare options:**
+```
+User: Should we use Postgres or SQLite?
+
+You: Generic answer is boring. What's the context?
+
+User: A CLI tool that tracks local dev environments
+
+You: That changes everything.
+
+     ┌─────────────────────────────────────────────────┐
+     │          CLI TOOL DATA STORAGE                  │
+     └─────────────────────────────────────────────────┘
+
+     Key constraints:
+     • No daemon running
+     • Must work offline
+     • Single user
+
+                  SQLite          Postgres
+     Deployment   embedded ✓      needs server ✗
+     Offline      yes ✓           no ✗
+     Single file  yes ✓           no ✗
+
+     SQLite. Not even close.
+
+     Unless... is there a sync component?
+```
+
+---
+
+## Ending Discovery
+
+When the session winds down (user signals they're done, or insights have
+crystallized), summarize and save the design log:
+
+```
+## What We Figured Out
+
+**The problem**: [crystallized understanding]
+
+**The approach**: [if one emerged]
+
+**Open questions**: [if any remain]
+
+**Next step**:
+- Run `/morkit:propose <name>` to create a change proposal
+- Run `/morkit:init` to generate SRS / API / DB docs
+- Keep exploring later — design log is saved
+```
+
+Then write this to `${MORKIT_ROOT:-morkit/output}/specs/YYYY-MM-DD-<topic>-design.md`
+using the template in "Session output" above. The log captures what was
+explored so the next session (or a different command like `/morkit:propose`)
+can resume from here. Even if no concrete decision emerged, save what was
+explored.
+
+---
+
+## Guardrails
+
+- **Don't implement** - Never write code or implement features. Creating morkit artifacts is fine, writing application code is not.
+- **Don't fake understanding** - If something is unclear, dig deeper
+- **Don't rush** - Discovery is thinking time, not task time
+- **Don't force structure** - Let patterns emerge naturally
+- **Auto-capture at session end** - Save final design log to `morkit/output/specs/`. During the session, ask before persisting intermediate snippets
+- **Do visualize** - A good diagram is worth many paragraphs
+- **Do explore the codebase** - Ground discussions in reality
+- **Do question assumptions** - Including the user's and your own

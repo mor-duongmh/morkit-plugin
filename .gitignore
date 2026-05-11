@@ -3,6 +3,12 @@ node_modules/
 *.log
 .preview/
 .claude-flow/
+.claude/launch.json
 .code-review-graph/
 __pycache__/
 *.pyc
+.claude
+plans
+CLAUDE.md
+release-manifest.json
+.repomixignore

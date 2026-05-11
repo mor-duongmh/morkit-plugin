@@ -63,7 +63,7 @@ def _render_meta(model: ProjectModel, lang: Language) -> str:
         f"| Language | {lang.value} |\n\n"
         "> This document is **manual** — there is no codebase sync. Add / edit "
         "entries in the ProjectModel JSON, then re-run `/morkit:init` "
-        "(or `/morkit:update`) to regenerate.\n\n"
+        "(or `/morkit:update-doc`) to regenerate.\n\n"
     )
 
 
