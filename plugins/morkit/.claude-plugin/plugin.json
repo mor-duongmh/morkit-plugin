@@ -1,6 +1,6 @@
 {
   "name": "morkit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Mor's all-in-one Claude Code toolkit. Single-namespace consolidation of spec workflow + brainstorming/execute/TDD skills + 5-specialist code review + BrSE doc generation. Every skill, agent, and slash command lives under /morkit:.",
   "author": { "name": "Mor", "email": "duong@mor.company" },
   "homepage": "https://github.com/mor-duongmh/claude-plugins",

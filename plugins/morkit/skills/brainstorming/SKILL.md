@@ -38,6 +38,33 @@ Depending on what the user brings, you might:
 - Identify patterns already in use
 - Surface hidden complexity
 
+**Read project context files at session start (priority tiers)**
+
+Before opening threads, scan project context. These files often contain
+constraints, conventions, and prior decisions that should shape the
+direction — agent must respect them, not override them.
+
+- **Tier 1 — User instructions** (highest priority, override this skill):
+  - `CLAUDE.md` (Claude Code project rules)
+  - `AGENTS.md` (multi-agent project conventions)
+  - `GEMINI.md` (Gemini CLI rules)
+  - `.github/copilot-instructions.md` (GitHub Copilot rules)
+  - Memory files under `memory/` or `.claude/memory/` if present
+- **Tier 2 — Project shape**:
+  - `README.md` (project goals, tech stack, how-to-run)
+  - Stack manifests: `package.json` / `pyproject.toml` / `Cargo.toml` /
+    `go.mod` / `pom.xml` (declared deps reveal architecture)
+  - Recent commits: `git log -20 --oneline` (current direction)
+  - Active spec changes: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/list-changes.sh" --json`
+- **Tier 3 — Domain artifacts**:
+  - `morkit/output/spec/<name>/` (proposal/design/tasks if user mentions a change)
+  - Existing docs: `docs/`, `docs/srs.md`, `docs/api-docs.md`, etc.
+  - Legacy: `openspec/changes/<name>/` if migrating
+
+Skip a tier only when files don't exist. Cite Tier 1 explicitly when
+relevant — e.g. "CLAUDE.md says no class components → propose React
+functional only" — so the user sees the reasoning grounded in their rules.
+
 **Research libraries with Context7 (preferred over WebSearch for accuracy)**
 When the discussion involves a specific library, framework, or SDK and you need current API/version/docs, use Context7 — it pulls version-specific docs straight from upstream and prevents hallucinated APIs from stale training data:
 - **MCP path (preferred when Context7 MCP installed):**
