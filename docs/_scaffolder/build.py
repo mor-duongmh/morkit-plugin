@@ -193,16 +193,17 @@ def render_overview() -> str:
          ", ".join(link_cmd(s) for s in ["propose", "review", "archive"]),
          "Tự sinh proposal, design, tasks và checklist để bạn duyệt trước khi cho code chạy."),
         ("Plan &amp; build",
+         # Most-used 6 skill — 7 skill phụ trợ khác (dispatching-parallel-agents,
+         # using-git-worktrees, finishing-a-development-branch,
+         # verification-before-completion, requesting-code-review,
+         # receiving-code-review, writing-skills) vẫn có trang detail nhưng
+         # không hiện trong overview để tránh nhiễu cho người mới.
          ", ".join(link_skill(s) for s in [
             "brainstorming", "writing-plans", "executing-plans",
             "subagent-driven-development", "test-driven-development",
-            "systematic-debugging", "dispatching-parallel-agents",
-            "using-git-worktrees", "finishing-a-development-branch",
-            "verification-before-completion",
-            "requesting-code-review", "receiving-code-review",
-            "writing-skills",
+            "systematic-debugging",
          ]),
-         "Suy nghĩ ý tưởng, viết plan, chạy plan từng bước, viết test trước, debug có hệ thống và xin review."),
+         "Suy nghĩ ý tưởng, viết plan, chạy plan từng bước, viết test trước, debug có hệ thống."),
         ("Code review",
          ", ".join(link_cmd(s) for s in ["deep-review", "deep-review-doctor", "deep-review-post"]),
          "Review code chuyên sâu bằng 5 chuyên gia AI chạy song song."),
