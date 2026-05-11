@@ -3,6 +3,7 @@ node_modules/
 *.log
 .preview/
 .claude-flow/
+.claude/launch.json
 .code-review-graph/
 __pycache__/
 *.pyc

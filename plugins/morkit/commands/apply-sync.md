@@ -16,5 +16,5 @@ Invoke orchestrator skill with mode `apply-sync` + the proposal path. The skill 
 
 1. Parse proposal → extract checked items only
 2. Emit Delta JSON to `${PWD}/.tmp/<api|db>-delta.json`
-3. Run standard update flow with that Delta (same as `/morkit:update`)
+3. Run standard update flow with that Delta (same as `/morkit:update-doc`)
 4. Manual edits preserved via diff engine

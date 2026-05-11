@@ -66,7 +66,7 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 |---|---|
 | `/morkit:setup` | Bootstrap Python venv (~30-60s, 1 lần) |
 | `/morkit:init` | Sinh fresh docs từ ProjectModel JSON — chọn 1+ trong 7 outputs |
-| `/morkit:update` | Apply change/plan vào doc |
+| `/morkit:update-doc` | Apply change/plan vào doc |
 | `/morkit:sync` | Scan codebase, đề xuất update (API / DB / arch / standards / summary) |
 | `/morkit:apply-sync` | Apply đề xuất từ sync |
 | `/morkit:doctor` | Health-check docs-hero |
