@@ -383,7 +383,7 @@ CURATED = {
     # NHÓM 3 — REVIEW CODE
     # ====================================================================
     "skills.deep-review": {
-        "lede": "Review code chuyên sâu bằng 5 chuyên gia AI chạy song song (rủi ro, bảo mật, pattern, kiểm thử, quy ước).",
+        "lede": "Review code chuyên sâu bằng 5 agent AI chạy song song (rủi ro, bảo mật, pattern, kiểm thử, quy ước).",
         "details": [
             "Dispatch 5 specialist subagent chạy song song:",
             "<ul><li><strong>Risk analyst</strong> — đánh giá rủi ro thay đổi</li><li><strong>Security auditor</strong> — vuln, secret leak, OWASP</li><li><strong>Pattern reviewer</strong> — anti-pattern, code smell</li><li><strong>Test reviewer</strong> — độ phủ, edge case</li><li><strong>Convention checker</strong> — CLAUDE.md, lint, style</li></ul>",

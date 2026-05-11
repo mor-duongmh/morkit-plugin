@@ -206,7 +206,7 @@ def render_overview() -> str:
          "Suy nghĩ ý tưởng, viết plan, chạy plan từng bước, viết test trước, debug có hệ thống."),
         ("Code review",
          ", ".join(link_cmd(s) for s in ["deep-review", "deep-review-doctor", "deep-review-post"]),
-         "Review code chuyên sâu bằng 5 chuyên gia AI chạy song song."),
+         "Review code chuyên sâu bằng 5 agent AI chạy song song."),
         ("Doc generation",
          ", ".join(link_cmd(s) for s in ["setup", "init", "update-doc", "sync", "apply-sync", "doctor"]),
          "Tự sinh tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc..."),
@@ -239,7 +239,7 @@ def render_overview() -> str:
             ("skill", "systematic-debugging",        "Debug 5 bước có hệ thống — không đoán mò."),
         ]),
         ("Code review", [
-            ("command", "deep-review [target]", "Review chuyên sâu trên PR hoặc git diff (5 chuyên gia AI chạy song song)."),
+            ("command", "deep-review [target]", "Review chuyên sâu trên PR hoặc git diff (5 agent AI chạy song song)."),
             ("command", "deep-review-doctor",   "Kiểm tra cài đặt Deep Review đã đủ điều kiện chạy chưa."),
             ("command", "deep-review-post",     "Post báo cáo review lên PR làm comment."),
         ]),
