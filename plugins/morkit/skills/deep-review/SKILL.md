@@ -96,6 +96,10 @@ findings:
 2. **Print full report directly to chat.**
 3. Save to `morkit/output/reviews/deep-review-<timestamp>-<target>.md` if writable; otherwise skip silently.
 4. If `--json` flag passed, emit JSON instead (see "JSON output mode" below).
+5. **Suggest next step at the end of the report** based on Decision:
+   - **BLOCK** → "Fix Critical findings, push fix commit, then re-run `/morkit:deep-review <target>`."
+   - **APPROVE WITH CHANGES** → "Address High findings (or defer with justification), push, then merge."
+   - **APPROVE** → "Ready to merge. After merge, close out the change with `/morkit:archive <name>` if this PR was linked to a morkit change."
 
 ## Universal Rules (Tier 3, embedded)
 

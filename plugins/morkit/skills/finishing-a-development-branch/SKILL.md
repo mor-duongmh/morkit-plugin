@@ -88,6 +88,16 @@ Then: Cleanup worktree (Step 5)
 
 #### Option 2: Push and Create PR
 
+**Recommended pre-push step:** run a self-review on the local diff first
+to catch risk / security / pattern issues before opening the PR:
+
+```bash
+# Self-review on local diff (skips PR fetch, faster than post-push review)
+/morkit:deep-review --diff
+```
+
+Fix any Critical/Major findings, then push:
+
 ```bash
 # Push branch
 git push -u origin <feature-branch>
@@ -102,6 +112,10 @@ gh pr create --title "<title>" --body "$(cat <<'EOF'
 EOF
 )"
 ```
+
+After PR is open, you (or a reviewer) can run `/morkit:deep-review <PR#>`
+for a full review with PR context. After merge, close out the change
+with `/morkit:archive <name>`.
 
 Then: Cleanup worktree (Step 5)
 

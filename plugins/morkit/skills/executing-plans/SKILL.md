@@ -45,6 +45,17 @@ After all tasks complete and verified:
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use morkit:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
+- **Recommended before push:** run `/morkit:deep-review --diff` on the
+  local diff to catch risk / security / pattern issues before opening
+  the PR. The `finishing-a-development-branch` skill calls this out
+  under Option 2 (Push and Create PR).
+
+After PR is merged, close out the morkit change:
+```bash
+/morkit:archive <change-name>
+```
+This moves `morkit/output/spec/<name>/` to `morkit/output/spec/archive/<name>/`
+so future `/morkit:propose` runs don't see it as active.
 
 ## When to Stop and Ask for Help
 

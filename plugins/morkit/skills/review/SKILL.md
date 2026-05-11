@@ -84,7 +84,7 @@ Next steps:
   1. Open the file and review each section
   2. Tick the items, fill the Review Summary
   3. Change "Overall Decision: PENDING" → "Overall Decision: OK"
-  4. Run /morkit:executing-plans (or /morkit:executing-plans / /morkit:subagent-driven-development)
+  4. Run /morkit:executing-plans (or /morkit:subagent-driven-development for parallel TDD)
 
 The plugin's PreToolUse hook will block those skills until the decision is OK.
 ```

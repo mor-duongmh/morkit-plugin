@@ -212,6 +212,24 @@ You MUST complete each phase before proceeding to the next.
 
    This is NOT a failed hypothesis - this is a wrong architecture.
 
+### Phase 5: Wrap-up
+
+After the fix is verified:
+
+1. **Verify completion criteria** — Use the `morkit:verification-before-completion`
+   skill to confirm tests, lint, typecheck, and build all pass before
+   claiming "done".
+2. **Decide how to integrate** — Use the `morkit:finishing-a-development-branch`
+   skill, which presents merge / push-PR / keep / discard options
+   (typical bug fix → push + PR).
+3. **Optional self-review on local diff** — for bugs that touched
+   security-sensitive code (auth, XSS, SQL), run `/morkit:deep-review --diff`
+   before push.
+
+For tiny single-file bug fixes (≤2 file, ≤10 LOC), you can skip
+`/morkit:propose` entirely (CLAUDE.md NO swarm rule). Just go straight
+through Phases 1-5 above.
+
 ## Red Flags - STOP and Follow Process
 
 If you catch yourself thinking:
