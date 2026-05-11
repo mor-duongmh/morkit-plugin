@@ -65,8 +65,6 @@ Bước 3 là **chốt chặn của con người**. Plugin chặn `/morkit:execu
 | `/morkit:archive [tên]` | Đóng change sau merge |
 
 ### Plan & build (brainstorm, plan, execute, debug, TDD)
-14 skills under `/morkit:*` namespace. Most-used:
-
 | Command | Việc |
 |---|---|
 | `/morkit:brainstorming` | Suy nghĩ + investigate codebase, không code |
@@ -95,33 +93,7 @@ Bước 3 là **chốt chặn của con người**. Plugin chặn `/morkit:execu
 
 ---
 
-## 5. Plan review gate (chốt chặn human-in-the-loop)
-
-Sau `/morkit:propose`, plugin sinh `morkit/output/spec/<tên>/review-checklist.md` từ [Google Doc canonical của Mor](https://docs.google.com/document/d/184wY2N2WOUExmZrClvHCfcRCnSQsJYvav6gc6JwL6xc).
-
-Auto-detect variant (BE/FE × Feature/BugFix/Refactor). Override:
-
-```
-/morkit:review --variant FE-BugFix
-/morkit:review --refresh
-```
-
-Bạn mở file, tick từng mục, sửa dòng cuối:
-
-```diff
-- Overall Decision: PENDING
-+ Overall Decision: OK
-```
-
-→ `/morkit:executing-plans` mở khoá.
-
-**Hai lớp bảo vệ song song** (defense-in-depth):
-1. **PreToolUse hook** — Claude Code chặn tool call ngay từ harness
-2. **Skill content** — mỗi skill tự kiểm tra ở Step 0 trước khi làm việc
-
----
-
-## 6. Companion tools (Context7 + RTK)
+## 5. Companion tools (Context7 + RTK)
 
 Hai tool nâng chất lượng research và giảm token. Plugin xử lý lịch sự — không cài silent.
 
