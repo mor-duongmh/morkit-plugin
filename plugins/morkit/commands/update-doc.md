@@ -17,13 +17,13 @@ test -f "${PWD}/.docs-hero-meta.json" || {
 }
 ```
 
-Then invoke the orchestrator skill with mode `update`. Synergy with `spec` plugin:
+Then invoke the orchestrator skill with mode `update` (internal keyword — unchanged). Typical workflow within the `morkit` plugin:
 
 ```
-/spec:propose "feature-X"                          # creates openspec/changes/feature-X/...
+/morkit:propose "feature-X"                         # creates openspec/changes/feature-X/...
 # (review-checklist gate)
-/spec:apply feature-X                              # implements code
-/morkit:update --from-openspec feature-X        # SRS/API/DB updated atomically
+/morkit:apply feature-X                             # implements code
+/morkit:update-doc --from-openspec feature-X        # SRS/API/DB updated atomically
 ```
 
 The diff engine flow:

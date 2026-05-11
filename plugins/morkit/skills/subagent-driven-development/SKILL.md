@@ -323,7 +323,7 @@ CHANGE_DIR="$(find openspec/changes -mindepth 1 -maxdepth 1 -type d ! -name 'arc
 CHECKLIST="$CHANGE_DIR/review-checklist.md"
 
 if [ ! -f "$CHECKLIST" ]; then
-    echo "✗ STOP: $CHECKLIST does not exist. Run /spec:review."
+    echo "✗ STOP: $CHECKLIST does not exist. Run /morkit:review."
     exit 1
 fi
 if ! grep -qE '^[[:space:]]*Overall Decision:[[:space:]]*OK[[:space:]]*$' "$CHECKLIST"; then
