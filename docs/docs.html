@@ -456,15 +456,19 @@
           <span class="tdesc">prep inputs → /morkit:init → plan gate → render + QA → team review → /morkit:update · 6 step</span>
         </button>
         <button class="tab" role="tab" aria-selected="false" data-target="uc2" type="button">
-          <span class="tnum">2.</span> Feature mới hoàn toàn
-          <span class="tdesc">editor-wire-v1 · 11 task groups · TDD strict · PR #1</span>
+          <span class="tnum">2.</span> Greenfield project — từ ý tưởng → bộ docs full
+          <span class="tdesc">brainstorm → function list → review → /morkit:init SRS → review → /morkit:init HLD → final review · 7 step</span>
         </button>
         <button class="tab" role="tab" aria-selected="false" data-target="uc3" type="button">
-          <span class="tnum">3.</span> Fix bug
-          <span class="tdesc">cmdk Unicode normalize · branch fix/* · PR #2</span>
+          <span class="tnum">3.</span> Feature mới hoàn toàn
+          <span class="tdesc">editor-wire-v1 · 11 task groups · TDD strict · PR #1</span>
         </button>
         <button class="tab" role="tab" aria-selected="false" data-target="uc4" type="button">
-          <span class="tnum">4.</span> Code review
+          <span class="tnum">4.</span> Fix bug
+          <span class="tdesc">cmdk Unicode normalize · branch fix/* · PR #2</span>
+        </button>
+        <button class="tab" role="tab" aria-selected="false" data-target="uc5" type="button">
+          <span class="tnum">5.</span> Code review
           <span class="tdesc">/morkit:review &lt;PR#&gt; · 5 subagent · comment trên PR</span>
         </button>
       </nav>
@@ -811,17 +815,485 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
 🔁 Loop lại review → update cho tới khi cả team OK → ✅ ship.
 
 <span class="tcom"># Sẵn sàng dùng làm input cho:
-#   UC2 (feature)  — implement dựa trên SRS §3 + API contract
-#   UC3 (fix bug)  — DB design rõ → debug nhanh hơn
-#   UC4 (review)   — /morkit:review có context tốt từ docs/</span>
+#   UC3 (feature)  — implement dựa trên SRS §3 + API contract
+#   UC4 (fix bug)  — DB design rõ → debug nhanh hơn
+#   UC5 (review)   — /morkit:review có context tốt từ docs/</span>
             </div>
           </div>
         </div>
 
       </section>
 
-      <!-- ──────────── USE CASE 2 — FEATURE ──────────── -->
+      <!-- ──────────── USE CASE 2 — GREENFIELD: IDEA → FULL DOC SET ──────────── -->
       <section id="uc2" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Greenfield project — từ ý tưởng đến bộ docs full team-verified</h2>
+          <p>
+            <b>Tình huống thực tế:</b> bạn được giao 1 dự án greenfield — <i>chưa có
+            code, chưa có docs</i>, chỉ có idea note / requirement / market research.
+            UC này hướng dẫn 7 step từ brainstorm ý tưởng → function list → SRS &amp;
+            screen-spec (tầng business) → API/DB/Arch (tầng technical / HLD) → team
+            sign-off. Cách tiếp cận <b>top-down 2 vòng</b>: chốt business trước, chốt
+            technical sau — tránh tốn công khi business chưa rõ.
+          </p>
+          <p class="callout">
+            <b>Khác UC1 thế nào?</b> UC1 (brownfield) có code &amp; partial docs làm
+            anchor → /morkit:init 1 lần ra hết. UC2 (greenfield) không có anchor → phải
+            brainstorm trước, tách <code class="mono">/morkit:init</code> làm 2 vòng
+            (vòng 1: SRS · vòng 2: HLD) để dừng lại cho PM/BrSE/BA review giữa chừng.
+          </p>
+          <div class="meta">
+            <span class="chip accent">input: idea / requirement only</span>
+            <span class="chip">7 step</span>
+            <span class="chip">3 human gates</span>
+            <span class="chip">2 vòng /morkit:init</span>
+            <span class="chip muted">~2-3 ngày realtime · ~250k tokens</span>
+          </div>
+        </div>
+
+        <!-- Step 1 — Brainstorm cùng agent từ idea/requirement -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 1</span> Brainstorm ý tưởng với agent <code class="mono">/morkit:brainstorming</code>
+            <span class="phase-desc">— input idea/requirement · dialog 1-câu-1-lần · HARD-GATE không được implement</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · ~/Documents/work/TaskFlow (greenfield, no code yet)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Greenfield = bắt đầu từ 0, không có code/docs làm anchor.
+# Brainstorm skill ép quy trình "design trước, code sau" — có
+# HARD-GATE chặn mọi implementation skill cho tới khi user
+# approve design. Đây là nơi đầu tư nhiều câu hỏi để hiểu
+# purpose / constraints / success criteria trước khi tốn công.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tcom"># 1) Gom mọi input có sẵn vào 1 chỗ</span>
+<span class="tprompt">$</span> <span class="tcmd">mkdir -p .tmp/brainstorm-inputs &amp;&amp; cp</span> <span class="tstr">idea-note.md</span> <span class="tstr">competitor-research.pdf \</span>
+   <span class="tstr">requirement-from-stakeholder.docx</span> <span class="tstr">.tmp/brainstorm-inputs/</span>
+
+<span class="tcom"># 2) Mời agent brainstorm</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:brainstorming</span>
+
+<span class="label output">▼ Bạn thấy (dialog flow của brainstorming skill)</span>
+1. <span class="tflag">Explore project context</span> — agent đọc inputs, recent commits
+2. <span class="tflag">Offer Visual Companion</span> (nếu cần — UI mockup/diagram)
+3. <span class="tflag">Ask clarifying questions</span> — 1 câu mỗi message
+   Q1: Target user của TaskFlow là ai? IC / Manager / cả hai?
+   Q2: Success criteria 6 tháng đầu? (DAU? Retention? NPS?)
+   Q3: Phải compete với gì? Linear? Asana? Tự build cho team nội bộ?
+   ...
+4. <span class="tflag">Propose 2-3 approaches</span> kèm trade-offs (vd: SaaS multi-tenant
+   vs single-tenant self-hosted vs hybrid) — bạn pick 1
+5. <span class="tflag">Present design sections</span> — bạn approve từng section
+6. <span class="tflag">Write design doc</span> → <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span>
+7. <span class="tflag">Spec self-review</span> — agent quét placeholders, contradictions
+8. <span class="tflag">User reviews written spec</span> — bạn confirm trước khi qua STEP 2
+
+<span class="tcom"># Output để feed STEP 2: 1 design doc dạng prose
+#   • Project vision · target persona · scope IN/OUT
+#   • 2-3 approaches considered + lý do pick
+#   • Constraints (technical, business, time)
+#   • Success criteria (đo lường được)
+#   • Open questions còn lại</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 — Discuss với AI để rút function list draft -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 2</span> Convert design doc → function list draft (cùng AI)
+            <span class="phase-desc">— prose design → bảng FR có cấu trúc · MoSCoW priority · acceptance criteria sơ bộ</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · dialog refinement</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Brainstorm output là prose, KHÔNG phải input ăn được của
+# /morkit:init. /morkit:init cần entities có FR-ID, Screen,
+# ENDPOINT, TBL. Bước này discuss với AI để decompose design
+# doc thành function list dạng bảng — đây là "hợp đồng" giữa
+# PM/BrSE/BA và development team.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tprompt">$</span> Claude, dùng <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span>
+  convert thành function list:
+    • mỗi function → 1 FR-ID (FR-001, FR-002, ...)
+    • columns: ID · Title · Description · MoSCoW · AC draft · Depends-on
+    • group theo Epic (vd Epic-Auth, Epic-Tasks, Epic-Notifications)
+    • thêm user journey table cho từng persona
+
+<span class="label output">▼ Bạn thấy (function-list-draft.md)</span>
+<span class="tflag">Epic-Auth</span>
+| ID     | Title           | MoSCoW | AC draft                 | Deps |
+|--------|-----------------|--------|--------------------------|------|
+| FR-001 | Email signup    | Must   | OTP verify · 60s expiry  | —    |
+| FR-002 | SSO Google      | Should | Onclick · auto-create    | 001  |
+| FR-003 | Forget password | Must   | Email link · 1h expiry   | 001  |
+
+<span class="tflag">Epic-Tasks</span>
+| ID     | Title             | MoSCoW | AC draft                 | Deps |
+|--------|-------------------|--------|--------------------------|------|
+| FR-004 | Create task       | Must   | title required · due opt | 001  |
+| FR-005 | Assign to teammate| Must   | search by name/email     | 004  |
+| FR-006 | Subtask nesting   | Could  | 2 levels max             | 004  |
+...
+
+<span class="tflag">User Journey · Persona "IC engineer"</span>
+  Signup → Create first project → Invite teammate → Create task →
+  Assign → Notify in Slack → Mark done
+
+<span class="tcom"># Iterate cùng AI: thêm FR thiếu, xóa FR ngoài scope, lock MoSCoW
+# Save: .tmp/function-list-draft.md</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 — PM/BrSE/BA review function list -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 3</span> 🚦 PM/BrSE/BA review function list theo checklist
+            <span class="phase-desc">— human gate · sửa ở đây cost = 0 · sửa sau khi render SRS = rewrite</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">.tmp/function-list-draft.md · human gate</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Function list là input chính cho /morkit:init ở STEP 4. Một FR
+# sai/thiếu/dư sẽ propagate sang SRS, screen-spec, và toàn bộ
+# HLD ở vòng sau. Đây là gate rẻ nhất — chỉ là markdown table.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+  1. Gửi <span class="tstr">.tmp/function-list-draft.md</span> cho PM / BrSE / BA
+  2. Reviewer tick checklist 5 mục:
+  3. Feedback inline (comment hoặc track changes)
+  4. Bạn merge feedback → <span class="tstr">.tmp/function-list-v1.md</span> (locked)
+
+<span class="label gate">▼ Checklist function list</span><span class="skill-chip gate">PM·BrSE·BA</span>
+
+╭─ <span class="tflag">PM</span> · business value ─────────────────────────────────╮
+│ [ ] Mỗi FR có business value rõ ràng                    │
+│ [ ] Target persona đúng (IC / Manager / Admin)          │
+│ [ ] MoSCoW priority hợp lý cho MVP                      │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BrSE</span> · template-ready ────────────────────────────────╮
+│ [ ] FR-ID format đúng (FR-NNN)                          │
+│ [ ] Mỗi FR có AC draft đo lường được                    │
+│ [ ] Traceability: Epic ↔ FR ↔ user journey              │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BA</span> · scope ─────────────────────────────────────────╮
+│ [ ] Scope IN/OUT rõ — không creep                       │
+│ [ ] Dependency tracked (FR-005 deps FR-004)             │
+│ [ ] User journey cover edge case quan trọng             │
+╰─────────────────────────────────────────────────────────╯
+
+<span class="label output">▼ Bạn thấy</span>
+  Feedback ví dụ:
+    PM   · "FR-006 subtask nesting đẩy sang v2 (out-of-scope MVP)"
+    BrSE · "FR-002 SSO Google: AC thêm 'fail-fallback về email signup'"
+    BA   · "Thiếu Epic-Notifications: in-app + email digest"
+
+  → Bạn merge → <span class="tstr">.tmp/function-list-v1.md</span> · 24 FR locked · Epic-Notif added
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 — /morkit:init vòng 1 → chọn SRS (kèm screen-spec) -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 4</span> <code class="mono">/morkit:init</code> vòng 1 — chọn SRS (kèm screen-specs)
+            <span class="phase-desc">— input function-list + idea docs · multi-select chỉ tick SRS · render docs tầng business</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · /morkit:init (vòng 1)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao chỉ chọn SRS ở vòng 1? ────────────────────────
+# Top-down approach: chốt tầng business (SRS + screen-spec)
+# trước khi tốn công vẽ HLD (API/DB/Arch). PM/BrSE/BA cần ký
+# duyệt SRS trước khi technical team (BE/FE/DBA) join. Nếu
+# chọn hết 7 loại 1 lần → tới khi PM phản hồi, phải redo cả
+# DB/API → lãng phí.
+# Lưu ý: flag `srs` của docs-hero TỰ kèm screen-specs/SCREEN-*.md
+# (không cần flag riêng).
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tcom"># 1) Gom function list + design doc + idea docs vào .tmp/</span>
+<span class="tprompt">$</span> <span class="tcmd">cp</span> <span class="tstr">.tmp/function-list-v1.md</span> <span class="tstr">.tmp/brainstorm-inputs/*</span> <span class="tstr">.tmp/</span>
+<span class="tprompt">$</span> <span class="tcmd">cp</span> <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span> <span class="tstr">.tmp/</span>
+
+<span class="tcom"># 2) Chạy /morkit:setup nếu lần đầu, rồi /morkit:init</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:init</span> <span class="tflag">--inputs</span> <span class="tstr">.tmp/</span> <span class="tflag">--language</span> <span class="tstr">VN</span>
+
+<span class="label gate">▼ Multi-select dialog</span> <span class="tcom">// CHỈ tick SRS</span>
+  [<span class="tok-ok">x</span>] SRS               — Software Requirements Spec (+screen-specs)
+  [ ] API docs          — để vòng 2
+  [ ] DB design         — để vòng 2
+  [ ] System Arch.      — để vòng 2
+  [ ] Code Standards    — để vòng 2 (tuỳ team)
+  [ ] Codebase Summary  — để vòng 2 (tuỳ team)
+  [ ] Design Guidelines — để vòng 2 (tuỳ team)
+
+<span class="label output">▼ Bạn thấy</span>
+Pre-flight venv... <span class="tok-ok">✓</span>
+Parse → project-model.json
+  • 24 FR (từ function-list-v1.md) · 12 Screen (từ user journey) · 6 NFR
+  • 0 ENDPOINT · 0 TBL (greenfield, chưa có code)
+Impl status snapshot:
+  Done <span class="tnum">0</span>  InProgress <span class="tnum">0</span>  Verified <span class="tnum">0</span>  NotStarted <span class="tnum">24</span>
+  <span class="tcom">// expected — greenfield chưa có code/openspec để scan</span>
+
+docs-plan.md viết ra .tmp/ · gate Proceed/Revise/Abort
+  Gaps thường gặp ở greenfield:
+    <span class="tok-warn">[warning]</span> Screen state default/loading/empty/error chưa spec
+    <span class="tok-com">[info]</span>    NFR threshold chưa lượng hoá (perf, scale)
+  → Bạn chọn Proceed (greenfield ít blocker hơn brownfield)
+
+<span class="label output">▼ Render</span>
+  <span class="tok-add">A</span> docs/srs.md                            <span class="tnum">1480</span> lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Signup.md     <span class="tnum">92</span>
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Dashboard.md  <span class="tnum">156</span>
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-TaskList.md   <span class="tnum">134</span>
+  ... (12 screen-specs)
+  <span class="tok-add">A</span> .docs-hero-meta.json (sidecar)
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 — PM/BrSE/BA review SRS + screen-specs -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 5</span> 🚦 PM/BrSE/BA review SRS + screen-specs theo checklist
+            <span class="phase-desc">— chốt tầng business trước khi technical team build HLD · feedback → /morkit:update</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">docs/srs.md + docs/screen-specs/ · human gate</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# SRS lần đầu render KHÔNG hoàn hảo — luôn cần PM/BrSE/BA fine-
+# tune. Nhưng KHÔNG re-run /morkit:init (sẽ ghi đè manual edits).
+# Dùng /morkit:update --from-plan với diff engine — chỉ patch
+# phần đổi, manual edits preserved.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm (loop)</span>
+  1. Gửi <span class="tstr">docs/srs.md</span> + <span class="tstr">docs/screen-specs/</span> cho PM/BrSE/BA
+  2. Mỗi feedback → viết 1 plan.md ngắn vào .tmp/
+  3. Apply: <span class="tcmd">/morkit:update</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/&lt;feedback&gt;.md</span>
+  4. Loop tới khi 3 lane đều OK
+
+<span class="label gate">▼ Checklist SRS &amp; screen-specs</span><span class="skill-chip gate">PM·BrSE·BA</span>
+
+╭─ <span class="tflag">PM</span> · business correctness ──────────────────────────╮
+│ [ ] §3 Use cases khớp product vision                    │
+│ [ ] §5 Business rules đầy đủ (login retry, RBAC, ...)  │
+│ [ ] §7 NFR ưu tiên đúng (perf? a11y? scalability?)     │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BrSE</span> · template ITO Japan ──────────────────────────╮
+│ [ ] 13 sections + 2 appendices đầy đủ                   │
+│ [ ] NFR có IPA-6 categories                             │
+│ [ ] Traceability matrix FR↔Screen mapped                │
+│ [ ] Acceptance/UAT scenarios đầy đủ                     │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BA</span> · screen flow ────────────────────────────────────╮
+│ [ ] Mỗi screen có state default/loading/empty/error    │
+│ [ ] Transition đúng — không deadlock screen flow        │
+│ [ ] Edge case cover (offline · permission denied · ...) │
+╰─────────────────────────────────────────────────────────╯
+
+<span class="label output">▼ Ví dụ feedback → apply qua /morkit:update</span>
+  PM   · "Thiếu UC §3.7 'Bulk archive tasks'"
+  BrSE · "NFR perf TTI cần threshold cụ thể: 1.8s p95"
+  BA   · "SCREEN-TaskList thiếu empty state với CTA"
+
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/pm-bulk-archive.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/brse-nfr-tti.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/ba-empty-state.md</span>
+
+  <span class="tok-add">M</span> docs/srs.md                            <span class="tok-add">+28</span> <span class="tok-rm">−4</span>
+  <span class="tok-add">M</span> docs/screen-specs/SCREEN-TaskList.md   <span class="tok-add">+12</span> <span class="tok-rm">−0</span>
+  <span class="tok-ok">✓</span> diff engine preserve BrSE manual edits
+
+🚦 <span class="tflag">Sign-off</span>: PM/BrSE/BA all OK → tầng business chốt → STEP 6
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 6 — /morkit:init vòng 2 → HLD docs -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 6</span> <code class="mono">/morkit:init</code> vòng 2 — HLD (API + DB + Arch + ...)
+            <span class="phase-desc">— SRS đã chốt làm anchor · render tầng technical · technical team chuẩn bị build</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · /morkit:init (vòng 2 · HLD)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao tách vòng 2? ──────────────────────────────────
+# SRS đã chốt = anchor cho HLD. /morkit:init vòng 2 đọc lại
+# docs/srs.md + project-model.json + screen-specs để derive:
+#   - API contract (từ FR + Screen)
+#   - DB schema (từ data items mention trong SRS)
+#   - System Architecture (từ tech-stack constraint + NFR)
+# Technical team (BE/FE/DBA/Architect) join từ STEP 6 trở đi.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tcom"># Cùng /morkit:init, cùng .tmp/, nhưng tick các flag còn lại</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:init</span> <span class="tflag">--inputs</span> <span class="tstr">.tmp/</span> <span class="tflag">--language</span> <span class="tstr">VN</span>
+
+<span class="label gate">▼ Multi-select dialog</span> <span class="tcom">// tick HLD docs còn lại</span>
+  [ ] SRS               — đã có ở STEP 4, KHÔNG tick lại
+  [<span class="tok-ok">x</span>] API docs          — REST endpoints + cURL + error codes
+  [<span class="tok-ok">x</span>] DB design         — Tables + Mermaid ERD
+  [<span class="tok-ok">x</span>] System Arch.      — arc42-lite + component diagram
+  [<span class="tok-ok">x</span>] Code Standards    — Conventional Commits + lint
+  [<span class="tok-ok">x</span>] Codebase Summary  — README-style tech overview
+  [<span class="tok-ok">x</span>] Design Guidelines — Principles + Patterns + ADR
+
+<span class="label output">▼ Bạn thấy</span>
+Parse → project-model.json
+  • Reuse 24 FR · 12 Screen · 6 NFR từ vòng 1
+  • Derive: 18 ENDPOINT (từ FR+Screen) · 9 TBL (từ data items)
+
+docs-plan.md cho HLD — gaps thường gặp:
+  <span class="tok-bad">[blocker]</span> ENDPOINT POST /api/tasks/bulk-archive — request schema chưa rõ
+  <span class="tok-warn">[warning]</span> TBL tasks — soft delete strategy chưa quyết
+  <span class="tok-com">[info]</span>     ADR pending: choose Postgres vs MySQL
+
+  → Bạn chọn Revise: trả lời blocker · loop · chọn Proceed
+
+<span class="label output">▼ Render (parallel · ~5 phút)</span>
+  <span class="tok-add">A</span> docs/api-docs.md                <span class="tnum">680</span> lines · 18 endpoints
+  <span class="tok-add">A</span> docs/database-design.md         <span class="tnum">412</span> lines · Mermaid ERD
+  <span class="tok-add">A</span> docs/system-architecture.md     <span class="tnum">520</span> lines · arc42-lite
+  <span class="tok-add">A</span> docs/code-standards.md          <span class="tnum">186</span> lines
+  <span class="tok-add">A</span> docs/codebase-summary.md        <span class="tnum">94</span>  lines
+  <span class="tok-add">A</span> docs/design-guidelines.md       <span class="tnum">312</span> lines
+  <span class="tok-add">A</span> docs/adr/ADR-001-postgres.md    <span class="tnum">68</span>  lines
+  <span class="tok-add">A</span> docs/adr/ADR-002-rest-vs-grpc.md <span class="tnum">54</span> lines
+
+<span class="label gate">▼ QA agent docs-hero validate</span>
+  Cross-ref FR ↔ Screen ↔ ENDPOINT ↔ TBL    <span class="tok-ok">✓ 24/24 mapped</span>
+  Mermaid ERD + arc42 component diag        <span class="tok-ok">✓ valid</span>
+  BrSE template + IPA-6 NFR                 <span class="tok-ok">✓ pass</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 7 — Cả team review tất cả docs -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 7</span> 🚦 Cả team review TẤT CẢ docs theo checklist
+            <span class="phase-desc">— PM·BrSE·BA·BE·FE·DBA·Architect · cross-doc consistency · sign-off ship</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">docs/ full set · team-wide gate</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Greenfield "ready to ship" = đủ docs để start /morkit:propose +
+# /morkit:executing-plans cho feature đầu tiên. Cả team review
+# để đảm bảo cross-doc consistency: FR-001 trong SRS phải có
+# endpoint trong api-docs phải có table trong db-design. Một
+# inconsistency = blocker cho dev.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label gate">▼ Checklist team-wide</span><span class="skill-chip gate">PM·BrSE·BA·BE·FE·DBA·Arch</span>
+
+╭─ <span class="tflag">PM·BrSE·BA</span> · business + screen ─────────────────────╮
+│ [<span class="tok-ok">x</span>] re-confirm SRS + screen-specs (đã chốt STEP 5)     │
+│ [ ] §13 Acceptance/UAT scenarios runnable               │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BE</span> · API contract feasible ──────────────────────────╮
+│ [ ] Mỗi ENDPOINT có request/response schema rõ          │
+│ [ ] Error codes consistent (HTTP + business error)      │
+│ [ ] Auth: bearer / cookie / API key xác định            │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">FE</span> · screen-spec build-able ──────────────────────────╮
+│ [ ] Mỗi screen-spec có mock + component breakdown       │
+│ [ ] State machine đầy đủ                                │
+│ [ ] Design tokens link đến design-guidelines.md         │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">DBA</span> · ERD &amp; data model ────────────────────────────╮
+│ [ ] PK / FK / index hợp lý                              │
+│ [ ] Normal form 3NF (trừ deliberate denormalize có ADR) │
+│ [ ] Soft delete / audit fields có policy                │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">Architect</span> · system architecture ────────────────────╮
+│ [ ] arc42 8 sections đầy đủ                             │
+│ [ ] Component diagram khớp với code structure dự kiến   │
+│ [ ] Cross-cutting concerns (logging, auth, observability)│
+│ [ ] ADRs đầy đủ cho key decisions                       │
+╰─────────────────────────────────────────────────────────╯
+
+<span class="label output">▼ Feedback loop</span>
+  Mỗi role raise 1-3 feedback → bạn viết plan.md cho từng cái
+  → <span class="tcmd">/morkit:update</span> <span class="tflag">--from-plan</span> apply lần lượt
+  → diff engine preserve BrSE/PM manual edits từ STEP 5
+
+🔁 Re-loop tới khi tất cả lane OK → ✅ <span class="tflag">Bộ docs greenfield ready</span>
+
+<span class="tok-ok">✓</span> Sẵn sàng start implementation:
+   1) <span class="tcmd">/morkit:propose</span> <span class="tstr">"feature-X"</span>        — create OpenSpec change
+   2) review-checklist gate
+   3) <span class="tcmd">/morkit:executing-plans</span> feature-X — TDD-driven implement
+   4) <span class="tcmd">/morkit:update</span> <span class="tflag">--from-plan</span>    — keep docs in sync
+
+<span class="tcom"># Greenfield 2-3 ngày realtime nhưng tiết kiệm cả tháng rework
+# nếu skip docs đi thẳng vào code.</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ──────────── USE CASE 3 — FEATURE ──────────── -->
+      <section id="uc3" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Feature mới hoàn toàn — kích hoạt TipTap editor</h2>
           <p>
@@ -1076,8 +1548,8 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
         </div>
       </section>
 
-      <!-- ──────────── USE CASE 3 — BUG FIX ──────────── -->
-      <section id="uc3" class="panel" role="tabpanel">
+      <!-- ──────────── USE CASE 4 — BUG FIX ──────────── -->
+      <section id="uc4" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Bug fix — Unicode normalize trong CommandPalette</h2>
           <p>
@@ -1238,8 +1710,8 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
         </div>
       </section>
 
-      <!-- ──────────── USE CASE 4 — REVIEW ──────────── -->
-      <section id="uc4" class="panel" role="tabpanel">
+      <!-- ──────────── USE CASE 5 — REVIEW ──────────── -->
+      <section id="uc5" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Code review — /morkit:review &lt;PR#&gt;</h2>
           <p>
