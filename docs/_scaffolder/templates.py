@@ -78,6 +78,29 @@ h2 {
 .tag.deprecated { color: var(--accent); border-color: var(--accent); }
 ul, ol { padding-left: 22px; }
 li { margin: 4px 0; }
+ul.duties { padding-left: 0; list-style: none; }
+ul.duties > li {
+  position: relative; padding: 8px 12px 8px 28px;
+  border-left: 2px solid var(--border);
+  margin: 0 0 4px 0;
+}
+ul.duties > li::before {
+  content: "›"; position: absolute; left: 10px; top: 8px;
+  color: var(--accent); font-weight: 600;
+}
+/* When a duty-bullet only contains a nested <ul>, hide its chevron+border so
+   the nested items visually attach to the previous bullet above. */
+ul.duties > li:has(> ul:only-child) {
+  border-left: 0; padding: 0 0 4px 28px; margin-top: -8px;
+}
+ul.duties > li:has(> ul:only-child)::before { content: none; }
+ul.duties ul { margin: 4px 0 2px 0; padding-left: 18px; list-style: disc; }
+ul.duties ul li {
+  margin: 3px 0; padding: 0; border: 0;
+  color: var(--fg-muted);
+}
+ul.duties ul li::before { content: none; }
+ul.duties ul li code { font-size: 0.88em; }
 pre {
   background: var(--code-bg); color: var(--code-fg);
   padding: 14px 16px; border-radius: 8px;
@@ -229,10 +252,16 @@ def detail_page(*, kind, slug, name, lede, details, group_label, deprecated,
   <p class="lede" style="font-size:14px;">Slash command — gõ trực tiếp trong Claude Code.</p>
 """
     else:
-        # Skill — show "Nhiệm vụ" detail paragraph
-        first_block = f"""<h2>1. Nhiệm vụ</h2>
-  <p>{details}</p>
-""" if details else ""
+        # Skill — show "Nhiệm vụ" as bullet list (more scannable than paragraph)
+        if details:
+            details_html = "\n".join(f"    <li>{b}</li>" for b in details)
+            first_block = f"""<h2>1. Nhiệm vụ</h2>
+  <ul class="duties">
+{details_html}
+  </ul>
+"""
+        else:
+            first_block = ""
 
     when_idx = 2 if (kind == "command" or details) else 1
     example_idx = when_idx + 1

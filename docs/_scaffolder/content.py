@@ -77,7 +77,12 @@ CURATED = {
     # ====================================================================
     "skills.propose": {
         "lede": "Mô tả ý tưởng bằng 1-2 câu → tự sinh đầy đủ 4 file: proposal, design, tasks và checklist review.",
-        "details": "Skill đọc mô tả ngắn của bạn, đặt tên change tự động, rồi sinh ra cả bộ artifact gồm proposal (lý do làm), design (cách làm), tasks (chia bước theo TDD) và review-checklist (để bạn duyệt). Tất cả nằm gọn trong một thư mục dưới <code>morkit/output/spec/&lt;tên-change&gt;/</code>. Không phụ thuộc OpenSpec hay CLI ngoài — plugin tự dựng artifact.",
+        "details": [
+            "Đặt tên change tự động từ mô tả ngắn của bạn",
+            "Sinh ra 4 file artifact: <strong>proposal</strong> (lý do), <strong>design</strong> (cách làm), <strong>tasks</strong> (chia bước theo TDD), <strong>review-checklist</strong> (để bạn duyệt)",
+            "Tất cả nằm trong <code>morkit/output/spec/&lt;tên-change&gt;/</code>",
+            "Không phụ thuộc OpenSpec hay CLI ngoài — plugin tự dựng",
+        ],
         "when_to_use": [
             "Khi muốn bắt đầu một thay đổi mới trong dự án",
             "Trước khi viết bất kỳ dòng code nào, để có spec rõ ràng",
@@ -87,7 +92,13 @@ CURATED = {
     },
     "skills.review": {
         "lede": "Sinh checklist để bạn duyệt thiết kế. Khi nào bạn ghi 'Overall Decision: OK', bước thực thi mới được mở khoá.",
-        "details": "Đây là chốt chặn human-in-the-loop của morkit. Skill tải checklist canonical từ Google Doc của Mor, tự phát hiện variant (BE/FE × Feature/BugFix/Refactor), và sinh file <code>review-checklist.md</code> trong change folder. Hai lớp bảo vệ song song: PreToolUse hook chặn ở mức harness, và mỗi skill thực thi tự kiểm tra ở Step 0.",
+        "details": [
+            "Tải checklist canonical từ Google Doc của Mor",
+            "Tự phát hiện variant: <strong>BE/FE</strong> × <strong>Feature/BugFix/Refactor</strong>",
+            "Sinh file <code>review-checklist.md</code> trong change folder",
+            "Là chốt chặn human-in-the-loop — 2 lớp bảo vệ song song:",
+            "<ul><li>PreToolUse hook chặn ở mức harness</li><li>Mỗi skill thực thi tự kiểm tra ở Step 0</li></ul>",
+        ],
         "when_to_use": [
             "Sau khi vừa chạy propose xong",
             "Khi muốn làm mới checklist với một biến thể khác (BE/FE × Feature/BugFix/Refactor)",
@@ -97,7 +108,12 @@ CURATED = {
     },
     "skills.archive": {
         "lede": "Đóng một change folder sau khi PR đã merge và đã deploy ổn.",
-        "details": "Skill di chuyển thư mục change từ vùng active sang <code>archive/YYYY-MM/</code> theo tháng, và cập nhật <code>.meta.json</code> với trạng thái archived. Không xoá file — bạn vẫn có thể tra lại sau. Mục đích là giữ thư mục <code>morkit/output/spec/</code> chỉ chứa các change đang làm dở.",
+        "details": [
+            "Di chuyển thư mục change sang <code>archive/YYYY-MM/</code> theo tháng",
+            "Cập nhật <code>.meta.json</code> với trạng thái <code>archived</code>",
+            "Không xoá file — bạn vẫn có thể tra lại sau này",
+            "Giữ thư mục <code>morkit/output/spec/</code> chỉ chứa change đang làm dở",
+        ],
         "when_to_use": [
             "Sau khi đã merge và verify ở môi trường thật",
             "Khi muốn giữ thư mục morkit/output/spec/ gọn gàng",
@@ -137,7 +153,12 @@ CURATED = {
     # ====================================================================
     "skills.brainstorming": {
         "lede": "Cùng bạn suy nghĩ ý tưởng và khảo sát mã nguồn trước khi viết code. Chỉ tư duy — không tạo file, không sửa code.",
-        "details": "Skill dẫn bạn qua quy trình hỏi-trả lời từng bước để làm rõ scope, requirements và tiêu chí thành công. Sau đó đề xuất 2-3 phương án kèm trade-offs để bạn chọn, ghi lại quyết định vào file design ở <code>morkit/output/specs/YYYY-MM-DD-&lt;topic&gt;-design.md</code>. Có HARD-GATE chặn mọi hành động viết code cho đến khi bạn approve design.",
+        "details": [
+            "Hỏi từng câu một để làm rõ <strong>scope</strong>, <strong>requirements</strong> và tiêu chí thành công",
+            "Đề xuất <strong>2-3 phương án</strong> kèm trade-offs để bạn chọn",
+            "Ghi quyết định vào <code>morkit/output/specs/YYYY-MM-DD-&lt;topic&gt;-design.md</code>",
+            "Có <strong>HARD-GATE</strong>: chặn mọi hành động viết code cho tới khi bạn approve design",
+        ],
         "when_to_use": [
             "Khi nhận một yêu cầu chưa rõ phạm vi",
             "Trước khi viết kế hoạch chi tiết",
@@ -148,7 +169,12 @@ CURATED = {
     },
     "skills.writing-plans": {
         "lede": "Khi đã có yêu cầu rõ ràng, dùng skill này để viết kế hoạch nhiều bước trước khi đụng code.",
-        "details": "Skill chuyển spec/design thành một plan thực thi: chia thành các bước đánh số, mỗi bước có acceptance criteria và thứ tự phụ thuộc rõ ràng. Plan được lưu để skill executing-plans hoặc subagent-driven-development chạy lại sau. Mục tiêu là tách hẳn pha thiết kế và pha thực thi — bạn duyệt plan trước, rồi mới cho code chạy.",
+        "details": [
+            "Chuyển <strong>spec/design</strong> thành plan thực thi đánh số từng bước",
+            "Mỗi bước có <strong>acceptance criteria</strong> và thứ tự phụ thuộc rõ ràng",
+            "Plan lưu lại để <code>executing-plans</code> hoặc <code>subagent-driven-development</code> chạy sau",
+            "Tách hẳn pha thiết kế và pha thực thi — bạn duyệt plan trước, code mới chạy",
+        ],
         "when_to_use": [
             "Sau khi brainstorming đã chốt phương án",
             "Khi đã có yêu cầu cụ thể và cần chia nhỏ thành các bước",
@@ -158,7 +184,12 @@ CURATED = {
     },
     "skills.executing-plans": {
         "lede": "Chạy plan từng bước trong một phiên làm việc riêng, có điểm dừng để bạn xem lại giữa chừng.",
-        "details": "Skill nạp plan, chạy lần lượt từng bước trong session riêng, và dừng ở các checkpoint quan trọng để bạn xác nhận trước khi đi tiếp. Bị plan-review-gate chặn cho tới khi checklist có <code>Overall Decision: OK</code>. Phù hợp khi muốn kiểm soát từng bước — đối lập với subagent-driven-development khi muốn đi nhanh song song.",
+        "details": [
+            "Nạp plan, chạy <strong>lần lượt</strong> từng bước trong session riêng",
+            "Dừng ở các <strong>checkpoint</strong> quan trọng để bạn xác nhận",
+            "Bị chặn cho tới khi checklist có <code>Overall Decision: OK</code>",
+            "Đối lập với <code>subagent-driven-development</code>: chậm hơn nhưng kiểm soát chặt hơn",
+        ],
         "when_to_use": [
             "Khi plan đã viết xong và checklist review đã được duyệt OK",
             "Khi muốn chạy có kiểm soát, dừng để confirm ở mỗi mốc quan trọng",
@@ -168,7 +199,13 @@ CURATED = {
     },
     "skills.subagent-driven-development": {
         "lede": "Khi plan có nhiều việc độc lập, spawn nhiều subagent chạy song song thay vì làm tuần tự.",
-        "details": "Skill phân tích plan, nhận diện các bước độc lập (không chia sẻ state), và dispatch từng bước cho một subagent riêng. Các subagent chạy đồng thời, kết quả được tổng hợp lại. Vẫn tuân thủ plan-review-gate giống executing-plans, nhưng tốc độ nhanh hơn đáng kể với plan rộng.",
+        "details": [
+            "Nhận diện các bước <strong>độc lập</strong> trong plan (không chia sẻ state)",
+            "Dispatch mỗi bước cho một subagent riêng, chạy đồng thời",
+            "Tổng hợp kết quả từ các subagent thành output cuối",
+            "Vẫn tuân thủ plan-review-gate giống <code>executing-plans</code>",
+            "Nhanh hơn đáng kể với plan rộng — đổi lại kiểm soát ít chi tiết hơn",
+        ],
         "when_to_use": [
             "Khi plan chứa các bước không phụ thuộc lẫn nhau",
             "Khi muốn đi nhanh hơn so với chạy tuần tự",
@@ -178,7 +215,13 @@ CURATED = {
     },
     "skills.test-driven-development": {
         "lede": "Bắt buộc viết test trước, code sau. Quy trình Red → Green → Refactor.",
-        "details": "Skill ép quy trình TDD ở từng bước: viết test fail trước (Red), viết code tối thiểu để test pass (Green), rồi refactor giữ test pass (Refactor). Không cho viết code production khi chưa có test. Đây là rigid skill — không adapt away khỏi discipline.",
+        "details": [
+            "<strong>Red:</strong> viết test fail trước",
+            "<strong>Green:</strong> viết code tối thiểu để test pass",
+            "<strong>Refactor:</strong> dọn code, giữ test vẫn pass",
+            "Không cho viết code production khi chưa có test fail",
+            "Đây là rigid skill — không bỏ qua discipline kể cả khi 'task đơn giản'",
+        ],
         "when_to_use": [
             "Khi triển khai bất kỳ tính năng hoặc bản sửa lỗi nào",
             "Trước khi viết code production",
@@ -188,7 +231,12 @@ CURATED = {
     },
     "skills.systematic-debugging": {
         "lede": "Khi gặp lỗi, debug có hệ thống thay vì đoán mò. Tái hiện lỗi trước, sửa sau.",
-        "details": "Skill ép quy trình debug 5 bước: tái hiện lỗi → thu hẹp phạm vi → đặt giả thuyết → xác minh giả thuyết → fix. Cấm đoán mò và cấm fix khi chưa biết root cause. Mỗi bước phải có evidence cụ thể (output, log, trace) trước khi sang bước tiếp.",
+        "details": [
+            "Quy trình 5 bước bắt buộc:",
+            "<ol><li>Tái hiện lỗi</li><li>Thu hẹp phạm vi</li><li>Đặt giả thuyết</li><li>Xác minh giả thuyết</li><li>Fix</li></ol>",
+            "Cấm đoán mò — mỗi bước phải có <strong>evidence</strong> cụ thể (output, log, trace)",
+            "Cấm fix khi chưa biết root cause",
+        ],
         "when_to_use": [
             "Khi gặp bug, test thất bại hoặc hành vi bất thường",
             "Trước khi đề xuất bất kỳ bản sửa nào",
@@ -198,7 +246,12 @@ CURATED = {
     },
     "skills.dispatching-parallel-agents": {
         "lede": "Khi có từ 2 việc độc lập trở lên, spawn nhiều agent chạy song song để tiết kiệm thời gian.",
-        "details": "Skill xác định các task có thể chạy song song (không chia sẻ state, không phụ thuộc tuần tự), rồi spawn nhiều Agent tool call trong cùng một message với <code>run_in_background: true</code>. Sau đó tổng hợp kết quả lại. Phù hợp với research nhiều hướng hoặc làm cùng lúc nhiều file độc lập.",
+        "details": [
+            "Xác định task có thể chạy song song (không chia sẻ state, không phụ thuộc tuần tự)",
+            "Spawn nhiều <code>Agent</code> tool call trong cùng một message với <code>run_in_background: true</code>",
+            "Tổng hợp kết quả từ các agent lại",
+            "Hợp với <strong>research nhiều hướng</strong> hoặc làm nhiều file độc lập cùng lúc",
+        ],
         "when_to_use": [
             "Khi có 2 hoặc nhiều việc không phụ thuộc lẫn nhau",
             "Khi cần khảo sát nhiều khía cạnh cùng lúc",
@@ -208,7 +261,12 @@ CURATED = {
     },
     "skills.using-git-worktrees": {
         "lede": "Tạo worktree riêng cho feature mới, không ảnh hưởng đến workspace hiện tại.",
-        "details": "Skill tạo git worktree ở một thư mục riêng dựa trên branch hiện tại hoặc một branch mới. Có kiểm tra an toàn (smart directory selection, không tạo trong thư mục đã có code), giúp tránh xung đột khi đang dở dang công việc trong workspace chính. Phù hợp khi muốn thử một hướng khác mà không stash.",
+        "details": [
+            "Tạo git worktree ở thư mục riêng dựa trên branch hiện tại hoặc branch mới",
+            "Có <strong>smart directory selection</strong>: không tạo trong thư mục đã có code",
+            "Tránh xung đột khi đang dở việc trong workspace chính",
+            "Hợp khi muốn thử một hướng khác mà không cần <code>git stash</code>",
+        ],
         "when_to_use": [
             "Khi bắt đầu một feature cần làm cách ly khỏi workspace hiện tại",
             "Trước khi chạy plan thực thi có thể đụng nhiều file",
@@ -218,7 +276,12 @@ CURATED = {
     },
     "skills.finishing-a-development-branch": {
         "lede": "Khi feature đã xong và test pass, skill gợi ý các lựa chọn đóng branch (merge, mở PR, hoặc bỏ).",
-        "details": "Skill phân tích trạng thái branch (commits ahead, tests, CI status, conflict với main), rồi đưa ra các lựa chọn có structure: squash merge thẳng, mở PR review trước khi merge, hoặc bỏ branch nếu thử nghiệm không thành. Skill không tự action — chỉ đề xuất; bạn quyết định và execute.",
+        "details": [
+            "Phân tích trạng thái branch: commits ahead, tests, CI status, conflict với main",
+            "Đưa ra 3 lựa chọn có cấu trúc:",
+            "<ul><li><strong>Squash merge</strong> thẳng</li><li>Mở <strong>PR</strong> review trước khi merge</li><li><strong>Bỏ branch</strong> nếu thử nghiệm không thành</li></ul>",
+            "Không tự action — chỉ đề xuất, bạn quyết định và execute",
+        ],
         "when_to_use": [
             "Khi đã code xong, test pass hết",
             "Khi cần quyết định bước đóng nhánh",
@@ -228,7 +291,12 @@ CURATED = {
     },
     "skills.verification-before-completion": {
         "lede": "Trước khi nói \"xong rồi\" hoặc commit, bắt buộc chạy lệnh kiểm tra thật và xem output thật.",
-        "details": "Skill ép một nguyên tắc: \"evidence before assertions\". Không được claim feature đã xong, bug đã fix, test đã pass cho tới khi chạy lệnh xác minh (build, test, lint, smoke run) và copy output thật ra. Mục tiêu là tránh báo cáo dối/hồ đồ — đặc biệt quan trọng khi làm AI-assisted dev.",
+        "details": [
+            "Nguyên tắc: <strong>evidence before assertions</strong>",
+            "Cấm claim feature đã xong / bug đã fix / test đã pass nếu chưa có bằng chứng",
+            "Bắt buộc chạy: build, test, lint, smoke run — và copy output thật ra",
+            "Quan trọng trong AI-assisted dev để tránh báo cáo hồ đồ",
+        ],
         "when_to_use": [
             "Trước khi báo cáo \"đã làm xong\" hay \"đã sửa rồi\"",
             "Trước khi commit hoặc mở PR",
@@ -238,7 +306,12 @@ CURATED = {
     },
     "skills.requesting-code-review": {
         "lede": "Khi feature đã xong, dùng skill này để chuẩn bị xin review một cách có hệ thống.",
-        "details": "Skill checklist hoá bước xin review: verify build pass, test pass, tự rà soát code, viết PR description rõ ràng (summary + test plan), tag đúng người. Có thể chain với <code>/morkit:deep-review</code> để tự review chuyên sâu trước khi gửi cho người. Mục tiêu là PR vào reviewer ở trạng thái sạch nhất có thể.",
+        "details": [
+            "Checklist trước khi mở PR:",
+            "<ul><li>Build pass</li><li>Test pass</li><li>Tự rà soát code</li><li>PR description rõ ràng (summary + test plan)</li><li>Tag đúng người review</li></ul>",
+            "Có thể chain với <code>/morkit:deep-review</code> để tự review chuyên sâu trước",
+            "Mục tiêu: PR vào reviewer ở trạng thái sạch nhất có thể",
+        ],
         "when_to_use": [
             "Sau khi đã làm xong một task hoặc một feature lớn",
             "Trước khi merge",
@@ -248,7 +321,12 @@ CURATED = {
     },
     "skills.receiving-code-review": {
         "lede": "Khi nhận góp ý review, skill này giúp bạn hiểu rõ trước khi sửa — không đồng ý theo phản xạ.",
-        "details": "Skill ép technical rigor khi đọc review: phải hiểu rõ từng góp ý, verify giả định reviewer đặt, push back có lý nếu góp ý sai. Cấm \"agree + fix\" theo phản xạ vì nhiều khi reviewer cũng nhầm. Phù hợp khi bạn không chắc một suggestion có đúng không.",
+        "details": [
+            "Phải <strong>hiểu rõ</strong> từng góp ý trước khi action",
+            "<strong>Verify</strong> giả định reviewer đặt — đôi khi reviewer cũng nhầm",
+            "<strong>Push back</strong> có lý nếu góp ý sai, không 'agree + fix' theo phản xạ",
+            "Hợp khi bạn không chắc một suggestion có đúng không",
+        ],
         "when_to_use": [
             "Khi đọc các comment review trên PR",
             "Đặc biệt khi feedback chưa rõ hoặc nghe có vẻ chưa hợp lý",
@@ -258,7 +336,12 @@ CURATED = {
     },
     "skills.writing-skills": {
         "lede": "Khi cần tạo skill mới hoặc sửa skill cũ, dùng skill này để đảm bảo viết đúng chuẩn.",
-        "details": "Skill hướng dẫn cấu trúc file <code>SKILL.md</code>: YAML frontmatter (name + description), trigger \"Use when\", workflow/checklist, red flags, examples thực tế. Có verify step để test skill chạy được trong session thật trước khi commit. Tránh skill bị invoke sai do description mơ hồ.",
+        "details": [
+            "Hướng dẫn cấu trúc file <code>SKILL.md</code>:",
+            "<ul><li>YAML frontmatter (<code>name</code> + <code>description</code>)</li><li>Trigger \"Use when...\"</li><li>Workflow / checklist</li><li>Red flags</li><li>Examples thực tế</li></ul>",
+            "Có verify step: test skill chạy được trong session thật trước khi commit",
+            "Tránh skill bị invoke sai do description mơ hồ",
+        ],
         "when_to_use": [
             "Khi viết file SKILL.md mới",
             "Khi sửa skill có sẵn",
@@ -301,7 +384,12 @@ CURATED = {
     # ====================================================================
     "skills.deep-review": {
         "lede": "Review code chuyên sâu bằng 5 chuyên gia AI chạy song song (rủi ro, bảo mật, pattern, kiểm thử, quy ước).",
-        "details": "Skill dispatch 5 specialist subagent song song: risk analyst (đánh giá rủi ro thay đổi), security auditor (vuln, secret leak, OWASP), pattern reviewer (anti-pattern, code smell), test reviewer (độ phủ, edge case), convention checker (CLAUDE.md, lint, style). Kết quả tổng hợp thành một báo cáo Markdown dạng bảng. Tôn trọng CLAUDE.md của project làm source of truth cao nhất.",
+        "details": [
+            "Dispatch 5 specialist subagent chạy song song:",
+            "<ul><li><strong>Risk analyst</strong> — đánh giá rủi ro thay đổi</li><li><strong>Security auditor</strong> — vuln, secret leak, OWASP</li><li><strong>Pattern reviewer</strong> — anti-pattern, code smell</li><li><strong>Test reviewer</strong> — độ phủ, edge case</li><li><strong>Convention checker</strong> — CLAUDE.md, lint, style</li></ul>",
+            "Tổng hợp thành một báo cáo Markdown dạng bảng",
+            "Tôn trọng <code>CLAUDE.md</code> của project làm source of truth cao nhất",
+        ],
         "when_to_use": [
             "Khi cần review chất lượng cao một PR hoặc git diff",
             "Trước khi merge một feature lớn",
@@ -341,7 +429,12 @@ CURATED = {
     # ====================================================================
     "skills.docs-hero-orchestrator": {
         "lede": "Điều phối các sub-skill để sinh hoặc cập nhật bộ tài liệu đầy đủ cho một dự án.",
-        "details": "Orchestrator gọi 7 sub-skill (SRS, API, DB, system architecture, code standards, codebase summary, design guidelines) theo thứ tự ít xung đột nhất. Có 3 chế độ chính: <code>init</code> tạo mới từ ProjectModel JSON, <code>update</code> áp dụng change/plan có sẵn, <code>sync</code> quét codebase và đề xuất cập nhật. Tuân thủ các chuẩn: BrSE ITO Japan cho SRS, arc42-lite cho kiến trúc, Conventional Commits + MADR cho guidelines.",
+        "details": [
+            "Gọi 7 sub-skill theo thứ tự ít xung đột nhất: SRS, API, DB, system architecture, code standards, codebase summary, design guidelines",
+            "3 chế độ chính:",
+            "<ul><li><code>init</code> — tạo mới từ ProjectModel JSON</li><li><code>update</code> — áp dụng change/plan có sẵn</li><li><code>sync</code> — quét codebase và đề xuất cập nhật</li></ul>",
+            "Theo các chuẩn: <strong>BrSE ITO Japan</strong> (SRS), <strong>arc42-lite</strong> (kiến trúc), <strong>Conventional Commits</strong> + <strong>MADR</strong> (guidelines)",
+        ],
         "when_to_use": [
             "Khi cần sinh nguyên bộ tài liệu (SRS, API, DB, kiến trúc…) một lần",
             "Khi muốn các sub-skill phối hợp với nhau, ít xung đột nhất có thể",
@@ -351,7 +444,11 @@ CURATED = {
     },
     "skills.generate-srs": {
         "lede": "Sinh hoặc cập nhật tài liệu yêu cầu phần mềm (SRS) theo chuẩn BrSE cho ITO Japan offshore.",
-        "details": "Render template SRS đầy đủ 13 section + 2 phụ lục: Doc Control, Overview, Business Flow (kèm UC detail), FR detail, Business Rules, Roles &amp; Permissions, NFR theo IPA-6 (kèm Security/PII), Data Items với retention, External Interfaces, Reports, Acceptance/UAT, Traceability, Open Q&amp;A, Constraints/Assumptions/Risks, Screen Index, Glossary. Chế độ <code>init</code> sinh từ ProjectModel JSON; <code>update</code> apply Delta vào doc đang có và giữ phần bạn sửa tay.",
+        "details": [
+            "Render template SRS <strong>13 section + 2 phụ lục</strong>:",
+            "<ul><li>Doc Control</li><li>Overview</li><li>Business Flow (kèm UC detail)</li><li>FR detail</li><li>Business Rules</li><li>Roles &amp; Permissions</li><li>NFR theo IPA-6 (kèm Security/PII)</li><li>Data Items với retention</li><li>External Interfaces</li><li>Reports</li><li>Acceptance / UAT</li><li>Traceability</li><li>Open Q&amp;A</li><li>Constraints / Assumptions / Risks (phụ lục)</li><li>Screen Index + Glossary (phụ lục)</li></ul>",
+            "2 chế độ: <code>init</code> sinh từ ProjectModel JSON; <code>update</code> apply Delta và giữ phần bạn sửa tay",
+        ],
         "when_to_use": [
             "Khi dự án cần SRS theo chuẩn của khách Nhật",
             "Khi yêu cầu thay đổi và cần làm mới SRS",
@@ -361,7 +458,12 @@ CURATED = {
     },
     "skills.generate-api-docs": {
         "lede": "Sinh hoặc cập nhật tài liệu REST API.",
-        "details": "Render <code>api-docs.md</code> mô tả endpoint, request, response, error code. 3 chế độ: <code>init</code> sinh từ ProjectModel, <code>update</code> áp dụng Delta có sẵn, <code>sync</code> là pipeline 2 bước (propose → apply) quét REST route trong codebase rồi xuất file <code>sync-proposal.md</code> có checkbox để bạn tick chọn nội dung muốn apply.",
+        "details": [
+            "Render <code>api-docs.md</code> mô tả endpoint, request, response, error code",
+            "3 chế độ:",
+            "<ul><li><code>init</code> — sinh từ ProjectModel</li><li><code>update</code> — áp dụng Delta có sẵn</li><li><code>sync</code> — pipeline 2 bước: <strong>propose → apply</strong>, có checkbox để bạn tick chọn</li></ul>",
+            "Chế độ sync quét REST route trong codebase, xuất file <code>sync-proposal.md</code>",
+        ],
         "when_to_use": [
             "Khi cần tài liệu mô tả endpoint, request, response",
             "Khi route trong mã nguồn đã đổi và muốn đồng bộ lại tài liệu",
@@ -371,7 +473,12 @@ CURATED = {
     },
     "skills.generate-db-design": {
         "lede": "Sinh hoặc cập nhật tài liệu thiết kế database, có sơ đồ ERD bằng Mermaid.",
-        "details": "Render <code>database-design.md</code> với mô tả bảng, cột, quan hệ, index và sơ đồ ERD nhúng bằng Mermaid. 3 chế độ: <code>init</code> sinh từ ProjectModel, <code>update</code> apply Delta, <code>sync</code> quét ORM model (TypeORM, Prisma, SQLAlchemy...) và đề xuất Thêm/Sửa/Bỏ theo bảng.",
+        "details": [
+            "Render <code>database-design.md</code> gồm: mô tả bảng, cột, quan hệ, index",
+            "Nhúng sơ đồ <strong>ERD</strong> vẽ bằng Mermaid",
+            "3 chế độ: <code>init</code> / <code>update</code> / <code>sync</code>",
+            "Sync quét ORM model (TypeORM, Prisma, SQLAlchemy...) và đề xuất <strong>Thêm / Sửa / Bỏ</strong> theo bảng",
+        ],
         "when_to_use": [
             "Khi cần tài liệu mô tả schema DB",
             "Khi muốn đồng bộ tài liệu với ORM model trong mã nguồn",
@@ -381,7 +488,12 @@ CURATED = {
     },
     "skills.generate-system-architecture": {
         "lede": "Sinh hoặc cập nhật tài liệu kiến trúc hệ thống theo arc42-lite, kèm sơ đồ thành phần bằng Mermaid.",
-        "details": "Render <code>system-architecture.md</code> 8 section arc42-lite: Introduction, Constraints, Context, Solution Strategy, Building Blocks, Runtime, Deployment, Crosscutting. Sơ đồ component nhúng bằng Mermaid. Chế độ <code>sync</code> quét services, packages, Dockerfile, k8s manifest và import graph để đề xuất Component cần Thêm/Bỏ.",
+        "details": [
+            "Render <code>system-architecture.md</code> theo <strong>arc42-lite 8 section</strong>:",
+            "<ul><li>Introduction</li><li>Constraints</li><li>Context</li><li>Solution Strategy</li><li>Building Blocks</li><li>Runtime</li><li>Deployment</li><li>Crosscutting</li></ul>",
+            "Nhúng sơ đồ component bằng Mermaid",
+            "Sync quét services, packages, Dockerfile, k8s manifest và import graph để đề xuất Component cần Thêm / Bỏ",
+        ],
         "when_to_use": [
             "Khi cần tài liệu kiến trúc cho dự án",
             "Khi muốn nhúng sơ đồ component vẽ bằng Mermaid",
@@ -391,7 +503,13 @@ CURATED = {
     },
     "skills.generate-code-standards": {
         "lede": "Sinh hoặc cập nhật tài liệu quy ước code (Conventional Commits + cấu hình lint/format).",
-        "details": "Render <code>code-standards.md</code> từ ProjectModel + auto-extract từ các file cấu hình lint/format đang có (ESLint, Prettier, Ruff, EditorConfig...). Phân loại theo scope LNT/NAM/CMT/FMT (lint/naming/commit/format). Chế độ <code>sync</code> đề xuất Thêm/Bỏ rule khi cấu hình đổi. Nếu repo đã có CONTRIBUTING.md, link sang thay vì duplicate.",
+        "details": [
+            "Render <code>code-standards.md</code> từ ProjectModel",
+            "Auto-extract rule từ ESLint, Prettier, Ruff, EditorConfig... đang có trong repo",
+            "Phân loại theo scope: <strong>LNT</strong> (lint) / <strong>NAM</strong> (naming) / <strong>CMT</strong> (commit) / <strong>FMT</strong> (format)",
+            "Sync đề xuất Thêm / Bỏ rule khi cấu hình đổi",
+            "Nếu repo đã có <code>CONTRIBUTING.md</code>, link sang thay vì duplicate",
+        ],
         "when_to_use": [
             "Khi dự án cần một tài liệu thống nhất về quy ước code",
             "Khi muốn rút quy ước từ các file cấu hình lint/format đang có",
@@ -401,7 +519,12 @@ CURATED = {
     },
     "skills.generate-codebase-summary": {
         "lede": "Sinh hoặc cập nhật tài liệu tổng quan mã nguồn dạng README: tech stack, cấu trúc, gói, entry point.",
-        "details": "Render <code>codebase-summary.md</code> dạng README-style overview: tech stack, repo layout (file tree gọn), packages chính, entry points và LOC theo ngôn ngữ. Chế độ <code>sync</code> quét file tree + manifest (package.json, pyproject.toml, go.mod...) và đề xuất Thêm/Bỏ. Phù hợp khi onboard người mới muốn nắm dự án nhanh trong 5 phút.",
+        "details": [
+            "Render <code>codebase-summary.md</code> dạng README-style overview gồm:",
+            "<ul><li>Tech stack</li><li>Repo layout (file tree gọn)</li><li>Packages chính</li><li>Entry points</li><li>LOC theo ngôn ngữ</li></ul>",
+            "Sync quét file tree + manifest (<code>package.json</code>, <code>pyproject.toml</code>, <code>go.mod</code>...) và đề xuất Thêm / Bỏ",
+            "Hợp khi <strong>onboard người mới</strong> — nắm dự án trong 5 phút",
+        ],
         "when_to_use": [
             "Khi cần một bản tổng quan dự án dành cho người mới onboard",
             "Khi muốn ai đó hiểu nhanh dự án mà không cần đọc hết code",
@@ -411,7 +534,13 @@ CURATED = {
     },
     "skills.generate-design-guidelines": {
         "lede": "Sinh hoặc cập nhật tài liệu Design Principles, Patterns và các ADR (MADR format).",
-        "details": "Render <code>design-guidelines.md</code> gồm 3 phần: Design Principles, Patterns, ADRs theo chuẩn MADR. Khi <code>init</code>, mỗi ADR có file riêng tại <code>docs/adr/NNN-slug.md</code> để dễ tra cứu sau. Phân loại theo scope DPR/PTN/ADR. Skill này cố ý <em>không hỗ trợ</em> chế độ sync vì guidelines là quyết định của người, không nên auto-generate.",
+        "details": [
+            "Render <code>design-guidelines.md</code> gồm 3 phần:",
+            "<ul><li><strong>Design Principles</strong></li><li><strong>Patterns</strong></li><li><strong>ADRs</strong> theo chuẩn MADR</li></ul>",
+            "Khi <code>init</code>, mỗi ADR có file riêng tại <code>docs/adr/NNN-slug.md</code>",
+            "Phân loại theo scope: <strong>DPR</strong> / <strong>PTN</strong> / <strong>ADR</strong>",
+            "<em>Không hỗ trợ</em> chế độ sync — guidelines là quyết định của người, không auto-generate",
+        ],
         "when_to_use": [
             "Khi cần một tài liệu thống nhất về nguyên tắc thiết kế",
             "Khi muốn ghi lại các quyết định kiến trúc theo MADR format",
@@ -478,7 +607,13 @@ CURATED = {
     # ====================================================================
     "skills.using-morkit": {
         "lede": "Skill nền — tự chạy ở đầu mỗi cuộc hội thoại để Claude biết cách tìm và dùng các skill khác.",
-        "details": "Skill này được Claude tự invoke ở đầu mọi phiên làm việc với morkit, trước khi trả lời bất kỳ câu hỏi nào (kể cả câu hỏi làm rõ). Nó establish cách Claude tìm và gọi các skill khác qua Skill tool, đảm bảo các overlay (như plan-review-gate) hoạt động đúng. Không gọi tay — chỉ là cơ chế nền.",
+        "details": [
+            "Claude <strong>tự invoke</strong> ở đầu mọi phiên làm việc với morkit",
+            "Chạy trước khi trả lời bất kỳ câu hỏi nào (kể cả câu hỏi làm rõ)",
+            "Establish cách Claude tìm và gọi các skill khác qua Skill tool",
+            "Đảm bảo các overlay (như <code>plan-review-gate</code>) hoạt động đúng",
+            "Không gọi tay — chỉ là cơ chế nền",
+        ],
         "when_to_use": [
             "Tự chạy mỗi khi bắt đầu một phiên mới — bạn không cần gọi tay",
             "Khi cần Claude hiểu cách điều phối các skill khác trong morkit",

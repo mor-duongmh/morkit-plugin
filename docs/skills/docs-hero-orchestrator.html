@@ -77,6 +77,29 @@ h2 {
 .tag.deprecated { color: var(--accent); border-color: var(--accent); }
 ul, ol { padding-left: 22px; }
 li { margin: 4px 0; }
+ul.duties { padding-left: 0; list-style: none; }
+ul.duties > li {
+  position: relative; padding: 8px 12px 8px 28px;
+  border-left: 2px solid var(--border);
+  margin: 0 0 4px 0;
+}
+ul.duties > li::before {
+  content: "›"; position: absolute; left: 10px; top: 8px;
+  color: var(--accent); font-weight: 600;
+}
+/* When a duty-bullet only contains a nested <ul>, hide its chevron+border so
+   the nested items visually attach to the previous bullet above. */
+ul.duties > li:has(> ul:only-child) {
+  border-left: 0; padding: 0 0 4px 28px; margin-top: -8px;
+}
+ul.duties > li:has(> ul:only-child)::before { content: none; }
+ul.duties ul { margin: 4px 0 2px 0; padding-left: 18px; list-style: disc; }
+ul.duties ul li {
+  margin: 3px 0; padding: 0; border: 0;
+  color: var(--fg-muted);
+}
+ul.duties ul li::before { content: none; }
+ul.duties ul li code { font-size: 0.88em; }
 pre {
   background: var(--code-bg); color: var(--code-fg);
   padding: 14px 16px; border-radius: 8px;
@@ -153,7 +176,12 @@ td code { font-size: 12px; }
   <p class="lede">Điều phối các sub-skill để sinh hoặc cập nhật bộ tài liệu đầy đủ cho một dự án.</p>
 
   <h2>1. Nhiệm vụ</h2>
-  <p>Orchestrator gọi 7 sub-skill (SRS, API, DB, system architecture, code standards, codebase summary, design guidelines) theo thứ tự ít xung đột nhất. Có 3 chế độ chính: <code>init</code> tạo mới từ ProjectModel JSON, <code>update</code> áp dụng change/plan có sẵn, <code>sync</code> quét codebase và đề xuất cập nhật. Tuân thủ các chuẩn: BrSE ITO Japan cho SRS, arc42-lite cho kiến trúc, Conventional Commits + MADR cho guidelines.</p>
+  <ul class="duties">
+    <li>Gọi 7 sub-skill theo thứ tự ít xung đột nhất: SRS, API, DB, system architecture, code standards, codebase summary, design guidelines</li>
+    <li>3 chế độ chính:</li>
+    <li><ul><li><code>init</code> — tạo mới từ ProjectModel JSON</li><li><code>update</code> — áp dụng change/plan có sẵn</li><li><code>sync</code> — quét codebase và đề xuất cập nhật</li></ul></li>
+    <li>Theo các chuẩn: <strong>BrSE ITO Japan</strong> (SRS), <strong>arc42-lite</strong> (kiến trúc), <strong>Conventional Commits</strong> + <strong>MADR</strong> (guidelines)</li>
+  </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>

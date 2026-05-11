@@ -77,6 +77,29 @@ h2 {
 .tag.deprecated { color: var(--accent); border-color: var(--accent); }
 ul, ol { padding-left: 22px; }
 li { margin: 4px 0; }
+ul.duties { padding-left: 0; list-style: none; }
+ul.duties > li {
+  position: relative; padding: 8px 12px 8px 28px;
+  border-left: 2px solid var(--border);
+  margin: 0 0 4px 0;
+}
+ul.duties > li::before {
+  content: "›"; position: absolute; left: 10px; top: 8px;
+  color: var(--accent); font-weight: 600;
+}
+/* When a duty-bullet only contains a nested <ul>, hide its chevron+border so
+   the nested items visually attach to the previous bullet above. */
+ul.duties > li:has(> ul:only-child) {
+  border-left: 0; padding: 0 0 4px 28px; margin-top: -8px;
+}
+ul.duties > li:has(> ul:only-child)::before { content: none; }
+ul.duties ul { margin: 4px 0 2px 0; padding-left: 18px; list-style: disc; }
+ul.duties ul li {
+  margin: 3px 0; padding: 0; border: 0;
+  color: var(--fg-muted);
+}
+ul.duties ul li::before { content: none; }
+ul.duties ul li code { font-size: 0.88em; }
 pre {
   background: var(--code-bg); color: var(--code-fg);
   padding: 14px 16px; border-radius: 8px;
@@ -153,7 +176,12 @@ td code { font-size: 12px; }
   <p class="lede">Trước khi nói &quot;xong rồi&quot; hoặc commit, bắt buộc chạy lệnh kiểm tra thật và xem output thật.</p>
 
   <h2>1. Nhiệm vụ</h2>
-  <p>Skill ép một nguyên tắc: "evidence before assertions". Không được claim feature đã xong, bug đã fix, test đã pass cho tới khi chạy lệnh xác minh (build, test, lint, smoke run) và copy output thật ra. Mục tiêu là tránh báo cáo dối/hồ đồ — đặc biệt quan trọng khi làm AI-assisted dev.</p>
+  <ul class="duties">
+    <li>Nguyên tắc: <strong>evidence before assertions</strong></li>
+    <li>Cấm claim feature đã xong / bug đã fix / test đã pass nếu chưa có bằng chứng</li>
+    <li>Bắt buộc chạy: build, test, lint, smoke run — và copy output thật ra</li>
+    <li>Quan trọng trong AI-assisted dev để tránh báo cáo hồ đồ</li>
+  </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
