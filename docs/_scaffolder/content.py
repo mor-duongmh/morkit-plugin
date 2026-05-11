@@ -36,7 +36,7 @@ GROUPS = {
         "skills":   ["deep-review"],
     },
     "doc-gen": {
-        "commands": ["setup", "init", "update", "sync", "apply-sync", "doctor"],
+        "commands": ["setup", "init", "update-doc", "sync", "apply-sync", "doctor"],
         "skills": [
             "generate-srs", "generate-api-docs", "generate-db-design",
             "generate-system-architecture", "generate-code-standards",
@@ -439,7 +439,7 @@ CURATED = {
             "Khi cần sinh nguyên bộ tài liệu (SRS, API, DB, kiến trúc…) một lần",
             "Khi muốn các sub-skill phối hợp với nhau, ít xung đột nhất có thể",
         ],
-        "example_args": "(gọi qua /morkit:init hoặc /morkit:update)",
+        "example_args": "(gọi qua /morkit:init hoặc /morkit:update-doc)",
         "example_note": "Theo các chuẩn quen thuộc: BrSE ITO Japan cho SRS, arc42-lite cho kiến trúc, MADR cho ADR.",
     },
     "skills.generate-srs": {
@@ -453,7 +453,7 @@ CURATED = {
             "Khi dự án cần SRS theo chuẩn của khách Nhật",
             "Khi yêu cầu thay đổi và cần làm mới SRS",
         ],
-        "example_args": "(gọi qua /morkit:init hoặc /morkit:update)",
+        "example_args": "(gọi qua /morkit:init hoặc /morkit:update-doc)",
         "example_note": "Gồm 13 mục lớn và 2 phụ lục: Doc Control, tổng quan, luồng nghiệp vụ, FR/NFR, quyền, dữ liệu, UAT, traceability...",
     },
     "skills.generate-api-docs": {
@@ -468,7 +468,7 @@ CURATED = {
             "Khi cần tài liệu mô tả endpoint, request, response",
             "Khi route trong mã nguồn đã đổi và muốn đồng bộ lại tài liệu",
         ],
-        "example_args": "(gọi qua /morkit:init / update / sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
         "example_note": "Chế độ init sinh từ ProjectModel; update áp dụng thay đổi; sync quét mã và đề xuất nội dung cần cập nhật.",
     },
     "skills.generate-db-design": {
@@ -483,7 +483,7 @@ CURATED = {
             "Khi cần tài liệu mô tả schema DB",
             "Khi muốn đồng bộ tài liệu với ORM model trong mã nguồn",
         ],
-        "example_args": "(gọi qua /morkit:init / update / sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
         "example_note": "Sinh file database-design.md kèm ERD vẽ bằng Mermaid. Chế độ sync quét ORM và đề xuất Thêm/Sửa/Bỏ.",
     },
     "skills.generate-system-architecture": {
@@ -498,7 +498,7 @@ CURATED = {
             "Khi cần tài liệu kiến trúc cho dự án",
             "Khi muốn nhúng sơ đồ component vẽ bằng Mermaid",
         ],
-        "example_args": "(gọi qua /morkit:init / update / sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
         "example_note": "Gồm 8 mục theo chuẩn arc42-lite. Sync quét services, packages, Docker, k8s và đồ thị import.",
     },
     "skills.generate-code-standards": {
@@ -514,7 +514,7 @@ CURATED = {
             "Khi dự án cần một tài liệu thống nhất về quy ước code",
             "Khi muốn rút quy ước từ các file cấu hình lint/format đang có",
         ],
-        "example_args": "(gọi qua /morkit:init / update / sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
         "example_note": "Nếu đã có CONTRIBUTING.md, sẽ link sang chứ không nhân đôi nội dung.",
     },
     "skills.generate-codebase-summary": {
@@ -529,7 +529,7 @@ CURATED = {
             "Khi cần một bản tổng quan dự án dành cho người mới onboard",
             "Khi muốn ai đó hiểu nhanh dự án mà không cần đọc hết code",
         ],
-        "example_args": "(gọi qua /morkit:init / update / sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
         "example_note": "Liệt kê công nghệ, bố cục thư mục, các package, entry point và số dòng code theo ngôn ngữ.",
     },
     "skills.generate-design-guidelines": {
@@ -545,7 +545,7 @@ CURATED = {
             "Khi cần một tài liệu thống nhất về nguyên tắc thiết kế",
             "Khi muốn ghi lại các quyết định kiến trúc theo MADR format",
         ],
-        "example_args": "(gọi qua /morkit:init / update)",
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc)",
         "example_note": "Khi init, mỗi ADR sẽ có một file riêng tại docs/adr/NNN-slug.md. Skill này không hỗ trợ chế độ sync — guidelines do người viết.",
     },
 
@@ -566,7 +566,7 @@ CURATED = {
         "example_args": "--lang VN",
         "example_note": "Có menu chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra nằm ở thư mục docs/ của dự án. Chọn 1 ngôn ngữ: JP, EN hoặc VN.",
     },
-    "commands.update": {
+    "commands.update-doc": {
         "lede": "Áp dụng một change hoặc plan đã chốt vào tài liệu đang có — vẫn giữ phần bạn đã sửa tay.",
         "when_to_use": [
             "Khi một change đã merge và cần cập nhật vào tài liệu tương ứng",
@@ -595,7 +595,7 @@ CURATED = {
     "commands.doctor": {
         "lede": "Kiểm tra cài đặt docs-hero xem có ổn không (Python, venv, dependencies...).",
         "when_to_use": [
-            "Khi /morkit:init hoặc /morkit:update báo lỗi cài đặt",
+            "Khi /morkit:init hoặc /morkit:update-doc báo lỗi cài đặt",
             "Sau khi cài lần đầu, muốn xác nhận môi trường đã sẵn sàng",
         ],
         "example_args": "",

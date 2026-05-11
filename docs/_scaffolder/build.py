@@ -207,7 +207,7 @@ def render_overview() -> str:
          ", ".join(link_cmd(s) for s in ["deep-review", "deep-review-doctor", "deep-review-post"]),
          "Review code chuyên sâu bằng 5 chuyên gia AI chạy song song."),
         ("Doc generation",
-         ", ".join(link_cmd(s) for s in ["setup", "init", "update", "sync", "apply-sync", "doctor"]),
+         ", ".join(link_cmd(s) for s in ["setup", "init", "update-doc", "sync", "apply-sync", "doctor"]),
          "Tự sinh tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc..."),
     ]
     groups_table_rows = "\n".join(
@@ -227,7 +227,7 @@ def render_overview() -> str:
         ("deep-review-post",       "Post báo cáo review lên PR làm comment."),
         ("setup",                  "Dựng môi trường Python cho docs-hero (khoảng 30-60 giây, chạy 1 lần)."),
         ("init",                   "Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON."),
-        ("update",                 "Áp dụng một change hoặc plan đã chốt vào tài liệu hiện có."),
+        ("update-doc",             "Áp dụng một change hoặc plan đã chốt vào tài liệu hiện có."),
         ("sync",                   "Đọc mã nguồn và đề xuất nội dung nên cập nhật vào tài liệu (chỉ đọc, không ghi)."),
         ("apply-sync",             "Áp dụng các nội dung bạn đã tick trong file sync-proposal.md."),
         ("doctor",                 "Kiểm tra cài đặt docs-hero xem có ổn không."),
@@ -316,7 +316,20 @@ def main():
     (DOCS_DIR / "index.html").write_text(render_overview(), encoding="utf-8")
     written += 1
 
+    # Cleanup orphans: HTML files in out dirs whose source .md no longer exists
+    orphans = []
+    for p in out_skills.glob("*.html"):
+        if p.stem not in skill_slugs:
+            orphans.append(p)
+    for p in out_commands.glob("*.html"):
+        if p.stem not in command_slugs:
+            orphans.append(p)
+    for p in orphans:
+        p.unlink()
+
     print(f"Wrote {written} files. ({len(skill_slugs)} skills + {len(command_slugs)} commands + 1 overview)")
+    if orphans:
+        print(f"Cleaned {len(orphans)} orphan(s): {[str(p.relative_to(REPO_ROOT)) for p in orphans]}")
     print(f"  → {out_skills.relative_to(REPO_ROOT)}/")
     print(f"  → {out_commands.relative_to(REPO_ROOT)}/")
     print(f"  → docs/index.html")
