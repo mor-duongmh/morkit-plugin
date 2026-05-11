@@ -176,9 +176,9 @@ td code { font-size: 12px; }
     <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">brainstorm</span></div>
     <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag deprecated">Đã thay thế</span><span class="tag">Plan & build</span><span class="tag">Command</span></div>
-  <h1>brainstorm</h1>
-  <p class="lede">Command cũ — đã được thay bằng skill morkit:brainstorming.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Plan & build</span><span class="tag">Command</span></div>
+  <h1>morkit:brainstorm</h1>
+  <p class="lede">Vào explore mode — agent là thinking partner free-form, không workflow cứng, không bao giờ viết code. Shortcut gọi skill brainstorming.</p>
 
   <h2>1. Cách gọi</h2>
   <pre><code>/morkit:brainstorm [tham số]</code></pre>
@@ -186,7 +186,9 @@ td code { font-size: 12px; }
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Đừng dùng nữa — dùng skill morkit:brainstorming thay thế</li>
+  <li>Khi nhận yêu cầu chưa rõ phạm vi và muốn tư duy cùng AI</li>
+  <li>Trước khi gõ /morkit:propose hoặc /morkit:init</li>
+  <li>Khi cần khảo sát mã nguồn / kiến trúc trước khi đụng vào</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -195,9 +197,9 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:brainstorm</code></pre>
+    <pre><code>$ /morkit:brainstorm tìm hiểu giúp tôi repo Notion-clone bao gồm các nhánh của nó</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Sẽ bị gỡ ở bản major tiếp theo.</p>
+  <p class="lede" style="font-size:14px;">Tương đương /morkit:brainstorming — cả 2 đều invoke skill brainstorming. Cuối phiên agent lưu design log vào morkit/output/specs/YYYY-MM-DD-&lt;topic&gt;-design.md.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">

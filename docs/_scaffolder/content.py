@@ -152,7 +152,7 @@ CURATED = {
     # NHÓM 2 — LÊN KẾ HOẠCH VÀ LÀM
     # ====================================================================
     "skills.brainstorming": {
-        "lede": "Cùng bạn suy nghĩ ý tưởng và khảo sát mã nguồn ở chế độ <strong>explore</strong> — tự do mở thread, vẽ ASCII diagram, không bao giờ viết code.",
+        "lede": "Cùng bạn suy nghĩ ý tưởng và khảo sát mã nguồn ở chế độ explore — tự do mở thread, vẽ ASCII diagram, không bao giờ viết code.",
         "details": [
             "<strong>Stance, not workflow</strong>: không có bước cố định — agent adapt theo idea bạn mang đến",
             "Hỏi câu mở thread thay vì checklist; pivot khi có thông tin mới",
@@ -163,7 +163,7 @@ CURATED = {
         ],
         "when_to_use": [
             "Khi nhận một yêu cầu chưa rõ phạm vi và muốn tư duy cùng AI",
-            "Trước khi gõ <code>/morkit:propose</code> hoặc <code>/morkit:init</code>",
+            "Trước khi gõ /morkit:propose hoặc /morkit:init",
             "Khi cần khảo sát mã nguồn / kiến trúc hiện tại trước khi đụng vào",
         ],
         "example_args": "tìm hiểu giúp tôi repo Notion-clone bao gồm các nhánh của nó",
@@ -354,13 +354,14 @@ CURATED = {
     },
 
     "commands.brainstorm": {
-        "lede": "Command cũ — đã được thay bằng skill morkit:brainstorming.",
-        "deprecated": True,
+        "lede": "Vào explore mode — agent là thinking partner free-form, không workflow cứng, không bao giờ viết code. Shortcut gọi skill brainstorming.",
         "when_to_use": [
-            "Đừng dùng nữa — dùng skill morkit:brainstorming thay thế",
+            "Khi nhận yêu cầu chưa rõ phạm vi và muốn tư duy cùng AI",
+            "Trước khi gõ /morkit:propose hoặc /morkit:init",
+            "Khi cần khảo sát mã nguồn / kiến trúc trước khi đụng vào",
         ],
-        "example_args": "",
-        "example_note": "Sẽ bị gỡ ở bản major tiếp theo.",
+        "example_args": "tìm hiểu giúp tôi repo Notion-clone bao gồm các nhánh của nó",
+        "example_note": "Tương đương /morkit:brainstorming — cả 2 đều invoke skill brainstorming. Cuối phiên agent lưu design log vào morkit/output/specs/YYYY-MM-DD-<topic>-design.md.",
     },
     "commands.write-plan": {
         "lede": "Command cũ — đã được thay bằng skill morkit:writing-plans.",

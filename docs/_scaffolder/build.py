@@ -221,9 +221,9 @@ def render_overview() -> str:
     # link đi tới commands/<slug>.html hay skills/<slug>.html. User cuối gọi cả
     # 2 bằng cú pháp /morkit:<slug> giống nhau, không cần phân biệt.
     #
-    # Plan & build nội bộ là skill (không có command tương ứng — 3 command cũ
-    # brainstorm/write-plan/execute-plan đều deprecated), nhưng vẫn liệt kê ở
-    # đây vì người dùng gọi /morkit:<name> như command.
+    # Plan & build nội bộ là skill — người dùng gọi /morkit:<name> như command.
+    # Có 1 command shim brainstorm (alias gọi skill brainstorming); 2 command
+    # write-plan/execute-plan vẫn deprecated (chỉ in deprecation warning).
     sub_sections = [
         ("Spec workflow", [
             ("command", "propose [mô tả]", "Sinh đầy đủ proposal, design, tasks và checklist trong một lần chạy."),

@@ -618,7 +618,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
   • Identified: 18 FR · 6 Screen · 14 ENDPOINT · 8 TBL · 6 NFR
 
 [impl-status] Auto-detecting status cho 18 FR...
-  ① openspec/changes + openspec/specs        →  3 FR <span class="tok-warn">InProgress</span>
+  ① morkit/output/spec + openspec/changes    →  3 FR <span class="tok-warn">InProgress</span>
   ② grep FR-ID trong source + git log        →  +2 FR <span class="tok-warn">InProgress</span>
   ③ grep FR-ID trong test files              →  +2 FR <span class="tok-ok">Verified</span>
   <span class="tcom">// manual override trong project-model.json THẮNG auto-detect
@@ -1081,7 +1081,7 @@ Parse → project-model.json
   • 0 ENDPOINT · 0 TBL (greenfield, chưa có code)
 Impl status snapshot:
   Done <span class="tnum">0</span>  InProgress <span class="tnum">0</span>  Verified <span class="tnum">0</span>  NotStarted <span class="tnum">24</span>
-  <span class="tcom">// expected — greenfield chưa có code/openspec để scan</span>
+  <span class="tcom">// expected — greenfield chưa có code/spec-changes để scan</span>
 
 docs-plan.md viết ra .tmp/ · gate Proceed/Revise/Abort
   Gaps thường gặp ở greenfield:
@@ -1291,7 +1291,7 @@ docs-plan.md cho HLD — gaps thường gặp:
 🔁 Re-loop tới khi tất cả lane OK → ✅ <span class="tflag">Bộ docs greenfield ready</span>
 
 <span class="tok-ok">✓</span> Sẵn sàng start implementation:
-   1) <span class="tcmd">/morkit:propose</span> <span class="tstr">"feature-X"</span>        — create OpenSpec change
+   1) <span class="tcmd">/morkit:propose</span> <span class="tstr">"feature-X"</span>        — create morkit change
    2) review-checklist gate
    3) <span class="tcmd">/morkit:executing-plans</span> feature-X — TDD-driven implement
    4) <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span>    — keep docs in sync
@@ -1348,7 +1348,7 @@ docs-plan.md cho HLD — gaps thường gặp:
   origin/docs           4e5c629
   origin/greenfield     67bae32 ← default, working line
 
-  <span class="tcom">// active OpenSpec change</span>
+  <span class="tcom">// active morkit change</span>
   bootstrap-mortion-v1  status: in-progress  tasks 0/64
 
 ⚠ Tension #1 — code đã ship vượt scope của bootstrap (sidebar, command
@@ -1363,7 +1363,7 @@ docs-plan.md cho HLD — gaps thường gặp:
         <!-- Phase 1 -->
         <div class="phase">
           <h3 class="phase-title">
-            <span class="phase-num">PHASE 1</span> Sinh OpenSpec artifacts
+            <span class="phase-num">PHASE 1</span> Sinh morkit artifacts
             <span class="phase-desc">— proposal · design · tasks · checklist · spec</span>
           </h3>
           <div class="term">
@@ -1385,7 +1385,7 @@ docs-plan.md cho HLD — gaps thường gặp:
 [<span class="tflag">Context7</span>] tiptap drag-handle peer deps audit...                    <span class="tok-warn">heavy</span>
 
 Đã tạo:
-  <span class="tflag">openspec/changes/editor-wire-v1/</span>
+  <span class="tflag">morkit/output/spec/editor-wire-v1/</span>
     ├── proposal.md          (40 dòng)
     ├── design.md            (126 dòng — có ## Tech Stack section)
     ├── tasks.md             (173 dòng — Superpowers header + 11 task groups)
@@ -1410,7 +1410,7 @@ docs-plan.md cho HLD — gaps thường gặp:
                 ><span class="light"></span><span class="light"></span
                 ><span class="light"></span
               ></span>
-              <span class="term-title">openspec/changes/editor-wire-v1/review-checklist.md</span>
+              <span class="term-title">morkit/output/spec/editor-wire-v1/review-checklist.md</span>
             </div>
             <div class="term-body">
 <span class="label gate">▼ HUMAN GATE</span><span class="skill-chip gate">plan-review-gate</span>
@@ -1451,7 +1451,7 @@ docs-plan.md cho HLD — gaps thường gặp:
             <div class="term-body">
 <span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:executing-plans</span><span class="skill-chip">test-driven-development</span>
 <span class="tprompt">$</span> <span class="tcmd">git checkout -b feature/editor-wire-v1</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:executing-plans</span> <span class="tstr">openspec/changes/editor-wire-v1/tasks.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:executing-plans</span> <span class="tstr">morkit/output/spec/editor-wire-v1/tasks.md</span>
 <hr class="sep"/>
 <span class="label output">▼ OUTPUT (rút gọn — 11 groups)</span>
 ▶ <span class="tflag">Group 1/11</span> — Vitest + RTL setup

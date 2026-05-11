@@ -809,7 +809,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
   • Identified: 18 FR · 6 Screen · 14 ENDPOINT · 8 TBL · 6 NFR
 
 [impl-status] Auto-detecting status cho 18 FR...
-  ① openspec/changes + openspec/specs        →  3 FR <span class="tok-warn">InProgress</span>
+  ① morkit/output/spec + openspec/changes    →  3 FR <span class="tok-warn">InProgress</span>
   ② grep FR-ID trong source + git log        →  +2 FR <span class="tok-warn">InProgress</span>
   ③ grep FR-ID trong test files              →  +2 FR <span class="tok-ok">Verified</span>
   <span class="tcom">// manual override trong project-model.json THẮNG auto-detect
@@ -1046,7 +1046,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
         <div class="phase" id="uc2-s1">
           <h3 class="phase-title">
             <span class="phase-num">STEP 1</span> Brainstorm ý tưởng với agent <code class="mono">/morkit:brainstorming</code>
-            <span class="phase-desc">— input idea/requirement · dialog 1-câu-1-lần · HARD-GATE không được implement</span>
+            <span class="phase-desc">— explore stance · thinking partner free-form · auto-save design log cuối phiên</span>
           </h3>
           <div class="term">
             <div class="term-bar">
@@ -1059,10 +1059,11 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
             <div class="term-body">
 <span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
 # Greenfield = bắt đầu từ 0, không có code/docs làm anchor.
-# Brainstorm skill ép quy trình "design trước, code sau" — có
-# HARD-GATE chặn mọi implementation skill cho tới khi user
-# approve design. Đây là nơi đầu tư nhiều câu hỏi để hiểu
-# purpose / constraints / success criteria trước khi tốn công.
+# Brainstorming skill ở chế độ "explore stance" — thinking
+# partner tò mò, mở thread, dùng ASCII diagram, không bao giờ
+# viết code. Đây không phải workflow cố định: agent điều chỉnh
+# theo idea bạn mang đến, có thể đào sâu 1 hướng hoặc so sánh
+# nhiều hướng, không bị ép theo checklist.
 # ──────────────────────────────────────────────────────────</span>
 
 <span class="label input">▶ Bạn làm</span>
@@ -1070,30 +1071,41 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
 <span class="tprompt">$</span> <span class="tcmd">mkdir -p .tmp/brainstorm-inputs &amp;&amp; cp</span> <span class="tstr">idea-note.md</span> <span class="tstr">competitor-research.pdf \</span>
    <span class="tstr">requirement-from-stakeholder.docx</span> <span class="tstr">.tmp/brainstorm-inputs/</span>
 
-<span class="tcom"># 2) Mời agent brainstorm</span>
+<span class="tcom"># 2) Mời agent vào explore mode</span>
 <span class="tprompt">$</span> <span class="tcmd">/morkit:brainstorming</span>
 
-<span class="label output">▼ Bạn thấy (dialog flow của brainstorming skill)</span>
-1. <span class="tflag">Explore project context</span> — agent đọc inputs, recent commits
-2. <span class="tflag">Offer Visual Companion</span> (nếu cần — UI mockup/diagram)
-3. <span class="tflag">Ask clarifying questions</span> — 1 câu mỗi message
-   Q1: Target user của TaskFlow là ai? IC / Manager / cả hai?
-   Q2: Success criteria 6 tháng đầu? (DAU? Retention? NPS?)
-   Q3: Phải compete với gì? Linear? Asana? Tự build cho team nội bộ?
-   ...
-4. <span class="tflag">Propose 2-3 approaches</span> kèm trade-offs (vd: SaaS multi-tenant
-   vs single-tenant self-hosted vs hybrid) — bạn pick 1
-5. <span class="tflag">Present design sections</span> — bạn approve từng section
-6. <span class="tflag">Write design doc</span> → <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span>
-7. <span class="tflag">Spec self-review</span> — agent quét placeholders, contradictions
-8. <span class="tflag">User reviews written spec</span> — bạn confirm trước khi qua STEP 2
+<span class="label output">▼ Bạn thấy (explore stance — flow tự do, output cố định)</span>
 
-<span class="tcom"># Output để feed STEP 2: 1 design doc dạng prose
-#   • Project vision · target persona · scope IN/OUT
-#   • 2-3 approaches considered + lý do pick
-#   • Constraints (technical, business, time)
-#   • Success criteria (đo lường được)
-#   • Open questions còn lại</span>
+Agent vào chế độ thinking partner: tò mò, mở thread, không vội kết
+luận. Một phiên typical với TaskFlow có thể đi như sau (thứ tự và
+độ sâu agent tự adapt theo bạn):
+
+▸ Đọc inputs trong <span class="tstr">.tmp/brainstorm-inputs/</span> — recent commits nếu repo đã init,
+  idea-note.md, requirement docx
+▸ Hỏi câu mở thread thay vì checklist:
+   "TaskFlow là task manager — nhưng cho IC đơn lẻ hay team?
+    Khác biệt 2 hướng này quyết định data model, billing, SSO..."
+▸ Vẽ <span class="tflag">ASCII diagram</span> khi cần làm rõ (state machine, comparison
+  table, data flow). Ví dụ comparison 3 approach:
+                Multi-tenant SaaS   Self-hosted   Hybrid
+   Onboard       1-click           install        1-click
+   Data privacy  shared            isolated       optional
+   Pricing       subscription      one-off        tiered
+▸ Đào sâu thread bạn quan tâm — pick multi-tenant thì bỏ qua
+  self-hosted, chuyển sang hỏi về billing model
+▸ <span class="tflag">Surface risks &amp; unknowns</span> — vd "OTP qua email tốn $ → cần
+  budget hay nên Magic Link như Notion?"
+▸ Khi session crystallize, agent <span class="tflag">confirm</span> rồi auto-save design log:
+   "Đã đủ shape để wrap up. Save design log vào
+    <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span>?"
+  Bạn OK → file được tạo, đây là input cho STEP 2.
+
+<span class="tcom"># Output: morkit/output/specs/2026-05-11-taskflow-design.md
+#   • Problem framing — vision · target persona · scope IN/OUT
+#   • Approaches considered + lý do pick
+#   • Decisions made
+#   • Open questions còn lại
+#   • Next step: → STEP 2 (convert thành function list)</span>
             </div>
           </div>
         </div>
@@ -1260,7 +1272,7 @@ Parse → project-model.json
   • 0 ENDPOINT · 0 TBL (greenfield, chưa có code)
 Impl status snapshot:
   Done <span class="tnum">0</span>  InProgress <span class="tnum">0</span>  Verified <span class="tnum">0</span>  NotStarted <span class="tnum">24</span>
-  <span class="tcom">// expected — greenfield chưa có code/openspec để scan</span>
+  <span class="tcom">// expected — greenfield chưa có code/spec-changes để scan</span>
 
 docs-plan.md viết ra .tmp/ · gate Proceed/Revise/Abort
   Gaps thường gặp ở greenfield:
@@ -1470,7 +1482,7 @@ docs-plan.md cho HLD — gaps thường gặp:
 🔁 Re-loop tới khi tất cả lane OK → ✅ <span class="tflag">Bộ docs greenfield ready</span>
 
 <span class="tok-ok">✓</span> Sẵn sàng start implementation:
-   1) <span class="tcmd">/morkit:propose</span> <span class="tstr">"feature-X"</span>        — create OpenSpec change
+   1) <span class="tcmd">/morkit:propose</span> <span class="tstr">"feature-X"</span>        — create morkit change
    2) review-checklist gate
    3) <span class="tcmd">/morkit:executing-plans</span> feature-X — TDD-driven implement
    4) <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span>    — keep docs in sync
@@ -1527,7 +1539,7 @@ docs-plan.md cho HLD — gaps thường gặp:
   origin/docs           4e5c629
   origin/greenfield     67bae32 ← default, working line
 
-  <span class="tcom">// active OpenSpec change</span>
+  <span class="tcom">// active morkit change</span>
   bootstrap-mortion-v1  status: in-progress  tasks 0/64
 
 ⚠ Tension #1 — code đã ship vượt scope của bootstrap (sidebar, command
@@ -1542,7 +1554,7 @@ docs-plan.md cho HLD — gaps thường gặp:
         <!-- Phase 1 -->
         <div class="phase">
           <h3 class="phase-title">
-            <span class="phase-num">PHASE 1</span> Sinh OpenSpec artifacts
+            <span class="phase-num">PHASE 1</span> Sinh morkit artifacts
             <span class="phase-desc">— proposal · design · tasks · checklist · spec</span>
           </h3>
           <div class="term">
@@ -1564,7 +1576,7 @@ docs-plan.md cho HLD — gaps thường gặp:
 [<span class="tflag">Context7</span>] tiptap drag-handle peer deps audit...                    <span class="tok-warn">heavy</span>
 
 Đã tạo:
-  <span class="tflag">openspec/changes/editor-wire-v1/</span>
+  <span class="tflag">morkit/output/spec/editor-wire-v1/</span>
     ├── proposal.md          (40 dòng)
     ├── design.md            (126 dòng — có ## Tech Stack section)
     ├── tasks.md             (173 dòng — Superpowers header + 11 task groups)
@@ -1589,7 +1601,7 @@ docs-plan.md cho HLD — gaps thường gặp:
                 ><span class="light"></span><span class="light"></span
                 ><span class="light"></span
               ></span>
-              <span class="term-title">openspec/changes/editor-wire-v1/review-checklist.md</span>
+              <span class="term-title">morkit/output/spec/editor-wire-v1/review-checklist.md</span>
             </div>
             <div class="term-body">
 <span class="label gate">▼ HUMAN GATE</span><span class="skill-chip gate">plan-review-gate</span>
@@ -1630,7 +1642,7 @@ docs-plan.md cho HLD — gaps thường gặp:
             <div class="term-body">
 <span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:executing-plans</span><span class="skill-chip">test-driven-development</span>
 <span class="tprompt">$</span> <span class="tcmd">git checkout -b feature/editor-wire-v1</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:executing-plans</span> <span class="tstr">openspec/changes/editor-wire-v1/tasks.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:executing-plans</span> <span class="tstr">morkit/output/spec/editor-wire-v1/tasks.md</span>
 <hr class="sep"/>
 <span class="label output">▼ OUTPUT (rút gọn — 11 groups)</span>
 ▶ <span class="tflag">Group 1/11</span> — Vitest + RTL setup

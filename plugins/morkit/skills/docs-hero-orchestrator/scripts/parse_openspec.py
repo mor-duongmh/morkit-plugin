@@ -1,8 +1,11 @@
-"""Parse an OpenSpec change folder into a normalized Delta.
+"""Parse a spec change folder into a normalized Delta.
 
-Reads proposal.md + design.md + specs/*.md from
-`openspec/changes/{change-name}/` and emits a Delta JSON with
+Reads proposal.md + design.md + specs/*.md and emits a Delta JSON with
 ADD / UPDATE / DEPRECATE operations.
+
+Layout auto-detection — looks for the change folder under either:
+    <root>/changes/<change-name>/      (OpenSpec convention, legacy)
+    <root>/spec/<change-name>/         (morkit convention, /morkit:propose)
 
 OpenSpec convention parsed:
     ## ADDED Requirements         -> ADD ops
@@ -13,10 +16,11 @@ OpenSpec convention parsed:
 
 CLI:
     parse-openspec.py --openspec-dir openspec/ --change-name <name> --output delta.json
+    parse-openspec.py --openspec-dir morkit/output --change-name <name> --output delta.json
 
 Public API (importable):
-    parse_openspec_change(openspec_dir, change_name) -> Delta
-    list_changes(openspec_dir) -> list[str]
+    parse_openspec_change(root_dir, change_name) -> Delta
+    list_changes(root_dir) -> list[str]
 """
 from __future__ import annotations
 
@@ -38,24 +42,53 @@ _REQUIREMENT_HEADER = re.compile(r"^###\s+Requirement:\s*(.+?)\s*$", re.IGNORECA
 _SCENARIO_HEADER = re.compile(r"^####\s+Scenario:\s*(.+?)\s*$", re.IGNORECASE)
 
 
+# Sub-folder candidates under <root> where change folders may live.
+# Order matters: legacy OpenSpec layout first (backward compat), then morkit.
+_LAYOUT_DIRS = ("changes", "spec")
+
+
+def _find_change_folder(root: str | Path, change_name: str) -> Path | None:
+    """Return path to a change folder by checking known layouts.
+
+    Tries <root>/changes/<name>/ (OpenSpec) and <root>/spec/<name>/ (morkit).
+    Returns None if neither exists.
+    """
+    for sub in _LAYOUT_DIRS:
+        candidate = Path(root) / sub / change_name
+        if candidate.exists():
+            return candidate
+    return None
+
+
 def list_changes(openspec_dir: str | Path) -> list[str]:
-    """Return list of change folder names under openspec/changes/."""
-    changes_dir = Path(openspec_dir) / "changes"
-    if not changes_dir.exists():
-        return []
-    return sorted(p.name for p in changes_dir.iterdir() if p.is_dir())
+    """Return list of change folder names under <root>/changes/ and <root>/spec/.
+
+    Merges OpenSpec (legacy) and morkit (/morkit:propose) layouts. Duplicates
+    are deduplicated (rare — same change name in both folders).
+    """
+    names: set[str] = set()
+    for sub in _LAYOUT_DIRS:
+        folder = Path(openspec_dir) / sub
+        if folder.exists():
+            for p in folder.iterdir():
+                if p.is_dir() and p.name != "archive":
+                    names.add(p.name)
+    return sorted(names)
 
 
 def parse_openspec_change(openspec_dir: str | Path, change_name: str) -> Delta:
-    """Parse openspec/changes/{change_name}/ → Delta."""
-    base = Path(openspec_dir) / "changes" / change_name
-    if not base.exists():
-        raise FileNotFoundError(f"OpenSpec change folder not found: {base}")
+    """Parse a spec change folder → Delta. Auto-detects OpenSpec vs morkit layout."""
+    base = _find_change_folder(openspec_dir, change_name)
+    if base is None or not base.exists():
+        raise FileNotFoundError(
+            f"Spec change folder not found under {openspec_dir} "
+            f"(tried changes/{change_name} and spec/{change_name})"
+        )
 
     # Track existing IDs to allocate new ones safely
     allocator = IdAllocator(existing_ids=[])
     changes: list[Change] = []
-    reason_prefix = f"From OpenSpec change {change_name}"
+    reason_prefix = f"From spec change {change_name}"
 
     # Parse delta specs in specs/
     specs_dir = base / "specs"

@@ -112,10 +112,13 @@ mkdir -p "$PROJECT_TMP"
 
 # 1b. Implementation status detection (LLM-driven, populates FR.impl_status
 #     + FR.evidence_refs in project-model.json BEFORE the plan is written).
+#     Scans BOTH layouts (legacy + modern):
+#       - openspec/changes/{id}/ + openspec/specs (OpenSpec legacy)
+#       - morkit/output/spec/{id}/ (morkit native, /morkit:propose output)
 #     Order of evidence (later signals upgrade earlier ones):
-#       a. openspec/changes/{id}/ archived         → Done   (kind=openspec)
-#       b. openspec/changes/{id}/ pending          → InProgress (kind=openspec)
-#       c. openspec/specs mention                  → InProgress (kind=openspec)
+#       a. spec change archived                    → Done   (kind=openspec)
+#       b. spec change pending                     → InProgress (kind=openspec)
+#       c. spec mention                            → InProgress (kind=openspec)
 #       d. FR-ID in source files / git log --grep  → InProgress (kind=code|commit)
 #       e. FR-ID in test files                     → Verified  (kind=test)
 #     Manual override (impl_status already set in inputs) wins over auto-detect.
