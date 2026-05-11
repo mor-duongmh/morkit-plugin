@@ -152,20 +152,22 @@ CURATED = {
     # NHÓM 2 — LÊN KẾ HOẠCH VÀ LÀM
     # ====================================================================
     "skills.brainstorming": {
-        "lede": "Cùng bạn suy nghĩ ý tưởng và khảo sát mã nguồn trước khi viết code. Chỉ tư duy — không tạo file, không sửa code.",
+        "lede": "Cùng bạn suy nghĩ ý tưởng và khảo sát mã nguồn ở chế độ <strong>explore</strong> — tự do mở thread, vẽ ASCII diagram, không bao giờ viết code.",
         "details": [
-            "Hỏi từng câu một để làm rõ <strong>scope</strong>, <strong>requirements</strong> và tiêu chí thành công",
-            "Đề xuất <strong>2-3 phương án</strong> kèm trade-offs để bạn chọn",
-            "Ghi quyết định vào <code>morkit/output/specs/YYYY-MM-DD-&lt;topic&gt;-design.md</code>",
-            "Có <strong>HARD-GATE</strong>: chặn mọi hành động viết code cho tới khi bạn approve design",
+            "<strong>Stance, not workflow</strong>: không có bước cố định — agent adapt theo idea bạn mang đến",
+            "Hỏi câu mở thread thay vì checklist; pivot khi có thông tin mới",
+            "Vẽ <strong>ASCII diagram</strong> khi cần làm rõ (state machine, comparison table, data flow)",
+            "Khảo sát codebase, surface risks &amp; unknowns, so sánh approaches",
+            "Có <strong>Context7</strong> để verify API library (tránh hallucinate)",
+            "Tự lưu design log cuối phiên vào <code>morkit/output/specs/YYYY-MM-DD-&lt;topic&gt;-design.md</code> (gồm 5 mục: problem · approaches · decisions · open questions · next step)",
         ],
         "when_to_use": [
-            "Khi nhận một yêu cầu chưa rõ phạm vi",
-            "Trước khi viết kế hoạch chi tiết",
-            "Khi cần đọc và hiểu mã nguồn hiện tại trước khi đụng vào",
+            "Khi nhận một yêu cầu chưa rõ phạm vi và muốn tư duy cùng AI",
+            "Trước khi gõ <code>/morkit:propose</code> hoặc <code>/morkit:init</code>",
+            "Khi cần khảo sát mã nguồn / kiến trúc hiện tại trước khi đụng vào",
         ],
-        "example_args": "Thêm tính năng cộng tác thời gian thực vào editor",
-        "example_note": "Skill sẽ hỏi từng câu một để làm rõ, rồi đề xuất 2-3 cách làm kèm ưu nhược điểm. Bạn chốt rồi mới qua bước viết plan.",
+        "example_args": "tìm hiểu giúp tôi repo Notion-clone bao gồm các nhánh của nó",
+        "example_note": "Agent vào explore mode: đọc inputs, mở thread tự do, vẽ ASCII diagram khi cần. Cuối phiên agent confirm rồi tự lưu design log để feed sang STEP 2 (function list) hoặc /morkit:propose.",
     },
     "skills.writing-plans": {
         "lede": "Khi đã có yêu cầu rõ ràng, dùng skill này để viết kế hoạch nhiều bước trước khi đụng code.",
