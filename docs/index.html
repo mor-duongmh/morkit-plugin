@@ -803,17 +803,21 @@
       </ol>
       <p class="lede-small">Từ đó mỗi lần khởi động Claude sẽ tự kiểm tra version mới và cài lên — không phải làm gì thêm.</p>
 
-      <h3>Cách 2 — Cập nhật thủ công</h3>
-      <p><strong>Bước 1:</strong> Refresh metadata marketplace — chạy trong phiên Claude:</p>
-      <pre><code>/plugin marketplace update mor-duongmh</code></pre>
-      <p class="lede-small">Hoặc qua menu: <code>/plugin</code> → tab <strong>Marketplaces</strong> → chọn <code>mor-duongmh</code> → <strong>Update marketplace</strong>.</p>
-
-      <p><strong>Bước 2:</strong> Cài lại plugin để pull bản mới:</p>
-      <pre><code>/plugin uninstall morkit@mor-duongmh
-/plugin install morkit@mor-duongmh
-/reload-plugins</code></pre>
+      <h3>Cách 2 — Cập nhật thủ công qua menu</h3>
+      <ol class="steps">
+        <li>
+          Mở menu plugin:
+          <pre><code>/plugins</code></pre>
+        </li>
+        <li>Sang tab <strong>Installed</strong>.</li>
+        <li>Scroll xuống tìm <code>morkit</code> → bấm chọn.</li>
+        <li>Chọn <strong>Update now</strong> — Claude pull bản mới về ngay.</li>
+      </ol>
+      <p class="lede-small">
+        Sau khi update xong, chạy <code>/reload-plugins</code> để áp dụng ngay mà không cần restart Claude.
+      </p>
       <div class="note">
-        Cấu hình plugin (Project Scope) không mất khi gỡ + cài lại trong cùng project.
+        Cấu hình plugin (Project Scope) không mất khi update — chỉ thay nội dung plugin.
       </div>
 
       <!-- ─────────────── §3 TỔNG QUAN ─────────────── -->
