@@ -2,7 +2,9 @@
 
 > Marketplace của Mor — một plugin `morkit` consolidates tất cả: spec workflow, brainstorm/execute, code review, doc generation. Một namespace `/morkit:*` cho tất cả.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+**Live**: https://mor-duongmh.github.io/claude-plugins/
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Live](https://img.shields.io/badge/live-mor--duongmh.github.io-blue)](https://mor-duongmh.github.io/claude-plugins/)
 
 ---
 

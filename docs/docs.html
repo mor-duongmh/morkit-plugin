@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="vi" data-theme="dark">
+<html lang="vi" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MORtion · AI Workflow Use Cases</title>
+    <title>morkit</title>
     <style>
       /* ──────────────────────────────────────────────────────────
          Tokens — Paper (light) + Vesper (dark), matched to project
@@ -33,6 +33,8 @@
         --traffic-red: #ff5f56;
         --traffic-yellow: #ffbd2e;
         --traffic-green: #27c93f;
+        --bg-nav: rgba(251, 248, 242, 0.85);
+        --accent-soft: rgba(176, 74, 47, 0.08);
       }
       [data-theme="dark"] {
         --bg: #101010;
@@ -56,6 +58,8 @@
         --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
         --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5);
         --shadow-3: 0 16px 48px rgba(0, 0, 0, 0.6);
+        --bg-nav: rgba(16, 16, 16, 0.85);
+        --accent-soft: rgba(255, 139, 90, 0.12);
       }
 
       * {
@@ -426,52 +430,233 @@
           font-size: 11.5px;
         }
       }
+
+      /* ─── v2 LAYOUT: topnav + sidebar + main ─────────────── */
+      .topnav {
+        position: sticky; top: 0; z-index: 20;
+        background: var(--bg-nav);
+        backdrop-filter: saturate(180%) blur(8px);
+        -webkit-backdrop-filter: saturate(180%) blur(8px);
+        border-bottom: 1px solid var(--border);
+      }
+      .topnav-inner {
+        max-width: 1280px; margin: 0 auto;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 24px; gap: 16px;
+      }
+      .brand {
+        display: flex; align-items: center; gap: 8px;
+        font-weight: 700; font-size: 15px; color: var(--fg);
+        text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; }
+      .brand .dot-mark {
+        display: inline-block; width: 18px; height: 18px;
+        border-radius: 5px; background: var(--accent);
+      }
+      .brand .sub { font-weight: 400; color: var(--fg-muted); font-size: 13px; }
+      .topnav-center { flex: 1; display: flex; justify-content: center; max-width: 480px; }
+      .search {
+        width: 100%; max-width: 380px;
+        display: flex; align-items: center; gap: 8px;
+        padding: 6px 12px;
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        border-radius: 8px; font-size: 13px; color: var(--fg-muted);
+        cursor: text;
+      }
+      .search:hover { border-color: var(--border-strong); }
+      .search .placeholder { flex: 1; }
+      .search kbd {
+        font-size: 11px; color: var(--fg-subtle);
+        background: var(--bg); border: 1px solid var(--border);
+        padding: 1px 6px; border-radius: 4px;
+      }
+      .nav-actions { display: flex; align-items: center; gap: 10px; }
+      .nav-actions a, .nav-actions .toggle {
+        background: transparent; color: var(--fg-muted);
+        border: 1px solid var(--border); border-radius: 6px;
+        padding: 5px 10px; font-size: 12px; cursor: pointer;
+        text-decoration: none;
+      }
+      .nav-actions a:hover, .nav-actions .toggle:hover {
+        border-color: var(--border-strong); color: var(--fg); text-decoration: none;
+      }
+      .nav-actions a.primary {
+        background: var(--accent); color: #fff; border-color: var(--accent);
+      }
+      .nav-actions a.primary:hover { opacity: .9; color: #fff; }
+
+      .layout {
+        max-width: 1280px; margin: 0 auto;
+        display: grid; grid-template-columns: 240px 1fr;
+        gap: 40px; padding: 32px 24px 80px;
+      }
+      .sidebar {
+        position: sticky; top: 76px; align-self: start;
+        max-height: calc(100vh - 96px); overflow-y: auto;
+        padding-right: 8px; padding-bottom: 24px;
+      }
+      .sidebar::-webkit-scrollbar { width: 6px; }
+      .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+      .sb-group { margin: 0 0 18px; }
+      .sb-group-title {
+        font-size: 11px; font-weight: 600; text-transform: uppercase;
+        color: var(--fg-subtle); letter-spacing: 0.08em;
+        margin: 0 0 4px; padding: 4px 10px;
+      }
+      .sidebar a {
+        display: block; padding: 5px 10px; margin: 1px 0;
+        border-radius: 5px; color: var(--fg); font-size: 13.5px;
+        text-decoration: none; line-height: 1.4;
+      }
+      .sidebar a:hover {
+        background: var(--bg-subtle); color: var(--accent);
+        text-decoration: none;
+      }
+      .sidebar .uc-link.active {
+        background: var(--accent-soft); color: var(--accent); font-weight: 600;
+      }
+      .sidebar .uc-num { color: var(--fg-subtle); font-size: 12px; margin-right: 6px; }
+      .sidebar .uc-link.active .uc-num { color: var(--accent); }
+      .sidebar .step-list {
+        list-style: none; margin: 2px 0 6px; padding: 0 0 4px 14px;
+        border-left: 1px solid var(--border);
+        display: none;
+      }
+      .sidebar .uc-link.active + .step-list { display: block; }
+      .sidebar .step-list a {
+        padding: 3px 8px; font-size: 12.5px; color: var(--fg-muted);
+        border-radius: 4px;
+      }
+      .sidebar .step-list a:hover { color: var(--accent); }
+      .sidebar .step-list a.active {
+        color: var(--accent); font-weight: 600;
+        background: var(--accent-soft);
+      }
+
+      .content { min-width: 0; }
+      .hero-v2 { padding: 4px 0 16px; margin-bottom: 8px; }
+      .hero-v2 .eyebrow {
+        display: inline-block; font-size: 11px; font-weight: 600;
+        color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;
+        padding: 3px 9px; background: var(--accent-soft);
+        border-radius: 999px; margin-bottom: 14px;
+      }
+      .hero-v2 h1 {
+        font-size: 32px; font-weight: 700; margin: 0 0 14px;
+        letter-spacing: -0.02em; line-height: 1.15;
+      }
+      .hero-v2 .lede {
+        font-size: 16px; color: var(--fg-muted); margin: 0 0 8px;
+        line-height: 1.55; max-width: 720px;
+      }
+      .hero-v2 .lede code { font-size: 0.92em; }
+      .hero-v2 .lede-small { font-size: 13.5px; color: var(--fg-muted); }
+
+      .footer-v2 {
+        margin-top: 56px; padding: 20px 0;
+        border-top: 1px solid var(--border);
+        font-size: 13px; color: var(--fg-muted);
+        display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+      }
+      .footer-v2 a { color: var(--fg-muted); }
+      .footer-v2 a:hover { color: var(--accent); }
+      .footer-v2 .meta-tag { margin-left: auto; color: var(--fg-subtle); font-size: 12px; }
+
+      /* Hide old chrome (not used in v2 but CSS retained for UC content) */
+      .pagehead, .tabs, .footrail { display: none !important; }
+
+      @media (max-width: 960px) {
+        .layout { grid-template-columns: 1fr; gap: 24px; padding: 20px 16px 60px; }
+        .sidebar {
+          position: static; max-height: none; overflow: visible;
+          border-bottom: 1px solid var(--border); padding-bottom: 16px;
+        }
+        .topnav-center { display: none; }
+      }
+      @media (max-width: 600px) {
+        .hero-v2 h1 { font-size: 26px; }
+      }
     </style>
   </head>
   <body>
-    <main class="page">
-      <header class="pagehead">
-        <div>
-          <h1>MORtion · AI Workflow Use Cases</h1>
-          <div class="subtitle">
-            4 kịch bản dùng Claude Code + marketplace
-            <code class="mono">mor-duongmh</code> trên repo này, biểu diễn dưới giao diện
-            CLI giả định.
-          </div>
+    <header class="topnav">
+      <div class="topnav-inner">
+        <a href="index.html" class="brand">
+          <span class="dot-mark"></span>
+          morkit <span class="sub">/ use cases</span>
+        </a>
+        <div class="topnav-center"></div>
+        <div class="nav-actions">
+          <a href="index.html">Docs hub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener" class="primary">GitHub</a>
+          <button id="themeBtn" class="toggle" type="button" title="Đổi sáng/tối">☾ / ☀</button>
         </div>
-        <button id="themeBtn" class="toggle" type="button">
-          ☾ Vesper / Paper
-        </button>
-      </header>
+      </div>
+    </header>
 
-      <nav class="tabs" role="tablist" aria-label="Use cases">
-        <button
-          class="tab active"
-          role="tab"
-          aria-selected="true"
-          data-target="uc1"
-          type="button"
-        >
-          <span class="tnum">1.</span> Brownfield onboarding — từ partial input → docs team-verified
-          <span class="tdesc">prep inputs → /morkit:init → plan gate → render + QA → team review → /morkit:update-doc · 6 step</span>
-        </button>
-        <button class="tab" role="tab" aria-selected="false" data-target="uc2" type="button">
-          <span class="tnum">2.</span> Greenfield project — từ ý tưởng → bộ docs full
-          <span class="tdesc">brainstorm → function list → review → /morkit:init SRS → review → /morkit:init HLD → final review · 7 step</span>
-        </button>
-        <button class="tab" role="tab" aria-selected="false" data-target="uc3" type="button">
-          <span class="tnum">3.</span> Feature mới hoàn toàn
-          <span class="tdesc">editor-wire-v1 · 11 task groups · TDD strict · PR #1</span>
-        </button>
-        <button class="tab" role="tab" aria-selected="false" data-target="uc4" type="button">
-          <span class="tnum">4.</span> Fix bug
-          <span class="tdesc">cmdk Unicode normalize · branch fix/* · PR #2</span>
-        </button>
-        <button class="tab" role="tab" aria-selected="false" data-target="uc5" type="button">
-          <span class="tnum">5.</span> Code review
-          <span class="tdesc">/morkit:deep-review &lt;PR#&gt; · 5 subagent · comment trên PR</span>
-        </button>
-      </nav>
+    <div class="layout">
+
+      <!-- ─────────────── SIDEBAR ─────────────── -->
+      <aside class="sidebar" aria-label="Use cases nav">
+        <div class="sb-group">
+          <div class="sb-group-title">Use cases</div>
+          <a class="uc-link active" data-target="uc1" href="#uc1">
+            <span class="uc-num">1.</span>Brownfield onboarding
+          </a>
+          <ul class="step-list" data-for="uc1">
+            <li><a href="#uc1-s1">Step 1 · Chuẩn bị inputs</a></li>
+            <li><a href="#uc1-s2">Step 2 · /morkit:init + doc types</a></li>
+            <li><a href="#uc1-s3">Step 3 · Parse + impl detect</a></li>
+            <li><a href="#uc1-s4">Step 4 · 🚦 Plan-approval gate</a></li>
+            <li><a href="#uc1-s5">Step 5 · Render + QA</a></li>
+            <li><a href="#uc1-s6">Step 6 · Team review + update</a></li>
+          </ul>
+          <a class="uc-link" data-target="uc2" href="#uc2">
+            <span class="uc-num">2.</span>Greenfield project
+          </a>
+          <ul class="step-list" data-for="uc2">
+            <li><a href="#uc2-s1">Step 1 · Brainstorm</a></li>
+            <li><a href="#uc2-s2">Step 2 · Function list draft</a></li>
+            <li><a href="#uc2-s3">Step 3 · 🚦 PM/BrSE/BA review</a></li>
+            <li><a href="#uc2-s4">Step 4 · /morkit:init SRS</a></li>
+            <li><a href="#uc2-s5">Step 5 · 🚦 SRS review</a></li>
+            <li><a href="#uc2-s6">Step 6 · /morkit:init HLD</a></li>
+            <li><a href="#uc2-s7">Step 7 · 🚦 Team-wide review</a></li>
+          </ul>
+          <a class="uc-link" data-target="uc3" href="#uc3">
+            <span class="uc-num">3.</span>Feature mới hoàn toàn
+          </a>
+          <a class="uc-link" data-target="uc4" href="#uc4">
+            <span class="uc-num">4.</span>Fix bug
+          </a>
+          <a class="uc-link" data-target="uc5" href="#uc5">
+            <span class="uc-num">5.</span>Code review
+          </a>
+        </div>
+        <div class="sb-group">
+          <div class="sb-group-title">Tham khảo</div>
+          <a href="index.html">← Docs hub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub →</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank" rel="noopener">README →</a>
+        </div>
+      </aside>
+
+      <!-- ─────────────── MAIN ─────────────── -->
+      <main class="content">
+
+        <section class="hero-v2">
+          <span class="eyebrow">Docs · Use cases</span>
+          <h1>AI Workflow Use Cases</h1>
+          <p class="lede">
+            5 kịch bản dùng <code>/morkit:*</code> trên repo Notion-clone, mô phỏng
+            qua giao diện CLI giả định. Mỗi UC tách thành các step có Tại sao · Bạn làm
+            · Bạn thấy để người mới follow được.
+          </p>
+          <p class="lede lede-small">
+            Dùng sidebar bên trái chuyển UC, hoặc click step để nhảy thẳng.
+          </p>
+        </section>
 
       <!-- ──────────── USE CASE 1 — ONBOARD BROWNFIELD ──────────── -->
       <section id="uc1" class="panel active" role="tabpanel">
@@ -501,7 +686,7 @@
         </div>
 
         <!-- Step 1 — Chuẩn bị inputs trước khi gõ lệnh -->
-        <div class="phase">
+        <div class="phase" id="uc1-s1">
           <h3 class="phase-title">
             <span class="phase-num">STEP 1</span> Chuẩn bị: cài venv + gom inputs vào <code class="mono">.tmp/</code>
             <span class="phase-desc">— làm trước khi gõ <code class="mono">/morkit:init</code> · càng nhiều input chất lượng càng ít TBD</span>
@@ -543,7 +728,7 @@
         </div>
 
         <!-- Step 2 — Gõ /morkit:init + chọn doc types -->
-        <div class="phase">
+        <div class="phase" id="uc1-s2">
           <h3 class="phase-title">
             <span class="phase-num">STEP 2</span> Gõ <code class="mono">/morkit:init</code> + chọn loại docs muốn sinh
             <span class="phase-desc">— Claude pre-flight venv · multi-select 7 doc types · không có default</span>
@@ -587,7 +772,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
         </div>
 
         <!-- Step 3 — Claude tự phân tích (bạn quan sát) -->
-        <div class="phase">
+        <div class="phase" id="uc1-s3">
           <h3 class="phase-title">
             <span class="phase-num">STEP 3</span> Claude tự phân tích — bạn quan sát (~2-3 phút)
             <span class="phase-desc">— parse inputs · scan source + git + tests · auto-detect Implementation Status</span>
@@ -636,7 +821,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
         </div>
 
         <!-- Step 4 — Đọc docs-plan.md + approve (gate quan trọng nhất) -->
-        <div class="phase">
+        <div class="phase" id="uc1-s4">
           <h3 class="phase-title">
             <span class="phase-num">STEP 4</span> 🚦 Mở <code class="mono">.tmp/docs-plan.md</code> + duyệt plan <i>(gate quan trọng nhất)</i>
             <span class="phase-desc">— đọc kỹ, fix blocker ngay tại đây · chọn Proceed / Revise / Abort</span>
@@ -699,7 +884,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
         </div>
 
         <!-- Step 5 — Render docs + QA validate -->
-        <div class="phase">
+        <div class="phase" id="uc1-s5">
           <h3 class="phase-title">
             <span class="phase-num">STEP 5</span> Claude render docs + QA agent validate (~5 phút)
             <span class="phase-desc">— sub-skills chạy song song · output ra <code class="mono">docs/</code> · QA cross-check</span>
@@ -754,7 +939,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
         </div>
 
         <!-- Step 6 — Team review + /morkit:update-doc -->
-        <div class="phase">
+        <div class="phase" id="uc1-s6">
           <h3 class="phase-title">
             <span class="phase-num">STEP 6</span> Team review → cập nhật qua <code class="mono">/morkit:update-doc</code>
             <span class="phase-desc">— feedback route đến diff engine · KHÔNG render lại từ đầu · manual edits preserved</span>
@@ -852,7 +1037,7 @@ Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
         </div>
 
         <!-- Step 1 — Brainstorm cùng agent từ idea/requirement -->
-        <div class="phase">
+        <div class="phase" id="uc2-s1">
           <h3 class="phase-title">
             <span class="phase-num">STEP 1</span> Brainstorm ý tưởng với agent <code class="mono">/morkit:brainstorming</code>
             <span class="phase-desc">— explore stance · thinking partner free-form · auto-save design log cuối phiên</span>
@@ -920,7 +1105,7 @@ luận. Một phiên typical với TaskFlow có thể đi như sau (thứ tự v
         </div>
 
         <!-- Step 2 — Discuss với AI để rút function list draft -->
-        <div class="phase">
+        <div class="phase" id="uc2-s2">
           <h3 class="phase-title">
             <span class="phase-num">STEP 2</span> Convert design doc → function list draft (cùng AI)
             <span class="phase-desc">— prose design → bảng FR có cấu trúc · MoSCoW priority · acceptance criteria sơ bộ</span>
@@ -977,7 +1162,7 @@ luận. Một phiên typical với TaskFlow có thể đi như sau (thứ tự v
         </div>
 
         <!-- Step 3 — PM/BrSE/BA review function list -->
-        <div class="phase">
+        <div class="phase" id="uc2-s3">
           <h3 class="phase-title">
             <span class="phase-num">STEP 3</span> 🚦 PM/BrSE/BA review function list theo checklist
             <span class="phase-desc">— human gate · sửa ở đây cost = 0 · sửa sau khi render SRS = rewrite</span>
@@ -1033,7 +1218,7 @@ luận. Một phiên typical với TaskFlow có thể đi như sau (thứ tự v
         </div>
 
         <!-- Step 4 — /morkit:init vòng 1 → chọn SRS (kèm screen-spec) -->
-        <div class="phase">
+        <div class="phase" id="uc2-s4">
           <h3 class="phase-title">
             <span class="phase-num">STEP 4</span> <code class="mono">/morkit:init</code> vòng 1 — chọn SRS (kèm screen-specs)
             <span class="phase-desc">— input function-list + idea docs · multi-select chỉ tick SRS · render docs tầng business</span>
@@ -1101,7 +1286,7 @@ docs-plan.md viết ra .tmp/ · gate Proceed/Revise/Abort
         </div>
 
         <!-- Step 5 — PM/BrSE/BA review SRS + screen-specs -->
-        <div class="phase">
+        <div class="phase" id="uc2-s5">
           <h3 class="phase-title">
             <span class="phase-num">STEP 5</span> 🚦 PM/BrSE/BA review SRS + screen-specs theo checklist
             <span class="phase-desc">— chốt tầng business trước khi technical team build HLD · feedback → /morkit:update-doc</span>
@@ -1166,7 +1351,7 @@ docs-plan.md viết ra .tmp/ · gate Proceed/Revise/Abort
         </div>
 
         <!-- Step 6 — /morkit:init vòng 2 → HLD docs -->
-        <div class="phase">
+        <div class="phase" id="uc2-s6">
           <h3 class="phase-title">
             <span class="phase-num">STEP 6</span> <code class="mono">/morkit:init</code> vòng 2 — HLD (API + DB + Arch + ...)
             <span class="phase-desc">— SRS đã chốt làm anchor · render tầng technical · technical team chuẩn bị build</span>
@@ -1233,7 +1418,7 @@ docs-plan.md cho HLD — gaps thường gặp:
         </div>
 
         <!-- Step 7 — Cả team review tất cả docs -->
-        <div class="phase">
+        <div class="phase" id="uc2-s7">
           <h3 class="phase-title">
             <span class="phase-num">STEP 7</span> 🚦 Cả team review TẤT CẢ docs theo checklist
             <span class="phase-desc">— PM·BrSE·BA·BE·FE·DBA·Architect · cross-doc consistency · sign-off ship</span>
@@ -1880,47 +2065,97 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
         </div>
       </section>
 
-      <footer class="footrail">
-        <div>
-          MORtion · 2026-05-10 · <span class="mono">docs/usecases.html</span>
+        <div class="footer-v2">
+          <a href="index.html">← Docs hub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank" rel="noopener">README</a>
+          <span class="meta-tag">v2 layout · claudekit-style hub</span>
         </div>
-        <div>
-          Repo:
-          <a href="https://github.com/mor-nhatlq/Notion-clone" target="_blank" rel="noopener noreferrer"
-            >mor-nhatlq/Notion-clone</a
-          >
-          · Playbook:
-          <a href="./ai-workflow-playbook.md">ai-workflow-playbook.md</a>
-        </div>
-      </footer>
-    </main>
+
+      </main>
+    </div>
 
     <script>
       (function () {
-        const tabs = document.querySelectorAll(".tab");
+        const ucLinks = document.querySelectorAll(".sidebar .uc-link");
+        const stepLinks = document.querySelectorAll(".sidebar .step-list a");
         const panels = document.querySelectorAll(".panel");
-        tabs.forEach((tab) => {
-          tab.addEventListener("click", () => {
-            const target = tab.dataset.target;
-            tabs.forEach((t) => {
-              t.classList.toggle("active", t === tab);
-              t.setAttribute("aria-selected", t === tab ? "true" : "false");
-            });
-            panels.forEach((p) => p.classList.toggle("active", p.id === target));
+
+        function activate(targetUc) {
+          ucLinks.forEach((l) => {
+            l.classList.toggle("active", l.dataset.target === targetUc);
+          });
+          panels.forEach((p) => p.classList.toggle("active", p.id === targetUc));
+        }
+
+        // UC link click: switch panel, scroll to top
+        ucLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            activate(link.dataset.target);
             window.scrollTo({ top: 0, behavior: "smooth" });
+            history.replaceState(null, "", "#" + link.dataset.target);
           });
         });
 
+        // Step link click: activate parent UC first, then scroll to step
+        stepLinks.forEach((a) => {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            const hash = a.getAttribute("href"); // #ucN-sN
+            const m = hash.match(/^#(uc\d)/);
+            if (!m) return;
+            activate(m[1]);
+            requestAnimationFrame(() => {
+              const t = document.querySelector(hash);
+              if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+            history.replaceState(null, "", hash);
+          });
+        });
+
+        // Init: read URL hash and activate matching UC
+        (function initFromHash() {
+          const hash = location.hash;
+          if (!hash) return;
+          const m = hash.match(/^#(uc\d)/);
+          if (!m) return;
+          activate(m[1]);
+          setTimeout(() => {
+            const t = document.querySelector(hash);
+            if (t) t.scrollIntoView({ block: "start" });
+          }, 50);
+        })();
+
+        // Theme toggle (preserve key for backward compat with original)
         const themeBtn = document.getElementById("themeBtn");
         const root = document.documentElement;
-        const stored = localStorage.getItem("mortion.usecases.theme");
-        if (stored === "light") root.setAttribute("data-theme", "light");
-        themeBtn.addEventListener("click", () => {
-          const cur = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+        const KEY = "mortion.usecases.theme";
+        const stored = localStorage.getItem(KEY);
+        if (stored) root.setAttribute("data-theme", stored);
+        themeBtn?.addEventListener("click", () => {
+          const cur = root.getAttribute("data-theme") || "light";
           const next = cur === "dark" ? "light" : "dark";
           root.setAttribute("data-theme", next);
-          localStorage.setItem("mortion.usecases.theme", next);
+          localStorage.setItem(KEY, next);
         });
+
+        // Step active tracking via IntersectionObserver
+        if ("IntersectionObserver" in window) {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (!e.isIntersecting) return;
+                const id = e.target.id;
+                stepLinks.forEach((a) => {
+                  a.classList.toggle("active", a.getAttribute("href") === "#" + id);
+                });
+              });
+            },
+            { rootMargin: "-100px 0px -65% 0px" }
+          );
+          document.querySelectorAll(".panel .phase[id]").forEach((el) => io.observe(el));
+        }
       })();
     </script>
   </body>
