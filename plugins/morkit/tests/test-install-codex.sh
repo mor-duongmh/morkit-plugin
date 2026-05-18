@@ -53,8 +53,9 @@ make_sandbox() {
     # AGENTS_HOME/CODEX_HOME). Tests that need to mutate (Case 2) swap them.
     mkdir -p "$tmp/plugin/scripts" "$tmp/plugin/hooks"
     cp "$TEST_PLUGIN_ROOT/scripts/install-codex.sh" "$tmp/plugin/scripts/"
-    ln -s "$TEST_PLUGIN_ROOT/skills-codex" "$tmp/plugin/skills-codex"
-    ln -s "$TEST_PLUGIN_ROOT/AGENTS.md"    "$tmp/plugin/AGENTS.md"
+    ln -s "$TEST_PLUGIN_ROOT/skills-codex"   "$tmp/plugin/skills-codex"
+    ln -s "$TEST_PLUGIN_ROOT/commands-codex" "$tmp/plugin/commands-codex"
+    ln -s "$TEST_PLUGIN_ROOT/AGENTS.md"      "$tmp/plugin/AGENTS.md"
     ln -s "$TEST_PLUGIN_ROOT/hooks/hooks-codex.json" "$tmp/plugin/hooks/hooks-codex.json"
     ln -s "$TEST_PLUGIN_ROOT/hooks/session-start.sh" "$tmp/plugin/hooks/session-start.sh"
 
@@ -88,7 +89,6 @@ SKILL_LINK="$SANDBOX/agents-home/skills/morkit"
 if [[ -L "$SKILL_LINK" ]]; then
     TARGET="$(readlink "$SKILL_LINK")"
     assert_contains "$TARGET" "skills-codex" "skill symlink target ends in skills-codex"
-    assert_not_contains "$TARGET" "/skills$" "skill symlink does not target legacy skills/"
 else
     _fail "skill symlink missing: $SKILL_LINK"
 fi
@@ -184,6 +184,24 @@ if [[ -L "$SANDBOX/agents-home/skills/morkit" ]]; then
 else
     _fail "skill symlink missing after re-run"
 fi
+
+# ---------------------------------------------------------------------------
+# Case 6: --uninstall removes hooks.json symlink installed via --with-hooks
+# ---------------------------------------------------------------------------
+echo "[case 6] --uninstall removes hooks.json symlink (with-hooks scenario)"
+SANDBOX="$(make_sandbox)"
+touch "$SANDBOX/home/.bashrc"
+run_install "$SANDBOX" --yes --with-hooks >/dev/null 2>&1
+
+# Sanity: hooks.json symlink exists before uninstall
+HOOKS_JSON="$SANDBOX/codex-home/hooks.json"
+[[ -L "$HOOKS_JSON" ]] || _fail "precondition: hooks.json symlink should exist after --with-hooks install"
+
+run_install "$SANDBOX" --uninstall >/dev/null 2>&1
+RC=$?
+assert_equal "$RC" "0" "uninstall (post --with-hooks) exits 0"
+
+assert_file_not_exists "$HOOKS_JSON" "hooks.json symlink removed by uninstall"
 
 # ---------------------------------------------------------------------------
 exit_with_status

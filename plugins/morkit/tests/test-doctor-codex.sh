@@ -127,10 +127,7 @@ rm -f "$SANDBOX/codex-home/hooks.json"
 
 OUT="$(run_doctor "$SANDBOX")"
 assert_contains "$OUT" "hooks.json" "doctor mentions hooks.json"
-# Missing hooks.json should not contribute to FAIL count. Count FAILs from
-# summary line.
-FAIL_LINE="$(printf '%s' "$OUT" | grep -E "^[[:space:]]*FAIL:" | tail -1)"
-FAIL_N="$(printf '%s' "$FAIL_LINE" | awk '{print $2}')"
+# Missing hooks.json should not contribute to FAIL count.
 # Allow other unrelated FAILs (e.g. missing optional deep-review pieces in
 # this stripped sandbox) — but ensure none of them is about hooks.json.
 if printf '%s' "$OUT" | grep -E "FAIL" | grep -qi "hooks.json"; then

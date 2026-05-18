@@ -150,7 +150,7 @@ if [ -L "$HOOKS_JSON" ]; then
 elif [ -f "$HOOKS_JSON" ]; then
     # Regular file (copy or manual). Check either explicit morkit reference
     # or the multi-tool PreToolUse matcher that ships in hooks-codex.json.
-    if grep -qE "morkit|MORKIT_PLUGIN_ROOT|apply_patch\|Edit\|Write" "$HOOKS_JSON" 2>/dev/null; then
+    if grep -qE "morkit|MORKIT_PLUGIN_ROOT" "$HOOKS_JSON" 2>/dev/null || grep -qF "apply_patch|Edit|Write" "$HOOKS_JSON" 2>/dev/null; then
         ok "$HOOKS_JSON references morkit (hooks-codex.json content detected)"
     else
         warn "$HOOKS_JSON exists but doesn't reference morkit hooks-codex.json"
@@ -193,7 +193,7 @@ if [ -x "$DRIFT_SCRIPT" ] || [ -f "$DRIFT_SCRIPT" ]; then
     echo "$DRIFT_OUT" | sed 's/^/    /' | head -10
     # Match WARN/INFO lines that indicate drift (avoid false match on the
     # success line "no drift detected").
-    if echo "$DRIFT_OUT" | grep -qiE "^(WARN|INFO):.*drift|out of sync|files? diverged|stale"; then
+    if echo "$DRIFT_OUT" | grep -qiE "^(WARN|INFO):.*(drift|out of sync|files? diverged|stale)"; then
         warn "drift detected — re-run sync-codex-fork.sh to refresh skills-codex/"
     else
         ok "no drift detected"
