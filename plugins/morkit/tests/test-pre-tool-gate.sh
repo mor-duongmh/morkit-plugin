@@ -298,6 +298,56 @@ case_7_24() {
     cd /; rm -rf "$tmp"
 }
 
+# ---------------------------------------------------------------------------
+# Codex env-var validation cases — prevent path traversal + archive bypass.
+# MORKIT_CURRENT_CHANGE must be a single innocuous change name.
+# ---------------------------------------------------------------------------
+
+# 7.25 — Path traversal: MORKIT_CURRENT_CHANGE=archive/old-change → fail-open with WARN
+case_7_25() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    # Approved active change (would falsely allow if path traversal worked)
+    setup_approved_change
+    # Approved change buried in archive subfolder (the bypass target)
+    mkdir -p morkit/output/spec/archive/old-change
+    cat > morkit/output/spec/archive/old-change/review-checklist.md <<'EOF'
+Overall Decision: OK
+EOF
+    local stderr
+    stderr=$(MORKIT_CURRENT_CHANGE='archive/old-change' printf '%s' '{"tool_name":"apply_patch","tool_input":{}}' \
+        | MORKIT_CURRENT_CHANGE='archive/old-change' bash "$GATE" 2>&1 >/dev/null)
+    local rc=$?
+    assert_equal "$rc" 0 "7.25 path traversal → fail-open"
+    assert_contains "$stderr" "MORKIT_CURRENT_CHANGE must be a single change name" "7.25 stderr explains validation"
+    cd /; rm -rf "$tmp"
+}
+
+# 7.26 — Literal "archive" blocked
+case_7_26() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    mkdir -p morkit/output/spec/archive
+    cat > morkit/output/spec/archive/review-checklist.md <<'EOF'
+Overall Decision: OK
+EOF
+    MORKIT_CURRENT_CHANGE='archive' printf '%s' '{"tool_name":"Edit","tool_input":{}}' \
+        | MORKIT_CURRENT_CHANGE='archive' bash "$GATE" >/dev/null 2>&1
+    assert_equal "$?" 0 "7.26 literal 'archive' → fail-open"
+    cd /; rm -rf "$tmp"
+}
+
+# 7.27 — Special chars (shell metacharacters) blocked
+case_7_27() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    setup_approved_change
+    local stderr
+    stderr=$(MORKIT_CURRENT_CHANGE='foo bar; rm -rf /' printf '%s' '{"tool_name":"Write","tool_input":{}}' \
+        | MORKIT_CURRENT_CHANGE='foo bar; rm -rf /' bash "$GATE" 2>&1 >/dev/null)
+    local rc=$?
+    assert_equal "$rc" 0 "7.27 special chars → fail-open"
+    assert_contains "$stderr" "MORKIT_CURRENT_CHANGE must be a single change name" "7.27 stderr explains validation"
+    cd /; rm -rf "$tmp"
+}
+
 case_7_1
 case_7_2
 case_7_3
@@ -322,5 +372,8 @@ case_7_21
 case_7_22
 case_7_23
 case_7_24
+case_7_25
+case_7_26
+case_7_27
 
 exit_with_status

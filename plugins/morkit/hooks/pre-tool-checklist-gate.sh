@@ -66,6 +66,17 @@ case "$tool_name" in
     apply_patch|Edit|Write)
         # Codex path — broad matcher, narrow on env var
         [[ -n "${MORKIT_CURRENT_CHANGE:-}" ]] || exit 0
+        # Validate the env var is a simple change name (no path components, no archive).
+        # Prevents path traversal (../sibling) and archive bypass (archive/old-thing)
+        # that would let the gate appear "approved" via an unintended checklist file.
+        if [[ "$MORKIT_CURRENT_CHANGE" == */* \
+           || "$MORKIT_CURRENT_CHANGE" == "." \
+           || "$MORKIT_CURRENT_CHANGE" == ".." \
+           || "$MORKIT_CURRENT_CHANGE" == "archive" \
+           || ! "$MORKIT_CURRENT_CHANGE" =~ ^[A-Za-z0-9._-]+$ ]]; then
+            echo "⚠ morkit gate: MORKIT_CURRENT_CHANGE must be a single change name (alphanumeric, dot, dash, underscore), got '$MORKIT_CURRENT_CHANGE' — fail-open" >&2
+            exit 0
+        fi
         trigger_label="$tool_name (change=$MORKIT_CURRENT_CHANGE)"
         ;;
     *)
