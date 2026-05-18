@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # test-pre-tool-gate.sh — tests for hooks/pre-tool-checklist-gate.sh
-# Coverage: 17 cases per Appendix B § 7.
+# Coverage: 17 base cases per Appendix B § 7, plus Codex multi-tool matcher cases.
 
 set -uo pipefail
 
@@ -229,6 +229,75 @@ case_7_18() {
     cd /; rm -rf "$tmp"
 }
 
+# ---------------------------------------------------------------------------
+# Codex multi-tool matcher cases (apply_patch / Edit / Write)
+# Codex CLI has no `Skill` tool; gate keys off MORKIT_CURRENT_CHANGE env var.
+# ---------------------------------------------------------------------------
+
+# 7.19 — apply_patch + MORKIT_CURRENT_CHANGE unset → fail-open
+case_7_19() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    setup_pending_change
+    # Explicitly clear env var so a leaked value can't pass the gate
+    unset MORKIT_CURRENT_CHANGE
+    printf '%s' '{"tool_name":"apply_patch","tool_input":{}}' \
+        | bash "$GATE" >/dev/null 2>&1
+    assert_equal "$?" 0 "7.19 apply_patch + no env → fail-open"
+    cd /; rm -rf "$tmp"
+}
+
+# 7.20 — apply_patch + MORKIT_CURRENT_CHANGE=foo + OK → allowed
+case_7_20() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    setup_approved_change
+    MORKIT_CURRENT_CHANGE=foo printf '%s' '{"tool_name":"apply_patch","tool_input":{}}' \
+        | MORKIT_CURRENT_CHANGE=foo bash "$GATE" >/dev/null 2>&1
+    assert_equal "$?" 0 "7.20 apply_patch + OK checklist → allowed"
+    cd /; rm -rf "$tmp"
+}
+
+# 7.21 — apply_patch + MORKIT_CURRENT_CHANGE=foo + PENDING → blocks
+case_7_21() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    setup_pending_change
+    MORKIT_CURRENT_CHANGE=foo printf '%s' '{"tool_name":"apply_patch","tool_input":{}}' \
+        | MORKIT_CURRENT_CHANGE=foo bash "$GATE" >/dev/null 2>&1
+    [[ "$?" -ne 0 ]] && _pass "7.21 apply_patch + PENDING → blocks" || _fail "7.21 should block"
+    cd /; rm -rf "$tmp"
+}
+
+# 7.22 — Edit + MORKIT_CURRENT_CHANGE=foo + missing checklist → blocks with helpful msg
+case_7_22() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    setup_no_checklist
+    local stderr
+    stderr=$(MORKIT_CURRENT_CHANGE=foo printf '%s' '{"tool_name":"Edit","tool_input":{}}' \
+        | MORKIT_CURRENT_CHANGE=foo bash "$GATE" 2>&1 >/dev/null)
+    assert_contains "$stderr" "missing" "7.22 Edit + missing checklist → stderr mentions missing"
+    cd /; rm -rf "$tmp"
+}
+
+# 7.23 — Write + MORKIT_CURRENT_CHANGE points to nonexistent change → fail-open
+case_7_23() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    setup_approved_change
+    MORKIT_CURRENT_CHANGE=does-not-exist printf '%s' '{"tool_name":"Write","tool_input":{}}' \
+        | MORKIT_CURRENT_CHANGE=does-not-exist bash "$GATE" >/dev/null 2>&1
+    assert_equal "$?" 0 "7.23 Write + nonexistent change → fail-open"
+    cd /; rm -rf "$tmp"
+}
+
+# 7.24 — Skill path takes precedence even when MORKIT_CURRENT_CHANGE is set
+case_7_24() {
+    local tmp; tmp="$(mktemp -d)"; cd "$tmp" || return
+    setup_pending_change
+    # Skill tool + env var set → Skill path runs (gate-relevant skill blocks on PENDING)
+    MORKIT_CURRENT_CHANGE=foo printf '%s' '{"tool_name":"Skill","tool_input":{"skill":"morkit:executing-plans"}}' \
+        | MORKIT_CURRENT_CHANGE=foo bash "$GATE" >/dev/null 2>&1
+    [[ "$?" -ne 0 ]] && _pass "7.24 Skill path precedence over env" || _fail "7.24 should block via Skill path"
+    cd /; rm -rf "$tmp"
+}
+
 case_7_1
 case_7_2
 case_7_3
@@ -247,5 +316,11 @@ case_7_15
 case_7_16
 case_7_17
 case_7_18
+case_7_19
+case_7_20
+case_7_21
+case_7_22
+case_7_23
+case_7_24
 
 exit_with_status
