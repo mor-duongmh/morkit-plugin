@@ -6,7 +6,7 @@
 
 **Goal:** Clone morkit skills/commands/hooks cần diverge sang folder song song `-codex` để Codex CLI dùng được vocab tự nhiên, giữ Claude Code path zero-impact.
 
-**Architecture:** Sibling-folder fork trong cùng plugin. `install-codex.sh` quyết định symlink target tại install time. Env vars cascade (`MORKIT_ROOT` → `CLAUDE_PLUGIN_ROOT` → fallback) cho phép scripts share giữa 2 paths.
+**Architecture:** Sibling-folder fork trong cùng plugin. `install-codex.sh` quyết định symlink target tại install time. Env vars cascade (`MORKIT_PLUGIN_ROOT` → `CLAUDE_PLUGIN_ROOT` → fallback) cho phép scripts share giữa 2 paths. **Lưu ý**: dùng `MORKIT_PLUGIN_ROOT`, KHÔNG `MORKIT_ROOT` (đã có nghĩa cũ là spec folder — xem design.md Resolved R1).
 
 **Tech Stack:** Bash 4+, Python 3, jq, YAML (sed-based parsing), GitHub Actions, Codex CLI ≥ 0.120.0. Không runtime dependency mới.
 
@@ -38,7 +38,8 @@
 - `plugins/morkit/hooks/dh-session-start.sh` — env cascade + `MORKIT_DATA` fallback
 - `plugins/morkit/hooks/first-run-tools.sh` — env cascade + `MORKIT_DATA` fallback
 - `plugins/morkit/hooks/session-start.sh` — env cascade
-- `plugins/morkit/skills/**/*.md` — 14 file đổi `${CLAUDE_PLUGIN_ROOT}` → `${MORKIT_ROOT:-${CLAUDE_PLUGIN_ROOT}}` (chỉ env var, text khác giữ nguyên)
+- `plugins/morkit/skills/**/*.md` — ~13 file đổi `${CLAUDE_PLUGIN_ROOT}` → `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}` (chỉ env var, text khác giữ nguyên)
+- `plugins/morkit/skills/docs-hero-orchestrator/scripts/dispatch_coordinator.py` — Python cascade: `os.environ.get("MORKIT_PLUGIN_ROOT") or os.environ.get("CLAUDE_PLUGIN_ROOT")`
 - `plugins/morkit/AGENTS.md` — bridge map trỏ `commands-codex/`
 - `plugins/morkit/.codex/INSTALL.md` — new install flow
 - `plugins/morkit/ci/github-actions.yml` — drift-check job mới
@@ -69,8 +70,8 @@
 
 **TDD steps:**
 
-- [ ] Write failing test: `tests/test-env-cascade.sh` — assert scripts dùng `${MORKIT_ROOT:-${CLAUDE_PLUGIN_ROOT:-...}}` pattern
-- [ ] Refactor scripts/hooks/skills sed-based: `${CLAUDE_PLUGIN_ROOT}` → `${MORKIT_ROOT:-${CLAUDE_PLUGIN_ROOT}}`
+- [ ] Write failing test: `tests/test-env-cascade.sh` — assert scripts dùng `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-...}}` pattern
+- [ ] Refactor scripts/hooks/skills sed-based: `${CLAUDE_PLUGIN_ROOT}` → `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}`
 - [ ] Refactor hardcode `~/.claude/plugins/data` → `${MORKIT_DATA:-$HOME/.claude/plugins/data}`
 - [ ] Test cross-shell: bash 3.x (macOS default) + bash 5.x + zsh
 - [ ] CC regression test: chạy `/morkit:propose test-env-1` dưới Claude Code → vẫn hoạt động
@@ -223,7 +224,7 @@
 **TDD steps:**
 
 - [ ] Write failing test: grep AGENTS.md cho "commands-codex/" reference; grep INSTALL.md cho "skills-codex/"
-- [ ] Update AGENTS.md bridge: "khi user gõ `/morkit:<name>` → đọc `<MORKIT_ROOT>/commands-codex/<name>.md`"
+- [ ] Update AGENTS.md bridge: "khi user gõ `/morkit:<name>` → đọc `<MORKIT_PLUGIN_ROOT>/commands-codex/<name>.md`"
 - [ ] Update Tool mapping section: thêm note "skills/ vs skills-codex/"
 - [ ] Update INSTALL.md: clone repo + chạy install-codex.sh → symlink skills-codex/ (mention rõ folder mới)
 - [ ] Commit

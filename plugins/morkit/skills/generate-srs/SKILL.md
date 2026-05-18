@@ -17,12 +17,12 @@ Sub-skill for generating SRS + per-screen design specs. Owns `morkit/output/docs
 ## Environment (plugin context)
 
 ```bash
-CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:?must be set by Claude Code}"
-VENV="${HOME}/.claude/plugins/data/docs-hero/.venv"
+MORKIT_PLUGIN_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:?must be set by Claude Code or MORKIT_PLUGIN_ROOT must be set by Codex}}"
+VENV="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/docs-hero/.venv"
 PY="${VENV}/bin/python3"
-SRS_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-srs/scripts"
-SRS_TEMPLATES="${CLAUDE_PLUGIN_ROOT}/skills/generate-srs/templates"
-ORCH_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/docs-hero-orchestrator/scripts"
+SRS_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-srs/scripts"
+SRS_TEMPLATES="${MORKIT_PLUGIN_ROOT}/skills/generate-srs/templates"
+ORCH_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/docs-hero-orchestrator/scripts"
 PROJECT_DOCS_DIR="${PWD}/docs"
 PROJECT_META="${PWD}/.docs-hero-meta.json"
 ```

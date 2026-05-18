@@ -4,8 +4,9 @@
 
 set -uo pipefail
 
-VENV="${HOME}/.claude/plugins/data/docs-hero/.venv"
-STATE_DIR="${HOME}/.claude/plugins/data/docs-hero"
+DATA_DIR="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}"
+VENV="${DATA_DIR}/docs-hero/.venv"
+STATE_DIR="${DATA_DIR}/docs-hero"
 HINT_SHOWN="${STATE_DIR}/.first-run-hint-shown"
 
 mkdir -p "$STATE_DIR"

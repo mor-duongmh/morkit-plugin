@@ -18,11 +18,11 @@ cannot be inferred from code.
 ## Environment (plugin context)
 
 ```bash
-CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:?must be set by Claude Code}"
-VENV="${HOME}/.claude/plugins/data/docs-hero/.venv"
+MORKIT_PLUGIN_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:?must be set by Claude Code or MORKIT_PLUGIN_ROOT must be set by Codex}}"
+VENV="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/docs-hero/.venv"
 PY="${VENV}/bin/python3"
-GUI_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-design-guidelines/scripts"
-ORCH_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/docs-hero-orchestrator/scripts"
+GUI_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-design-guidelines/scripts"
+ORCH_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/docs-hero-orchestrator/scripts"
 PROJECT_DOCS_DIR="${PWD}/docs"
 PROJECT_META="${PWD}/.docs-hero-meta.json"
 ```

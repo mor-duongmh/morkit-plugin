@@ -64,7 +64,7 @@ is_morkit_symlink() {
     esac
 }
 
-# --- shell rc detection (for CLAUDE_PLUGIN_ROOT env export) ---
+# --- shell rc detection (for MORKIT_PLUGIN_ROOT / CLAUDE_PLUGIN_ROOT env export) ---
 RC_MARKER_BEGIN="# >>> morkit-codex >>>"
 RC_MARKER_END="# <<< morkit-codex <<<"
 
@@ -191,22 +191,24 @@ else
     fi
 fi
 
-# --- step 3: shell rc env block (unblocks 12 skills using ${CLAUDE_PLUGIN_ROOT}) ---
+# --- step 3: shell rc env block (unblocks 12 skills using ${MORKIT_PLUGIN_ROOT}) ---
 echo
-echo "[3/4] Shell rc env (export CLAUDE_PLUGIN_ROOT for skills)"
+echo "[3/4] Shell rc env (export MORKIT_PLUGIN_ROOT for skills)"
 RC_FILE="$(detect_shell_rc)"
 if [ -z "$RC_FILE" ]; then
     echo "  skipped — unsupported shell ($SHELL). Add manually:"
-    echo "    export CLAUDE_PLUGIN_ROOT=\"$PLUGIN_ROOT\""
+    echo "    export MORKIT_PLUGIN_ROOT=\"$PLUGIN_ROOT\""
 elif grep -q "$RC_MARKER_BEGIN" "$RC_FILE" 2>/dev/null; then
     echo "  $RC_FILE already contains morkit-codex block — leaving alone."
     echo "  (re-run with --uninstall first if you need to repoint)"
-elif confirm "  Append CLAUDE_PLUGIN_ROOT export to $RC_FILE?"; then
+elif confirm "  Append MORKIT_PLUGIN_ROOT export to $RC_FILE?"; then
     {
         echo ""
         echo "$RC_MARKER_BEGIN"
-        echo "# morkit-codex: makes \${CLAUDE_PLUGIN_ROOT} visible to skills invoked by Codex."
-        echo "export CLAUDE_PLUGIN_ROOT=\"$PLUGIN_ROOT\""
+        echo "# morkit-codex: makes \${MORKIT_PLUGIN_ROOT} visible to skills invoked by Codex."
+        echo "# (Also exports CLAUDE_PLUGIN_ROOT as a MORKIT_PLUGIN_ROOT fallback for legacy scripts.)"
+        echo "export MORKIT_PLUGIN_ROOT=\"$PLUGIN_ROOT\""
+        echo "export CLAUDE_PLUGIN_ROOT=\"\${MORKIT_PLUGIN_ROOT:-\${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}}\""
         echo "export PATH=\"\$PATH:$PLUGIN_ROOT/scripts\""
         echo "$RC_MARKER_END"
     } >> "$RC_FILE"

@@ -2,14 +2,15 @@
 # setup-venv.sh — create + populate docs-hero Python venv at user-shared location.
 #
 # Usage (from /morkit:setup slash command):
-#   bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-venv.sh"
+#   bash "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/setup-venv.sh"
 #
 # Idempotent: re-running upgrades pinned deps to match requirements.txt.
 
 set -euo pipefail
 
-VENV="${HOME}/.claude/plugins/data/docs-hero/.venv"
-REQ="${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+VENV="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/docs-hero/.venv"
+PLUGIN_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}"
+REQ="${PLUGIN_ROOT}/requirements.txt"
 
 # --- Verify Python ≥ 3.9 ---
 if ! command -v python3 >/dev/null 2>&1; then
@@ -28,7 +29,7 @@ fi
 # --- Verify requirements.txt present ---
 if [ ! -f "$REQ" ]; then
     echo "ERROR: requirements.txt not found at $REQ" >&2
-    echo "Hint: \$CLAUDE_PLUGIN_ROOT must point to the docs-hero plugin root" >&2
+    echo "Hint: \$MORKIT_PLUGIN_ROOT (or \$CLAUDE_PLUGIN_ROOT) must point to the docs-hero plugin root" >&2
     exit 1
 fi
 

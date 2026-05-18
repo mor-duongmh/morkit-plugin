@@ -17,9 +17,10 @@
 
 set -euo pipefail
 
-# Resolve plugin data dir. Claude Code exports CLAUDE_PLUGIN_DATA when running
-# hooks; fall back to a deterministic path when invoked manually.
-PLUGIN_DATA="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data/spec}"
+# Resolve plugin data dir. Honor MORKIT_DATA first (Codex / explicit override),
+# then CLAUDE_PLUGIN_DATA (exported by Claude Code when running hooks), then
+# a deterministic default for manual invocation.
+PLUGIN_DATA="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/spec"
 mkdir -p "$PLUGIN_DATA" 2>/dev/null || true
 
 DONE_FLAG="$PLUGIN_DATA/.tools-setup-done"

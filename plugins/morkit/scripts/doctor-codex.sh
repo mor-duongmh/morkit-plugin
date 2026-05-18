@@ -90,7 +90,7 @@ fi
 
 # --- shell rc env block ---
 echo
-echo "[4] Shell rc CLAUDE_PLUGIN_ROOT export"
+echo "[4] Shell rc MORKIT_PLUGIN_ROOT export"
 SHELL_NAME="$(basename "${SHELL:-/bin/sh}")"
 case "$SHELL_NAME" in
     zsh)  RC_FILE="$HOME/.zshrc" ;;
@@ -98,7 +98,7 @@ case "$SHELL_NAME" in
     *)    RC_FILE="" ;;
 esac
 if [ -z "$RC_FILE" ]; then
-    warn "unsupported shell $SHELL_NAME — set CLAUDE_PLUGIN_ROOT manually"
+    warn "unsupported shell $SHELL_NAME — set MORKIT_PLUGIN_ROOT manually"
 elif [ ! -f "$RC_FILE" ]; then
     warn "$RC_FILE not found — re-run install-codex.sh"
 elif grep -q "# >>> morkit-codex >>>" "$RC_FILE"; then
@@ -106,14 +106,15 @@ elif grep -q "# >>> morkit-codex >>>" "$RC_FILE"; then
 else
     fail "$RC_FILE missing morkit-codex block — 12 skills (propose/review/archive/deep-review/docs-hero) will fail"
 fi
-if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
-    if [ -d "$CLAUDE_PLUGIN_ROOT" ]; then
-        ok "CLAUDE_PLUGIN_ROOT exported in current shell ($CLAUDE_PLUGIN_ROOT)"
+RESOLVED_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}"
+if [ -n "$RESOLVED_ROOT" ]; then
+    if [ -d "$RESOLVED_ROOT" ]; then
+        ok "MORKIT_PLUGIN_ROOT (or CLAUDE_PLUGIN_ROOT fallback) resolves to $RESOLVED_ROOT"
     else
-        fail "CLAUDE_PLUGIN_ROOT exported but path invalid: $CLAUDE_PLUGIN_ROOT"
+        fail "MORKIT_PLUGIN_ROOT/CLAUDE_PLUGIN_ROOT exported but path invalid: $RESOLVED_ROOT"
     fi
 else
-    warn "CLAUDE_PLUGIN_ROOT not exported in current shell — open a new terminal or 'source $RC_FILE'"
+    warn "neither MORKIT_PLUGIN_ROOT nor CLAUDE_PLUGIN_ROOT exported in current shell — open a new terminal or 'source $RC_FILE'"
 fi
 
 # --- hooks feature flag ---

@@ -122,7 +122,7 @@ preserve:
         "matcher": "startup|resume|clear",
         "hooks": [{
           "type": "command",
-          "command": "bash \"${MORKIT_ROOT:-${CLAUDE_PLUGIN_ROOT}}/hooks/session-start.sh\"",
+          "command": "bash \"${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/hooks/session-start.sh\"",
           "async": false
         }]
       }
@@ -132,7 +132,7 @@ preserve:
         "matcher": "apply_patch|Edit|Write",
         "hooks": [{
           "type": "command",
-          "command": "bash \"${MORKIT_ROOT:-${CLAUDE_PLUGIN_ROOT}}/hooks/pre-tool-checklist-gate.sh\"",
+          "command": "bash \"${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/hooks/pre-tool-checklist-gate.sh\"",
           "async": false
         }]
       }
@@ -167,6 +167,13 @@ Không có API mới. Chỉ thay đổi hành vi 2 entry points:
 | `install-codex.sh` | Symlink `skills/` | Symlink `skills-codex/`; write `~/.codex/hooks.json` từ `hooks-codex.json` |
 | `doctor-codex.sh` | Verify symlink `skills/` | Verify symlink `skills-codex/`; verify hooks-codex wired |
 | `pre-tool-checklist-gate.sh` | Match `tool_name == "Skill"` | Match `Skill` (CC) HOẶC `apply_patch|Edit|Write` (Codex) |
+
+## Resolved during execution
+
+- **R1 (Task 1, 2026-05-18)**: Var name cho plugin install root là `MORKIT_PLUGIN_ROOT`, KHÔNG dùng `MORKIT_ROOT`. Lý do: `MORKIT_ROOT` đã được dùng với nghĩa "spec changes folder" (default `morkit/output/spec`) trong `lib/common.sh::morkit_root()`, `scaffold-change.sh`, `pre-tool-checklist-gate.sh`, `list-changes.sh`, `generate-checklist.sh`, và 4 test files. Cùng env var = 2 nghĩa khác nhau sẽ gây silent breakage. Cascade pattern mới: `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}`.
+- **R2 (Task 1)**: `MORKIT_DATA` cascade cũng đi qua `CLAUDE_PLUGIN_DATA` (đã có trong fetch-checklist.sh): `${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}`.
+- **R3 (Task 1)**: Python file `dispatch_coordinator.py` cũng áp cascade: `os.environ.get("MORKIT_PLUGIN_ROOT") or os.environ.get("CLAUDE_PLUGIN_ROOT")`.
+- **R4 (Task 1)**: `commands/*.md` KHÔNG trong scope Task 1 — CC backward compat không cần (CC export CLAUDE_PLUGIN_ROOT tự động); commands sẽ được clone sang commands-codex/ trong Task 6.
 
 ## Open questions
 

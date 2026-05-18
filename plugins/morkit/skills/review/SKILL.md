@@ -38,7 +38,7 @@ The skill never modifies the user's review judgement — it only prepares the fi
 
    Run the helper script bundled with the plugin:
    ```bash
-   "${CLAUDE_PLUGIN_ROOT}/scripts/generate-checklist.sh" "$CHANGE_DIR" [--refresh] [--variant <id>]
+   "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/generate-checklist.sh" "$CHANGE_DIR" [--refresh] [--variant <id>]
    ```
 
    The script will:

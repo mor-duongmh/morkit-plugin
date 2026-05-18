@@ -86,7 +86,7 @@ CHECKLIST="$CHANGE_DIR/review-checklist.md"
 CHANGE_NAME="$(basename "$CHANGE_DIR")"
 
 if [[ "$USED_LEGACY" -eq 1 ]]; then
-    echo "⚠ Using legacy openspec/changes/ folder. Run: bash \${CLAUDE_PLUGIN_ROOT}/scripts/migrate-from-openspec.sh" >&2
+    echo "⚠ Using legacy openspec/changes/ folder. Run: bash \${MORKIT_PLUGIN_ROOT:-\${CLAUDE_PLUGIN_ROOT}}/scripts/migrate-from-openspec.sh" >&2
 fi
 
 if [[ ! -f "$CHECKLIST" ]]; then

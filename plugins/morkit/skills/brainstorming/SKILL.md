@@ -55,7 +55,7 @@ direction — agent must respect them, not override them.
   - Stack manifests: `package.json` / `pyproject.toml` / `Cargo.toml` /
     `go.mod` / `pom.xml` (declared deps reveal architecture)
   - Recent commits: `git log -20 --oneline` (current direction)
-  - Active spec changes: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/list-changes.sh" --json`
+  - Active spec changes: `bash "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/list-changes.sh" --json`
 - **Tier 3 — Domain artifacts**:
   - `morkit/output/spec/<name>/` (proposal/design/tasks if user mentions a change)
   - Existing docs: `docs/`, `docs/srs.md`, `docs/api-docs.md`, etc.
@@ -118,7 +118,7 @@ You have full context of the morkit spec system. Use it naturally, don't force i
 
 At the start, quickly check what exists:
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/scripts/list-changes.sh" --json
+bash "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/list-changes.sh" --json
 ```
 
 This tells you:

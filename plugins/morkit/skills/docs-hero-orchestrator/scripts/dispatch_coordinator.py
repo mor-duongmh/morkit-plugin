@@ -37,9 +37,9 @@ from lib.normalized_schema import (  # noqa: E402
 log = logging.getLogger(__name__)
 
 # Resolve sibling sub-skill folders.
-# Plugin layout: $CLAUDE_PLUGIN_ROOT/skills/<sub-skill>/scripts/
+# Plugin layout: $MORKIT_PLUGIN_ROOT (or $CLAUDE_PLUGIN_ROOT)/skills/<sub-skill>/scripts/
 # Bundle layout (legacy): <bundle>/.claude/skills/<sub-skill>/scripts/ via parents[1]
-_PLUGIN_ROOT_ENV = os.environ.get("CLAUDE_PLUGIN_ROOT")
+_PLUGIN_ROOT_ENV = os.environ.get("MORKIT_PLUGIN_ROOT") or os.environ.get("CLAUDE_PLUGIN_ROOT")
 if _PLUGIN_ROOT_ENV:
     _SKILLS_ROOT = Path(_PLUGIN_ROOT_ENV) / "skills"
 else:

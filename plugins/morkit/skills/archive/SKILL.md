@@ -16,7 +16,7 @@ Archive a completed change by moving it from `${MORKIT_ROOT:-morkit/output/spec}
 
    List active changes (excluding archive/):
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/list-changes.sh" --json
+   bash "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/list-changes.sh" --json
    ```
 
    If no name was provided, use **AskUserQuestion tool** to let the user pick.

@@ -12,7 +12,7 @@ Cần một path Codex-native — skill/command/hook đọc tự nhiên trên Co
 - Tạo `plugins/morkit/commands-codex/` — clone 15 command file mirror, bỏ cụm "using the Skill tool"
 - Tạo `plugins/morkit/hooks/hooks-codex.json` — schema Codex, matcher `apply_patch|Edit|Write` thay cho `Skill`
 - Refactor `pre-tool-checklist-gate.sh` để nhận thêm tool_name `apply_patch|Edit|Write`, gate condition giữ nguyên semantics
-- Cascade env vars cross-platform: `${MORKIT_ROOT:-${CLAUDE_PLUGIN_ROOT:-fallback}}` + `${MORKIT_DATA:-~/.claude/plugins/data}` áp cho 6 scripts + 4 hooks + 14 skills (skills/ gốc chỉ đổi tên env, không đổi nội dung text)
+- Cascade env vars cross-platform: `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-fallback}}` + `${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-~/.claude/plugins/data}}` áp cho 8 scripts + 4 hooks + ~13 skills + 1 Python file (skills/ gốc chỉ đổi tên env, không đổi nội dung text). **Lưu ý**: dùng `MORKIT_PLUGIN_ROOT` (KHÔNG dùng `MORKIT_ROOT`) vì `MORKIT_ROOT` đã có nghĩa cũ là spec changes folder (default `morkit/output/spec`) — không thể overload.
 - Tạo `plugins/morkit/codex/vocab-map.yaml` — định nghĩa rule swap (Skill tool → skill discovery, Agent tool → delegate to specialist, TodoWrite → task list, ExitPlanMode → present plan + pause, ...)
 - Tạo `plugins/morkit/scripts/sync-codex-fork.sh` — helper optional apply vocab swap từ skills/ → skills-codex/
 - Tạo `plugins/morkit/scripts/check-codex-drift.sh` — CI guard, warn (không fail) khi skills/ thay đổi mà skills-codex/ chưa sync
