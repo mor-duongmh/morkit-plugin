@@ -87,7 +87,7 @@ jobs:
           exit 0
 
       - name: Post drift warning to PR summary
-        if: steps.changed.outputs.run == 'true' && hashFiles('drift.err') != ''
+        if: steps.changed.outputs.run == 'true'
         run: |
           {
             echo "## Codex fork drift check"

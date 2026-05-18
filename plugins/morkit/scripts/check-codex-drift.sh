@@ -84,6 +84,13 @@ _mtime() {
     stat -f %m "$1" 2>/dev/null || stat -c %Y "$1" 2>/dev/null || echo ""
 }
 
+# Preflight: if neither hash tool exists, _sha256 silently returns empty and
+# every file would be falsely flagged as drifted. Bail loudly instead.
+if ! command -v sha256sum >/dev/null 2>&1 && ! command -v shasum >/dev/null 2>&1; then
+    echo "WARN: neither sha256sum nor shasum available — drift check skipped." >&2
+    exit 0
+fi
+
 # Hash of "current" source content. Task 2: raw bytes.
 # TODO(Task 4): when codex/vocab-map.yaml exists, pipe through the swap helper
 # before hashing so a vocab-only diff doesn't read as drift.

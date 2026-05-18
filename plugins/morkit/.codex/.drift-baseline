@@ -9,6 +9,10 @@
 # Format (one entry per line):
 #   <relpath-from-skills/>:<sha256>
 #
+# Constraint: <relpath> MUST NOT contain ':' (used as field delimiter by the
+# awk parser in check-codex-drift.sh). Sync script will reject paths violating
+# this. SKILL.md paths under skills/ are unlikely to need ':' in practice.
+#
 # Examples (illustrative — actual entries appear after first sync):
 #   brainstorming/SKILL.md:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 #   writing-plans/SKILL.md:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
