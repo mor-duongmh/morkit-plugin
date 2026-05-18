@@ -118,8 +118,10 @@ _baseline_entry_count() {
 # Case 1 — skills-codex/ not yet bootstrapped
 # ---------------------------------------------------------------------------
 if [[ ! -d "$TARGET_DIR" ]]; then
-    echo "INFO: skills-codex/ not yet bootstrapped (Task 5) — drift check skipped." >&2
-    echo "      Target dir: $TARGET_DIR"
+    {
+        echo "INFO: skills-codex/ not yet bootstrapped (Task 5) — drift check skipped."
+        echo "      Target dir: $TARGET_DIR"
+    } >&2
     exit 0
 fi
 
