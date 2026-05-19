@@ -48,13 +48,13 @@ echo "[2] Skill discovery ($SKILL_LINK)"
 if [ -L "$SKILL_LINK" ]; then
     TARGET="$(readlink "$SKILL_LINK")"
     if [ -d "$SKILL_LINK" ]; then
-        # Codex install must point at skills-codex/ (Codex vocab), not the
+        # Codex install must point at skills/ (Codex vocab), not the
         # raw skills/ (Claude vocab). Verify the basename of the target.
         TARGET_BASE="$(basename "$TARGET")"
-        if [ "$TARGET_BASE" = "skills-codex" ]; then
-            ok "symlink -> $TARGET (skills-codex/)"
+        if [ "$TARGET_BASE" = "skills" ]; then
+            ok "symlink -> $TARGET (skills/)"
         else
-            warn "symlink -> $TARGET (expected target: skills-codex/, got: $TARGET_BASE/). Re-run install-codex.sh to repoint."
+            warn "symlink -> $TARGET (expected target: skills/, got: $TARGET_BASE/). Re-run install-codex.sh to repoint."
         fi
     else
         fail "symlink dangling -> $TARGET"
@@ -142,18 +142,18 @@ fi
 
 if [ -L "$HOOKS_JSON" ]; then
     HOOKS_TARGET="$(readlink "$HOOKS_JSON")"
-    if [ "$(basename "$HOOKS_TARGET")" = "hooks-codex.json" ]; then
-        ok "$HOOKS_JSON -> $HOOKS_TARGET (hooks-codex.json)"
+    if [ "$(basename "$HOOKS_TARGET")" = "hooks.json" ]; then
+        ok "$HOOKS_JSON -> $HOOKS_TARGET (hooks.json)"
     else
-        warn "$HOOKS_JSON -> $HOOKS_TARGET (expected hooks-codex.json — re-run install-codex.sh --with-hooks)"
+        warn "$HOOKS_JSON -> $HOOKS_TARGET (expected hooks.json — re-run install-codex.sh --with-hooks)"
     fi
 elif [ -f "$HOOKS_JSON" ]; then
     # Regular file (copy or manual). Check either explicit morkit reference
-    # or the multi-tool PreToolUse matcher that ships in hooks-codex.json.
+    # or the multi-tool PreToolUse matcher that ships in hooks.json.
     if grep -qE "morkit|MORKIT_PLUGIN_ROOT" "$HOOKS_JSON" 2>/dev/null || grep -qF "apply_patch|Edit|Write" "$HOOKS_JSON" 2>/dev/null; then
-        ok "$HOOKS_JSON references morkit (hooks-codex.json content detected)"
+        ok "$HOOKS_JSON references morkit (hooks.json content detected)"
     else
-        warn "$HOOKS_JSON exists but doesn't reference morkit hooks-codex.json"
+        warn "$HOOKS_JSON exists but doesn't reference morkit hooks.json"
     fi
     if command -v python3 >/dev/null 2>&1; then
         if python3 -c "import json,sys; json.load(open('$HOOKS_JSON'))" 2>/dev/null; then
@@ -166,26 +166,26 @@ else
     warn "$HOOKS_JSON not present — hooks disabled (this is fine if you don't need them)"
 fi
 
-# --- commands-codex/ presence (read-only check; no symlink) ---
+# --- commands/ presence (read-only check; no symlink) ---
 echo
-echo "[6] commands-codex/ (slash-command bridge source)"
-COMMANDS_DIR="$PLUGIN_ROOT/commands-codex"
+echo "[6] commands/ (slash-command bridge source)"
+COMMANDS_DIR="$PLUGIN_ROOT/commands"
 if [ -d "$COMMANDS_DIR" ]; then
     CMD_COUNT=$(find "$COMMANDS_DIR" -maxdepth 1 -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
     if [ "$CMD_COUNT" -ge 10 ]; then
-        ok "$CMD_COUNT command files in commands-codex/"
+        ok "$CMD_COUNT command files in commands/"
     elif [ "$CMD_COUNT" -gt 0 ]; then
-        warn "only $CMD_COUNT command files in commands-codex/ (expected ≥ 10)"
+        warn "only $CMD_COUNT command files in commands/ (expected ≥ 10)"
     else
-        warn "commands-codex/ empty — re-run sync-codex-fork.sh"
+        warn "commands/ empty — re-run sync-codex-fork.sh"
     fi
 else
-    fail "commands-codex/ missing — run: bash $PLUGIN_ROOT/scripts/sync-codex-fork.sh"
+    fail "commands/ missing — run: bash $PLUGIN_ROOT/scripts/sync-codex-fork.sh"
 fi
 
 # --- drift check (informational — never fails the doctor) ---
 echo
-echo "[7] Drift check (skills/ vs skills-codex/ baseline)"
+echo "[7] Drift check (skills/ vs skills/ baseline)"
 DRIFT_SCRIPT="$PLUGIN_ROOT/scripts/check-codex-drift.sh"
 if [ -x "$DRIFT_SCRIPT" ] || [ -f "$DRIFT_SCRIPT" ]; then
     DRIFT_OUT="$(bash "$DRIFT_SCRIPT" 2>&1 || true)"
@@ -194,7 +194,7 @@ if [ -x "$DRIFT_SCRIPT" ] || [ -f "$DRIFT_SCRIPT" ]; then
     # Match WARN/INFO lines that indicate drift (avoid false match on the
     # success line "no drift detected").
     if echo "$DRIFT_OUT" | grep -qiE "^(WARN|INFO):.*(drift|out of sync|files? diverged|stale)"; then
-        warn "drift detected — re-run sync-codex-fork.sh to refresh skills-codex/"
+        warn "drift detected — re-run sync-codex-fork.sh to refresh skills/"
     else
         ok "no drift detected"
     fi

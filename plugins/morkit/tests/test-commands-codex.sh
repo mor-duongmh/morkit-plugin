@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test-commands-codex.sh — assert plugins/morkit/commands-codex/ is a clean
+# test-commands-codex.sh — assert plugins/morkit-codex/commands/ is a clean
 # Codex-flavored mirror of commands/ (Task 6 of codex-fork-skills-clone).
 #
 # Invariants:
@@ -29,7 +29,7 @@ HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HELPER_DIR/test-helper.sh"
 
 SRC_DIR="$TEST_PLUGIN_ROOT/commands"
-CODEX_DIR="$TEST_PLUGIN_ROOT/commands-codex"
+CODEX_DIR="$TEST_PLUGIN_ROOT/../morkit-codex/commands"
 
 # Bail early with a clear message if commands-codex/ wasn't built yet.
 if [[ ! -d "$CODEX_DIR" ]]; then

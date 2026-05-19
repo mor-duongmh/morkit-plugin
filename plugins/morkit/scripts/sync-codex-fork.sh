@@ -46,14 +46,18 @@ DEFAULT_PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PLUGIN_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-$DEFAULT_PLUGIN_ROOT}}"
 
 SOURCE_DIR="$PLUGIN_ROOT/skills"
-TARGET_DIR="$PLUGIN_ROOT/skills-codex"
+# Codex variant lives in plugins/morkit-codex/ (sibling), not skills-codex/ inside this plugin.
+# Reason: Codex CLI walks ANY skills/ folder inside a plugin install — bundling skills/ AND
+# skills-codex/ in plugins/morkit/ caused picker duplicates (each skill registered twice).
+# Now plugins/morkit-codex/ is its own plugin with default skills/ convention.
+TARGET_DIR="$(dirname "$PLUGIN_ROOT")/morkit-codex/skills"
 VOCAB_MAP="$PLUGIN_ROOT/codex/vocab-map.yaml"
-BASELINE="$PLUGIN_ROOT/.codex/.drift-baseline"
+BASELINE="$(dirname "$PLUGIN_ROOT")/morkit-codex/.codex/.drift-baseline"
 HELPER_PY="$SCRIPT_DIR/lib/apply-vocab-map.py"
 DRY_RUN=0
 
 # Built-in excludes — build artifacts and editor cruft that should never reach
-# skills-codex/. User-supplied --exclude patterns append to this list.
+# morkit-codex/skills/. User-supplied --exclude patterns append to this list.
 EXCLUDE_PATTERNS=('__pycache__' '*.pyc' '.DS_Store')
 
 # ---------------------------------------------------------------------------

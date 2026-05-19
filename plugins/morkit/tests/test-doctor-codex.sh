@@ -3,12 +3,12 @@
 # (Task 8 of codex-fork-skills-clone).
 #
 # Cases covered:
-#   1. All artifacts present (symlink → skills-codex/, AGENTS.md, env, hooks)
+#   1. All artifacts present (symlink → skills/, AGENTS.md, env, hooks)
 #      → 0 FAIL.
-#   2. Symlink points at legacy skills/ (not skills-codex/) → WARN
-#      surfaces "expected skills-codex".
+#   2. Symlink points at legacy skills/ (not skills/) → WARN
+#      surfaces "expected skills".
 #   3. hooks.json missing → WARN, not FAIL.
-#   4. commands-codex/ presence check appears in output when dir exists.
+#   4. commands/ presence check appears in output when dir exists.
 #   5. Drift check section surfaced (informational).
 
 set -uo pipefail
@@ -17,7 +17,9 @@ TEST_NAME="doctor-codex"
 HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HELPER_DIR/test-helper.sh"
 
-SCRIPT="$TEST_PLUGIN_ROOT/scripts/doctor-codex.sh"
+# Codex doctor script now lives in the sibling morkit-codex plugin.
+CODEX_PLUGIN_ROOT="$(cd "$TEST_PLUGIN_ROOT/../morkit-codex" && pwd)"
+SCRIPT="$CODEX_PLUGIN_ROOT/scripts/doctor-codex.sh"
 
 # ---------------------------------------------------------------------------
 # Sandbox builder — mirror layout used by test-install-codex.sh.
@@ -36,14 +38,14 @@ make_sandbox() {
 
     # The doctor script reads from $PLUGIN_ROOT. Copy it + symlink the rest
     # of the plugin tree we need.
-    cp "$TEST_PLUGIN_ROOT/scripts/doctor-codex.sh"        "$tmp/plugin/scripts/"
-    cp "$TEST_PLUGIN_ROOT/scripts/codex-deep-review.sh"   "$tmp/plugin/scripts/" 2>/dev/null || true
-    cp "$TEST_PLUGIN_ROOT/scripts/codex-deep-review-aggregate.py" "$tmp/plugin/scripts/" 2>/dev/null || true
-    cp "$TEST_PLUGIN_ROOT/scripts/check-codex-drift.sh"   "$tmp/plugin/scripts/" 2>/dev/null || true
-    ln -s "$TEST_PLUGIN_ROOT/skills-codex"   "$tmp/plugin/skills-codex"
-    ln -s "$TEST_PLUGIN_ROOT/commands-codex" "$tmp/plugin/commands-codex"
-    ln -s "$TEST_PLUGIN_ROOT/AGENTS.md"      "$tmp/plugin/AGENTS.md"
-    ln -s "$TEST_PLUGIN_ROOT/hooks/hooks-codex.json" "$tmp/plugin/hooks/hooks-codex.json"
+    cp "$CODEX_PLUGIN_ROOT/scripts/doctor-codex.sh"        "$tmp/plugin/scripts/"
+    cp "$CODEX_PLUGIN_ROOT/scripts/codex-deep-review.sh"   "$tmp/plugin/scripts/" 2>/dev/null || true
+    cp "$CODEX_PLUGIN_ROOT/scripts/codex-deep-review-aggregate.py" "$tmp/plugin/scripts/" 2>/dev/null || true
+    cp "$TEST_PLUGIN_ROOT/scripts/check-codex-drift.sh"    "$tmp/plugin/scripts/" 2>/dev/null || true
+    ln -s "$CODEX_PLUGIN_ROOT/skills"           "$tmp/plugin/skills"
+    ln -s "$CODEX_PLUGIN_ROOT/commands"         "$tmp/plugin/commands"
+    ln -s "$CODEX_PLUGIN_ROOT/AGENTS.md"        "$tmp/plugin/AGENTS.md"
+    ln -s "$CODEX_PLUGIN_ROOT/hooks/hooks.json" "$tmp/plugin/hooks/hooks.json"
 
     SANDBOXES+=("$tmp")
     echo "$tmp"
@@ -64,12 +66,12 @@ run_doctor() {
     printf '%s' "$out"
 }
 
-# Standard setup: skill symlink → skills-codex/, AGENTS.md, rc env, hooks.json
+# Standard setup: skill symlink → skills/, AGENTS.md, rc env, hooks.json
 setup_healthy() {
     local sandbox="$1"
-    ln -s "$sandbox/plugin/skills-codex" "$sandbox/agents-home/skills/morkit"
+    ln -s "$sandbox/plugin/skills" "$sandbox/agents-home/skills/morkit"
     ln -s "$sandbox/plugin/AGENTS.md"    "$sandbox/codex-home/AGENTS.md"
-    ln -s "$sandbox/plugin/hooks/hooks-codex.json" "$sandbox/codex-home/hooks.json"
+    ln -s "$sandbox/plugin/hooks/hooks.json" "$sandbox/codex-home/hooks.json"
     cat > "$sandbox/home/.bashrc" <<RC
 # >>> morkit-codex >>>
 export MORKIT_PLUGIN_ROOT="$sandbox/plugin"
@@ -85,7 +87,7 @@ SANDBOX="$(make_sandbox)"
 setup_healthy "$SANDBOX"
 OUT="$(run_doctor "$SANDBOX")"
 
-assert_contains "$OUT" "skills-codex" "doctor mentions skills-codex"
+assert_contains "$OUT" "skills" "doctor mentions skills"
 # FAIL count == 0 (script reports `FAIL:  N` in summary)
 if printf '%s' "$OUT" | grep -qE "FAIL:[[:space:]]+0"; then
     _pass "no FAILs"
@@ -94,14 +96,14 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Case 2: symlink points at legacy skills/ → WARN about wrong target
+# Case 2: missing skill symlink → FAIL surfaced
 # ---------------------------------------------------------------------------
-echo "[case 2] wrong symlink target (legacy skills/) → WARN"
+# (Old Case 2 tested "wrong target skills/ vs skills-codex/" — no longer
+# meaningful after fix/codex-separate-plugin since morkit-codex/skills/ is now
+# the canonical default-convention name. Replaced with a missing-symlink check.)
+echo "[case 2] missing skill symlink → FAIL surfaced"
 SANDBOX="$(make_sandbox)"
-# Create skills/ as well so the symlink target resolves (we just want the
-# wrong-target detection to fire, not a dangling-symlink failure).
-mkdir -p "$SANDBOX/plugin/skills"
-ln -s "$SANDBOX/plugin/skills" "$SANDBOX/agents-home/skills/morkit"
+# Set up everything EXCEPT the skill symlink
 ln -s "$SANDBOX/plugin/AGENTS.md" "$SANDBOX/codex-home/AGENTS.md"
 cat > "$SANDBOX/home/.bashrc" <<RC
 # >>> morkit-codex >>>
@@ -110,11 +112,10 @@ export MORKIT_PLUGIN_ROOT="$SANDBOX/plugin"
 RC
 
 OUT="$(run_doctor "$SANDBOX")"
-# Doctor should specifically call out the wrong target.
-if printf '%s' "$OUT" | grep -qiE "expected.*skills-codex|skills-codex.*expected|points to.*skills[^-]"; then
-    _pass "doctor warns about wrong symlink target"
+if printf '%s' "$OUT" | grep -qiE "FAIL.*skill|skill.*missing|missing.*install"; then
+    _pass "doctor flags missing skill symlink"
 else
-    _fail "expected wrong-target warning, got: $OUT"
+    _fail "expected missing-symlink FAIL, got: $OUT"
 fi
 
 # ---------------------------------------------------------------------------
@@ -137,14 +138,14 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# Case 4: commands-codex/ check present in output
+# Case 4: commands/ check present in output
 # ---------------------------------------------------------------------------
-echo "[case 4] commands-codex/ presence reported"
+echo "[case 4] commands/ presence reported"
 SANDBOX="$(make_sandbox)"
 setup_healthy "$SANDBOX"
 OUT="$(run_doctor "$SANDBOX")"
 
-assert_contains "$OUT" "commands-codex" "doctor reports on commands-codex/"
+assert_contains "$OUT" "commands" "doctor reports on commands/"
 
 # ---------------------------------------------------------------------------
 # Case 5: drift check surfaced

@@ -15,45 +15,42 @@ Cài xong là dùng được — không cần setup gì thêm trong project.
 
 ### Codex CLI
 
-**Native plugin marketplace** (recommended nếu Codex CLI version của bạn có `plugin marketplace`):
+**Native plugin marketplace** (Codex CLI ≥ 0.131):
 
 ```bash
 codex plugin marketplace add mor-duongmh/claude-plugins
 ```
 
-Codex tự clone repo, đọc `.agents/plugins/marketplace.json`, list plugin `morkit` available để install.
+Codex sẽ list 2 plugins: `morkit` (Claude Code variant) và `morkit-codex` (Codex variant). **Codex users install `morkit-codex`** (skills + vocab Codex-friendly, hooks gate dùng matcher `apply_patch|Edit|Write`).
 
-**Script install** (works trên mọi Codex ≥ 0.120.0):
+**Script install** (Codex < 0.131 hoặc fallback):
 
 ```bash
 git clone https://github.com/mor-duongmh/claude-plugins.git ~/.codex/morkit-source
-bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh
+bash ~/.codex/morkit-source/plugins/morkit-codex/scripts/install-codex.sh
 ```
 
-Sau đó restart Codex. Verify với `bash ~/.codex/morkit-source/plugins/morkit/scripts/doctor-codex.sh`.
-
-Chi tiết + Windows + hooks setup: [.codex/INSTALL.md](.codex/INSTALL.md).
-
-**Khác biệt giữa 2 platform**: skills + AGENTS.md hoạt động ngang nhau. Slash commands `/morkit:X`, hooks, và parallel subagents (deep-review) là native trong Claude Code, cần wire thủ công hoặc downgrade behavior trong Codex — xem bảng so sánh ở cuối INSTALL.md.
+Verify: `bash ~/.codex/morkit-source/plugins/morkit-codex/scripts/doctor-codex.sh`. Chi tiết: [plugins/morkit-codex/.codex/INSTALL.md](../morkit-codex/.codex/INSTALL.md).
 
 ## Claude Code vs Codex CLI
 
 | Aspect | Claude Code | Codex CLI |
 |---|---|---|
-| Install | `/plugin install morkit@mor-duongmh` | `codex plugin marketplace add mor-duongmh/claude-plugins` (native) hoặc `git clone` + `bash install-codex.sh` (script fallback) |
-| Skills | `plugins/morkit/skills/` (CC vocab) | `plugins/morkit/skills-codex/` (vocab-translated) |
-| Commands | `plugins/morkit/commands/` (CC vocab) | `plugins/morkit/commands-codex/` (suffix-stripped) |
-| Hooks | `hooks/hooks.json` | `hooks/hooks-codex.json` (multi-tool gate matcher) |
-| Slash | Native `/morkit:X` | AGENTS.md bridge → reads `commands-codex/X.md` |
-| Doctor | `/plugin doctor` | `bash scripts/doctor-codex.sh` |
+| Install | `/plugin install morkit@mor-duongmh` | `codex plugin marketplace add mor-duongmh/claude-plugins` → install **`morkit-codex`** |
+| Plugin folder | `plugins/morkit/` | `plugins/morkit-codex/` (**tách riêng**, không phải sub-folder) |
+| Skills | `plugins/morkit/skills/` (Claude vocab) | `plugins/morkit-codex/skills/` (vocab-translated) |
+| Commands | `plugins/morkit/commands/` | `plugins/morkit-codex/commands/` (suffix-stripped) |
+| Hooks | `plugins/morkit/hooks/hooks.json` | `plugins/morkit-codex/hooks/hooks.json` (multi-tool gate matcher) |
+| Slash | Native `/morkit:X` | `$morkit:X` picker hoặc AGENTS.md bridge cho `/morkit:X` |
+| Doctor | `/plugin doctor` | `bash plugins/morkit-codex/scripts/doctor-codex.sh` |
 
-### Sibling-folder approach (vì sao có `skills-codex/` + `commands-codex/`)
+### Separate-plugin approach (vì sao có `plugins/morkit-codex/`)
 
-Claude Code và Codex CLI dùng vocab + tool naming khác nhau (`Skill tool` vs skill discovery, `TodoWrite` vs to-do, `ExitPlanMode` vs plan-confirm...). Thay vì fork repo hoặc dùng template engine, plugin maintain hai cây song song: `skills/` + `commands/` là canonical cho Claude Code, còn `skills-codex/` + `commands-codex/` được sinh **deterministically** bởi `scripts/sync-codex-fork.sh` từ vocab map `codex/vocab-map.yaml`. Kết quả: zero impact lên người dùng Claude Code hiện tại; người dùng Codex thấy vocab native, không bị lộ Claude-only tokens.
+Claude Code và Codex CLI dùng vocab + tool naming khác nhau (`Skill tool` vs skill discovery, `TodoWrite` vs to-do, `ExitPlanMode` vs plan-confirm...). Earlier iteration đã thử sibling-folder pattern (`skills/` + `skills-codex/` trong cùng `plugins/morkit/`) — nhưng Codex CLI 0.130 walks ANY `skills/` directory inside an installed plugin folder, kể cả khi plugin.json explicitly declares `"skills": "./skills-codex/"`. Kết quả: mỗi skill xuất hiện 2 lần trong picker. Fix: tách hoàn toàn 2 plugins (`morkit/` cho CC, `morkit-codex/` cho Codex). Mỗi plugin có `skills/` riêng. Codex chỉ install plugin nó cần → no duplicate. CC users hoàn toàn không bị ảnh hưởng (marketplace.json giờ list 2 plugin tách biệt).
 
-Tài liệu chi tiết cho Codex users: [`.codex/INSTALL.md`](.codex/INSTALL.md) (install + troubleshoot), [`AGENTS.md`](AGENTS.md) (slash-command bridge).
+`plugins/morkit-codex/` được sinh **deterministically** từ `plugins/morkit/` qua `scripts/sync-codex-fork.sh` với vocab map `codex/vocab-map.yaml`. Tài liệu chi tiết: [`plugins/morkit-codex/AGENTS.md`](../morkit-codex/AGENTS.md), [`plugins/morkit-codex/.codex/INSTALL.md`](../morkit-codex/.codex/INSTALL.md).
 
-**Cho contributors edit `skills/` hoặc `commands/`**: chạy `bash scripts/check-codex-drift.sh` trước khi commit để CI không cảnh báo. Nếu drift, chạy `bash scripts/sync-codex-fork.sh` để regenerate fork + baseline.
+**Cho contributors edit `plugins/morkit/skills/` hoặc `plugins/morkit/commands/`**: chạy `bash scripts/check-codex-drift.sh` trước khi commit để CI không cảnh báo về sự lệch giữa CC plugin và Codex plugin. Nếu drift, chạy `bash scripts/sync-codex-fork.sh` để regenerate `plugins/morkit-codex/skills/` + `plugins/morkit-codex/commands/` + baselines.
 
 ## Quy trình điển hình
 

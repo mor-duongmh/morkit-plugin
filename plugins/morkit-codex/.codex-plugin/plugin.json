@@ -1,0 +1,38 @@
+{
+  "name": "morkit-codex",
+  "version": "1.0.0",
+  "description": "Mor's all-in-one toolkit for OpenAI Codex CLI — spec workflow (propose/review/archive) + brainstorming/execute/TDD skills + 5-specialist deep code review + BrSE document generation. Codex-native variant of morkit (see plugins/morkit/ for the Claude Code variant). Skills + commands use Codex-friendly vocab; hooks gate uses apply_patch|Edit|Write matcher.",
+  "author": {
+    "name": "Mor",
+    "email": "duongmh@mor.com.vn",
+    "url": "https://github.com/mor-duongmh"
+  },
+  "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/morkit-codex",
+  "repository": "https://github.com/mor-duongmh/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "spec",
+    "workflow",
+    "brse",
+    "deep-review",
+    "codex",
+    "tdd",
+    "documentation"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "interface": {
+    "displayName": "morkit (Codex)",
+    "shortDescription": "Spec workflow + deep code review + BrSE document generation for Codex CLI",
+    "longDescription": "All-in-one Codex CLI toolkit. Consolidates: spec workflow (propose/review/archive) + brainstorming/writing-plans/executing-plans/TDD/subagent-driven-development skills + 5-specialist parallel code review (deep-review) + BrSE document generation (docs-hero — SRS/API/DB/architecture). Single /morkit:* namespace via AGENTS.md bridge. Vocab-translated from the Claude Code variant (plugins/morkit/) via deterministic sync — see plugins/morkit/codex/vocab-map.yaml. INSTALL: codex plugin marketplace add mor-duongmh/claude-plugins, then install plugin 'morkit-codex'.",
+    "developerName": "Mor",
+    "category": "Development",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://mor-duongmh.github.io/claude-plugins/",
+    "defaultPrompt": [
+      "Bắt đầu propose spec change mới cho feature X",
+      "Chạy deep-review cho diff hiện tại",
+      "Generate SRS/API docs cho project này"
+    ]
+  }
+}

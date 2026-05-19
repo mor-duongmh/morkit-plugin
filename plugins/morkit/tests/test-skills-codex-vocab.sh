@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# test-skills-codex-vocab.sh — assert plugins/morkit/skills-codex/ is clean of
+# test-skills-codex-vocab.sh — assert plugins/morkit-codex/skills/ is clean of
 # Claude-specific vocab (Task 5 of codex-fork-skills-clone).
 #
 # Two-sided invariant:
@@ -21,7 +21,7 @@ TEST_NAME="skills-codex-vocab"
 HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HELPER_DIR/test-helper.sh"
 
-CODEX_DIR="$TEST_PLUGIN_ROOT/skills-codex"
+CODEX_DIR="$TEST_PLUGIN_ROOT/../morkit-codex/skills"
 VOCAB_MAP="$TEST_PLUGIN_ROOT/codex/vocab-map.yaml"
 
 # Bail with clear message if skills-codex/ is missing (e.g. running pre-bootstrap).

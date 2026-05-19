@@ -28,7 +28,7 @@ _pass() { PASSED=$((PASSED+1)); TOTAL=$((TOTAL+1)); echo "  ✓ $1"; }
 _fail() { FAILED=$((FAILED+1)); TOTAL=$((TOTAL+1)); echo "  ✗ $1" >&2; }
 _case() { echo; echo "Case: $1"; }
 
-PLUGIN_JSON="$PLUGIN_ROOT/.codex-plugin/plugin.json"
+PLUGIN_JSON="$PLUGIN_ROOT/../morkit-codex/.codex-plugin/plugin.json"
 CC_MARKETPLACE="$REPO_ROOT/.claude-plugin/marketplace.json"
 CODEX_MARKETPLACE="$REPO_ROOT/.agents/plugins/marketplace.json"
 
@@ -120,7 +120,7 @@ else
     _fail "README.md missing 'codex plugin marketplace add'"
 fi
 
-if grep -q "codex plugin marketplace add" "$PLUGIN_ROOT/.codex/INSTALL.md"; then
+if grep -q "codex plugin marketplace add" "$PLUGIN_ROOT/../morkit-codex/.codex/INSTALL.md"; then
     _pass "INSTALL.md mentions the marketplace add command"
 else
     _fail "INSTALL.md missing 'codex plugin marketplace add'"

@@ -48,11 +48,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_PLUGIN_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 PLUGIN_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-$DEFAULT_PLUGIN_ROOT}}"
 
-BASELINE="$(dirname "$PLUGIN_ROOT")/morkit-codex/.codex/.drift-baseline"
+BASELINE="$PLUGIN_ROOT/.codex/.drift-baseline"
 SOURCE_DIR="$PLUGIN_ROOT/skills"
-# Codex variant lives in plugins/morkit-codex/ sibling plugin (separate from morkit/) to
-# avoid Codex CLI walking both skills/ and skills-codex/ inside a single plugin install.
-TARGET_DIR="$(dirname "$PLUGIN_ROOT")/morkit-codex/skills"
+TARGET_DIR="$PLUGIN_ROOT/skills-codex"
 VOCAB_MAP="$PLUGIN_ROOT/codex/vocab-map.yaml"
 HELPER_PY="$SCRIPT_DIR/lib/apply-vocab-map.py"
 

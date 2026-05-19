@@ -20,8 +20,8 @@ TEST_NAME="docs-codex"
 HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HELPER_DIR/test-helper.sh"
 
-AGENTS_MD="$TEST_PLUGIN_ROOT/AGENTS.md"
-INSTALL_MD="$TEST_PLUGIN_ROOT/.codex/INSTALL.md"
+AGENTS_MD="$TEST_PLUGIN_ROOT/../morkit-codex/AGENTS.md"
+INSTALL_MD="$TEST_PLUGIN_ROOT/../morkit-codex/.codex/INSTALL.md"
 
 assert_file_exists "$AGENTS_MD"  "AGENTS.md exists"
 assert_file_exists "$INSTALL_MD" ".codex/INSTALL.md exists"
@@ -33,7 +33,7 @@ INSTALL_CONTENT="$(cat "$INSTALL_MD" 2>/dev/null || true)"
 # Case 1: AGENTS.md bridge points at commands-codex/
 # ---------------------------------------------------------------------------
 echo "[case 1] AGENTS.md mentions commands-codex/"
-assert_contains "$AGENTS_CONTENT" "commands-codex" \
+assert_contains "$AGENTS_CONTENT" "morkit-codex/commands" \
     "AGENTS.md references commands-codex/ for slash bridge"
 
 # ---------------------------------------------------------------------------
@@ -57,7 +57,7 @@ fi
 # Case 4: INSTALL.md symlink step targets skills-codex (not just skills)
 # ---------------------------------------------------------------------------
 echo "[case 4] INSTALL.md symlink → skills-codex"
-assert_contains "$INSTALL_CONTENT" "skills-codex" \
+assert_contains "$INSTALL_CONTENT" "morkit-codex/skills" \
     "INSTALL.md references skills-codex for manual symlink"
 
 # ---------------------------------------------------------------------------

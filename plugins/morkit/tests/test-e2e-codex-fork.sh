@@ -33,7 +33,8 @@ HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SYNC="$TEST_PLUGIN_ROOT/scripts/sync-codex-fork.sh"
 DRIFT="$TEST_PLUGIN_ROOT/scripts/check-codex-drift.sh"
-DOCTOR="$TEST_PLUGIN_ROOT/scripts/doctor-codex.sh"
+# Doctor now lives in sibling morkit-codex plugin (post-fix/codex-separate-plugin).
+DOCTOR="$TEST_PLUGIN_ROOT/../morkit-codex/scripts/doctor-codex.sh"
 
 # Quick preflight — fail fast with a useful message if any required artifact
 # is missing rather than letting subsequent assertions emit cryptic errors.
@@ -45,9 +46,18 @@ for f in "$SYNC" "$DRIFT" "$DOCTOR"; do
     fi
 done
 
-for d in skills skills-codex commands commands-codex .codex; do
+# Source dirs (CC plugin)
+for d in skills commands; do
     if [[ ! -d "$TEST_PLUGIN_ROOT/$d" ]]; then
         _fail "preflight: missing dir $TEST_PLUGIN_ROOT/$d"
+        exit_with_status
+        exit $?
+    fi
+done
+# Target dirs (Codex plugin sibling)
+for d in skills commands .codex; do
+    if [[ ! -d "$TEST_PLUGIN_ROOT/../morkit-codex/$d" ]]; then
+        _fail "preflight: missing dir $TEST_PLUGIN_ROOT/../morkit-codex/$d"
         exit_with_status
         exit $?
     fi
@@ -75,7 +85,7 @@ bash "$SYNC" \
 # diff -r doesn't support per-path excludes, so we filter the brief output
 # instead. Lines mentioning the two preserved-manual-edit files are dropped
 # before checking for any remaining diff signal.
-diff_raw="$(diff -r "$TEST_PLUGIN_ROOT/skills-codex" "$tmp_skills" \
+diff_raw="$(diff -r "$TEST_PLUGIN_ROOT/../morkit-codex/skills" "$tmp_skills" \
     --brief --exclude='.DS_Store' 2>&1 || true)"
 diff_filtered="$(printf '%s\n' "$diff_raw" \
     | grep -v 'executing-plans/SKILL.md' \
@@ -104,11 +114,11 @@ bash "$SYNC" \
     --exclude .claude-flow \
     >/dev/null 2>&1 || true
 
-if diff -r "$TEST_PLUGIN_ROOT/commands-codex" "$tmp_cmds" \
+if diff -r "$TEST_PLUGIN_ROOT/../morkit-codex/commands" "$tmp_cmds" \
         --brief --exclude='.DS_Store' >/dev/null 2>&1; then
     _pass "2. commands-codex/ regenerates identically from commands/"
 else
-    diff_out="$(diff -r "$TEST_PLUGIN_ROOT/commands-codex" "$tmp_cmds" \
+    diff_out="$(diff -r "$TEST_PLUGIN_ROOT/../morkit-codex/commands" "$tmp_cmds" \
         --brief --exclude='.DS_Store' 2>&1 | head -10)"
     _fail "2. regenerated commands-codex/ differs from committed (drift)
         run: bash scripts/sync-codex-fork.sh --source commands --target commands-codex
@@ -125,7 +135,7 @@ rm -rf "$tmp_cmds"
 # (Codex-tools reference docs need original CC vocab for comparison), so we
 # exclude it from this check.
 hits="$(grep -rn -E "Skill tool|TodoWrite|ExitPlanMode" \
-        "$TEST_PLUGIN_ROOT/skills-codex" --include='*.md' 2>/dev/null \
+        "$TEST_PLUGIN_ROOT/../morkit-codex/skills" --include='*.md' 2>/dev/null \
         | grep -v 'using-morkit/references' \
         || true)"
 if [[ -z "$hits" ]]; then
@@ -139,7 +149,7 @@ fi
 # Case 4 — commands-codex/ vocab cleanliness (no preserve list at all)
 # -----------------------------------------------------------------------------
 hits="$(grep -rn -E "Skill tool|using the Skill tool|via the Skill tool" \
-        "$TEST_PLUGIN_ROOT/commands-codex" --include='*.md' 2>/dev/null \
+        "$TEST_PLUGIN_ROOT/../morkit-codex/commands" --include='*.md' 2>/dev/null \
         || true)"
 if [[ -z "$hits" ]]; then
     _pass "4. commands-codex/ vocab clean"
@@ -171,20 +181,20 @@ fi
 # so users know which directory the symlink points at.
 agents_ok=0
 install_ok=0
-if [[ -f "$TEST_PLUGIN_ROOT/AGENTS.md" ]] \
-        && grep -q "commands-codex" "$TEST_PLUGIN_ROOT/AGENTS.md"; then
+if [[ -f "$TEST_PLUGIN_ROOT/../morkit-codex/AGENTS.md" ]] \
+        && grep -q "morkit-codex/commands" "$TEST_PLUGIN_ROOT/../morkit-codex/AGENTS.md"; then
     agents_ok=1
 fi
-if [[ -f "$TEST_PLUGIN_ROOT/.codex/INSTALL.md" ]] \
-        && grep -q "skills-codex" "$TEST_PLUGIN_ROOT/.codex/INSTALL.md"; then
+if [[ -f "$TEST_PLUGIN_ROOT/../morkit-codex/.codex/INSTALL.md" ]] \
+        && grep -q "morkit-codex/skills" "$TEST_PLUGIN_ROOT/../morkit-codex/.codex/INSTALL.md"; then
     install_ok=1
 fi
 if [[ "$agents_ok" -eq 1 ]] && [[ "$install_ok" -eq 1 ]]; then
     _pass "6. AGENTS.md + .codex/INSTALL.md reference fork dirs"
 else
     msg="6. docs missing fork references:"
-    [[ "$agents_ok" -eq 0 ]] && msg="$msg AGENTS.md lacks 'commands-codex';"
-    [[ "$install_ok" -eq 0 ]] && msg="$msg .codex/INSTALL.md lacks 'skills-codex';"
+    [[ "$agents_ok" -eq 0 ]] && msg="$msg AGENTS.md lacks 'morkit-codex/commands';"
+    [[ "$install_ok" -eq 0 ]] && msg="$msg .codex/INSTALL.md lacks 'morkit-codex/skills';"
     _fail "$msg"
 fi
 
@@ -192,16 +202,16 @@ fi
 # Case 7 — doctor-codex.sh smoke test against a sandboxed HOME
 # -----------------------------------------------------------------------------
 # Build a minimal fake install layout:
-#   $sandbox/.agents/skills/morkit -> $PLUGIN_ROOT/skills-codex
-#   $sandbox/.codex/AGENTS.md      -> $PLUGIN_ROOT/AGENTS.md
+#   $sandbox/.agents/skills/morkit -> $PLUGIN_ROOT/../morkit-codex/skills
+#   $sandbox/.codex/AGENTS.md      -> $PLUGIN_ROOT/../morkit-codex/AGENTS.md
 # Then run doctor with HOME overridden. We don't enforce a specific rc — the
 # sandbox is intentionally missing the shell rc block + codex CLI, so doctor
 # WILL report FAILs and exit non-zero. Goal of this case is to assert the
 # script runs to completion without a hard crash (rc < 100, no stack trace).
 sandbox="$(mktemp -d)"
 mkdir -p "$sandbox/.agents/skills" "$sandbox/.codex"
-ln -s "$TEST_PLUGIN_ROOT/skills-codex" "$sandbox/.agents/skills/morkit"
-ln -s "$TEST_PLUGIN_ROOT/AGENTS.md"    "$sandbox/.codex/AGENTS.md"
+ln -s "$TEST_PLUGIN_ROOT/../morkit-codex/skills" "$sandbox/.agents/skills/morkit"
+ln -s "$TEST_PLUGIN_ROOT/../morkit-codex/AGENTS.md"    "$sandbox/.codex/AGENTS.md"
 
 doctor_out="$(HOME="$sandbox" \
     AGENTS_HOME="$sandbox/.agents" \
@@ -230,8 +240,8 @@ rm -rf "$sandbox"
 # executing-plans + subagent-driven-development skills are responsible for
 # exporting it before any file mutation. If either skill stops mentioning the
 # env var, the gate becomes structurally inert under Codex (R1 regression).
-exec_skill="$TEST_PLUGIN_ROOT/skills-codex/executing-plans/SKILL.md"
-sub_skill="$TEST_PLUGIN_ROOT/skills-codex/subagent-driven-development/SKILL.md"
+exec_skill="$TEST_PLUGIN_ROOT/../morkit-codex/skills/executing-plans/SKILL.md"
+sub_skill="$TEST_PLUGIN_ROOT/../morkit-codex/skills/subagent-driven-development/SKILL.md"
 missing=()
 if ! grep -q 'MORKIT_CURRENT_CHANGE' "$exec_skill" 2>/dev/null; then
     missing+=("executing-plans/SKILL.md")
