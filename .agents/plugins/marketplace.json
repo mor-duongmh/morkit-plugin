@@ -1,0 +1,20 @@
+{
+  "name": "mor-duongmh",
+  "interface": {
+    "displayName": "Mor's Claude Code + Codex Plugins"
+  },
+  "plugins": [
+    {
+      "name": "morkit",
+      "source": {
+        "source": "local",
+        "path": "./plugins/morkit"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Development"
+    }
+  ]
+}

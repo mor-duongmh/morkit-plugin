@@ -39,3 +39,66 @@ jobs:
         run: gh pr comment ${{ github.event.pull_request.number }} --body-file deep-review.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # drift-check — warn (never fail) when `plugins/morkit/skills/**` is modified
+  # but `plugins/morkit/skills-codex/` hasn't been re-synced. Reviewer sees the
+  # warning in the PR check summary and decides whether to require a sync.
+  # See: morkit/output/spec/codex-fork-skills-clone/ (Task 2).
+  # ---------------------------------------------------------------------------
+  drift-check:
+    name: Codex fork drift check
+    runs-on: ubuntu-latest
+    # Only run when skills source changed — wraps the job-level paths filter.
+    if: ${{ github.event_name == 'pull_request' }}
+    continue-on-error: true   # belt-and-braces; script itself always exits 0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if skills/ touched
+        id: changed
+        run: |
+          if git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+              | grep -qE '^plugins/morkit/skills/'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run drift detector
+        if: steps.changed.outputs.run == 'true'
+        id: drift
+        run: |
+          set +e
+          bash plugins/morkit/scripts/check-codex-drift.sh \
+            > drift.out 2> drift.err
+          rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          # Surface both streams to the job log.
+          echo "::group::drift-check stdout"
+          cat drift.out
+          echo "::endgroup::"
+          echo "::group::drift-check stderr (warnings)"
+          cat drift.err
+          echo "::endgroup::"
+          # Always succeed — guard is informational.
+          exit 0
+
+      - name: Post drift warning to PR summary
+        if: steps.changed.outputs.run == 'true'
+        run: |
+          {
+            echo "## Codex fork drift check"
+            echo ""
+            if [[ -s drift.err ]]; then
+              echo "**Warnings:**"
+              echo ""
+              echo '```'
+              cat drift.err
+              echo '```'
+            else
+              echo "No drift detected."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

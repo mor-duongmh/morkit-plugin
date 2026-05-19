@@ -4,7 +4,8 @@
 set -uo pipefail
 # (no -e: we want to report all checks even if some fail)
 
-VENV="${HOME}/.claude/plugins/data/docs-hero/.venv"
+VENV="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/docs-hero/.venv"
+PLUGIN_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}"
 
 echo "=== docs-hero doctor ==="
 
@@ -41,11 +42,11 @@ else
 fi
 
 # --- Schema ---
-if [ -x "$VENV/bin/python3" ] && [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
-    SCHEMA="$CLAUDE_PLUGIN_ROOT/skills/docs-hero-orchestrator/scripts/lib/normalized_schema.py"
+if [ -x "$VENV/bin/python3" ] && [ -n "$PLUGIN_ROOT" ]; then
+    SCHEMA="$PLUGIN_ROOT/skills/docs-hero-orchestrator/scripts/lib/normalized_schema.py"
     if [ -f "$SCHEMA" ] && "$VENV/bin/python3" -c "
 import sys
-sys.path.insert(0, '$CLAUDE_PLUGIN_ROOT/skills/docs-hero-orchestrator/scripts')
+sys.path.insert(0, '$PLUGIN_ROOT/skills/docs-hero-orchestrator/scripts')
 from lib.normalized_schema import ProjectModel, Delta
 " 2>/dev/null; then
         echo "schema: OK (ProjectModel + Delta importable)"
@@ -53,7 +54,7 @@ from lib.normalized_schema import ProjectModel, Delta
         echo "schema: FAIL"
     fi
 else
-    echo "schema: SKIP (venv or CLAUDE_PLUGIN_ROOT missing)"
+    echo "schema: SKIP (venv or MORKIT_PLUGIN_ROOT missing)"
 fi
 
 # --- mmdc (optional) ---

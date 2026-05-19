@@ -1,0 +1,111 @@
+# vocab-map.yaml — canonical swap rules for skills/ → skills-codex/ fork.
+#
+# Consumed by scripts/sync-codex-fork.sh (Task 4). When sync runs, each
+# Markdown file under skills/ is read, rules below are applied top-down
+# (order matters), and the result is written to the mirrored path under
+# skills-codex/.
+#
+# Why YAML: human-readable for the 5 rules, comments allowed (see `note:`
+# blocks), reviewable diffs. JSON would lose the rationale.
+#
+# Rule type semantics
+#   - type: literal → exact-string replace (no regex interpretation, no
+#                     escape concerns; safe for tokens like "TodoWrite")
+#   - type: regex   → POSIX ERE (extended regex). Backrefs use `$1`, `$2`,
+#                     etc. Implementation (Task 4) MUST normalize sed BREs
+#                     vs Python `re` syntax — Task 3 only defines intent.
+#
+# Adding a rule? Bump the test fixture in tests/test-vocab-map.sh too.
+
+rules:
+  - id: skill-invocation-suffix
+    type: regex
+    pattern: ' (?:using|via) the Skill tool'
+    replacement: ''
+    apply_to: ['*.md']
+    note: |
+      Strips the awkward " using the Skill tool" / " via the Skill tool"
+      suffix that appears in commands/*.md after a "skill" noun
+      (e.g. "Invoke the `propose` skill using the Skill tool."). Without
+      this rule, skill-tool-invoke alone would produce the double-noun
+      "skill using skill discovery" which reads worse than the source.
+
+      MUST run BEFORE skill-tool-invoke so the longer phrase is consumed
+      first; otherwise skill-tool-invoke matches "Skill tool" mid-string
+      and the suffix-cleanup pattern no longer applies.
+
+  - id: skill-tool-bold
+    type: regex
+    pattern: 'the \*\*Skill tool\*\*'
+    replacement: 'skill discovery'
+    apply_to: ['*.md']
+    note: |
+      Handles bolded form "Use the **Skill tool** to invoke X" (seen in
+      commands/init.md). The generic skill-tool-invoke regex doesn't
+      strip the surrounding asterisks, so swap the bolded phrase as a
+      single unit first.
+
+      MUST run BEFORE skill-tool-invoke.
+
+  - id: skill-tool-invoke
+    type: regex
+    pattern: '(Use the )?Skill tool( to invoke)?'
+    replacement: 'skill discovery'
+    apply_to: ['*.md']
+    note: |
+      Codex agents auto-discover skills from ~/.agents/skills/<plugin>/.
+      No "Skill tool" exists. Neutral phrasing: "skill discovery".
+
+  - id: agent-tool-dispatch
+    type: regex
+    pattern: '(Use the )?Agent tool with subagent_type=([A-Za-z_-]+)'
+    replacement: 'delegate to a $2 specialist'
+    apply_to: ['*.md']
+    note: |
+      Codex doesn't have native subagent. Maps to `codex exec` parallel processes
+      or sequential skill chain. Phrasing: "delegate to a <name> specialist".
+
+  - id: agent-tool-bare
+    type: literal
+    pattern: 'Agent tool'
+    replacement: 'subagent dispatch'
+    apply_to: ['*.md']
+    note: |
+      Fallback for bare "Agent tool" mentions (e.g. "multiple Agent tool calls")
+      that the regex above didn't catch because no `subagent_type=` qualifier
+      followed. MUST run AFTER agent-tool-dispatch — that rule consumes the
+      specific form first, leaving only bare mentions for this one. Neutral
+      Codex-friendly phrasing.
+
+  - id: todowrite-task-list
+    type: literal
+    pattern: 'TodoWrite'
+    replacement: 'task list'
+    apply_to: ['*.md']
+    note: |
+      Codex has no TodoWrite tool. Agents track internally.
+      Phrasing: "task list".
+
+  - id: exit-plan-mode
+    type: literal
+    pattern: 'ExitPlanMode'
+    replacement: 'present plan and pause for confirmation'
+    apply_to: ['*.md']
+    note: |
+      Codex has no ExitPlanMode. Phrasing describes intent.
+
+  - id: notebook-edit-removed
+    type: literal
+    pattern: 'NotebookEdit'
+    replacement: '(no equivalent — skip)'
+    apply_to: ['*.md']
+    note: |
+      Codex has no Jupyter notebook editor. Rare in morkit skills.
+
+# Files in skills/ that should NOT be swapped (copied as-is to skills-codex/).
+# These intentionally describe Claude vocab as reference documentation —
+# swapping would corrupt their meaning.
+preserve:
+  - 'using-morkit/references/codex-tools.md'
+  - 'using-morkit/references/copilot-tools.md'
+  - 'using-morkit/references/gemini-tools.md'

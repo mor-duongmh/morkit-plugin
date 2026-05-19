@@ -137,7 +137,7 @@ if [[ -x "$VALIDATE" ]]; then
     if [[ "$VIOLATIONS" -gt 0 ]]; then
         echo ""
         echo "  $VIOLATIONS migrated change(s) need manual schema fixup."
-        echo "  Run: bash \${CLAUDE_PLUGIN_ROOT}/scripts/validate-tasks.sh --explain"
+        echo "  Run: bash \${MORKIT_PLUGIN_ROOT:-\${CLAUDE_PLUGIN_ROOT}}/scripts/validate-tasks.sh --explain"
     else
         echo "  ✓ All migrated tasks.md pass v2 schema."
     fi

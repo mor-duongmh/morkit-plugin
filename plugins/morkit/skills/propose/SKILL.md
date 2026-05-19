@@ -32,7 +32,7 @@ When ready to implement, run `/morkit:executing-plans` (blocked until review-che
 2. **Scaffold the change folder**
 
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold-change.sh" "<name>"
+   bash "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/scaffold-change.sh" "<name>"
    ```
 
    On success the script creates `<root>/<name>/{proposal,design,tasks}.md` + `.meta.json` + ensures `<root>/.morkit` marker.
@@ -51,7 +51,7 @@ When ready to implement, run `/morkit:executing-plans` (blocked until review-che
 4. **Validate the tasks.md**
 
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/validate-tasks.sh" "<root>/<name>/tasks.md"
+   bash "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/validate-tasks.sh" "<root>/<name>/tasks.md"
    ```
 
    On failure, fix the cited rule (R1-R6) and re-validate. Do NOT claim success until validator exits 0.
@@ -59,7 +59,7 @@ When ready to implement, run `/morkit:executing-plans` (blocked until review-che
 5. **Generate the review-checklist (human gate)**
 
    ```bash
-   bash "${CLAUDE_PLUGIN_ROOT}/scripts/generate-checklist.sh" "<root>/<name>"
+   bash "${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/generate-checklist.sh" "<root>/<name>"
    ```
 
    Auto-detects variant (BE/FE × Feature/BugFix/Refactor) from proposal+tasks signals. Override with `--variant <id>` if user specifies.
@@ -93,5 +93,5 @@ When ready to implement, run `/morkit:executing-plans` (blocked until review-che
 - Never auto-tick the review checklist — that's the human's responsibility.
 - Never silently overwrite an existing change folder — confirm via AskUserQuestion before passing `--force`.
 - Never bypass `validate-tasks.sh` — if the schema fails, fix and re-validate; do not claim done.
-- All script paths use `${CLAUDE_PLUGIN_ROOT}` — never hardcode absolute paths.
+- All script paths use `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}` — never hardcode absolute paths.
 - Honor `MORKIT_ROOT` env if set in the user's shell.

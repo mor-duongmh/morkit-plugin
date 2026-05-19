@@ -5,7 +5,7 @@
 # Provides:
 #   morkit_root           — resolve project-relative changes folder (honors MORKIT_ROOT)
 #   marker_path            — path of .morkit marker
-#   plugin_root            — resolve ${CLAUDE_PLUGIN_ROOT} or fallback to script location
+#   plugin_root            — resolve ${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}} or fallback to script location
 #   file_mtime <path>      — cross-platform mtime (epoch seconds)
 #   iso_now                — current time as ISO 8601 UTC
 #   is_kebab_case <name>   — exit 0 if valid kebab-case, 1 otherwise
@@ -28,12 +28,14 @@ marker_path() {
     echo "$(morkit_root)/.morkit"
 }
 
-# Resolve plugin root: prefer env, fall back to derive-from-script-location.
+# Resolve plugin root: prefer env (MORKIT_PLUGIN_ROOT, then CLAUDE_PLUGIN_ROOT
+# for Claude Code backward compat), fall back to derive-from-script-location.
 # Caller must pass a "hint" path (e.g. ${BASH_SOURCE[0]} of the calling script).
 plugin_root() {
     local hint="${1:-}"
-    if [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]]; then
-        echo "$CLAUDE_PLUGIN_ROOT"
+    local resolved="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}"
+    if [[ -n "$resolved" ]]; then
+        echo "$resolved"
         return 0
     fi
     if [[ -n "$hint" ]]; then
@@ -49,7 +51,7 @@ plugin_root() {
             dir="$(dirname "$dir")"
         done
     fi
-    echo "✗ common.sh: cannot resolve plugin root (no CLAUDE_PLUGIN_ROOT, no hint walks to .claude-plugin/)" >&2
+    echo "✗ common.sh: cannot resolve plugin root (no MORKIT_PLUGIN_ROOT, no CLAUDE_PLUGIN_ROOT, no hint walks to .claude-plugin/)" >&2
     return 1
 }
 

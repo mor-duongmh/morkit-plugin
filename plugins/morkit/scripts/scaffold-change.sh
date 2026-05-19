@@ -39,7 +39,7 @@ Options:
 
 Env:
   MORKIT_ROOT          Override the changes folder (default: morkit/output/spec)
-  CLAUDE_PLUGIN_ROOT     Plugin root (auto-derived from script location if unset)
+  MORKIT_PLUGIN_ROOT   Plugin root (falls back to CLAUDE_PLUGIN_ROOT, then auto-derived from script location)
 EOF
 }
 

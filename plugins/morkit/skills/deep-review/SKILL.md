@@ -27,10 +27,10 @@ The user invokes via `/morkit:deep-review <target>` where `<target>` is one of:
    - Languages present (by extension): `.ts`/`.tsx`, `.py`, `.go`, `.java`, `.rs`, `.cs`, `.php`, `.rb`, `.js`/`.jsx`, etc.
 3. Load **convention sources** in priority order:
    - **Tier 1**: project `CLAUDE.md` (read full content; if absent, mark "no CLAUDE.md").
-   - **Tier 2**: matching `profiles/<lang>.md` files for each detected language (read from `${CLAUDE_PLUGIN_ROOT}/profiles/`).
+   - **Tier 2**: matching `profiles/<lang>.md` files for each detected language (read from `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/profiles/`).
    - **Tier 3**: universal rules (SOLID/DRY/KISS/YAGNI) — embedded below.
 4. **Graph pre-flight (CRITICAL UX step).** Before dispatching specialists:
-   1. Run `bash ${CLAUDE_PLUGIN_ROOT}/scripts/graph-status.sh` and parse the key=value output.
+   1. Run `bash ${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/scripts/graph-status.sh` and parse the key=value output.
    2. Cross-check with `mcp__code-review-graph__list_graph_stats_tool` if the helper indicates `graph_present=true`.
    3. Decide based on `recommendation`:
 
@@ -83,7 +83,7 @@ findings:
 
 1. Merge findings from all 5 subagents.
 2. Deduplicate (same file:line + same title).
-3. Apply severity calibration matrix in `${CLAUDE_PLUGIN_ROOT}/lib/severity-calibration.md` (multiply weights by modifiers).
+3. Apply severity calibration matrix in `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/lib/severity-calibration.md` (multiply weights by modifiers).
 4. Rank: Critical first, then High, Medium, Low, Info.
 5. Build executive summary:
    - Overall Risk: highest individual severity (capped at HIGH unless ≥2 Critical → CRITICAL).
@@ -92,7 +92,7 @@ findings:
 
 ## Phase 4 — Output
 
-1. Render `${CLAUDE_PLUGIN_ROOT}/templates/report-template.md` with computed values.
+1. Render `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/templates/report-template.md` with computed values.
 2. **Print full report directly to chat.**
 3. Save to `morkit/output/reviews/deep-review-<timestamp>-<target>.md` if writable; otherwise skip silently.
 4. If `--json` flag passed, emit JSON instead (see "JSON output mode" below).
@@ -127,7 +127,7 @@ If CLAUDE.md states a convention that conflicts with the language profile, **CLA
 
 ## Severity calibration
 
-Apply the matrix in `${CLAUDE_PLUGIN_ROOT}/lib/severity-calibration.md` during Phase 3 (Synthesize). Multiply base weight by modifiers; recompute overall risk and decision per the matrix.
+Apply the matrix in `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/lib/severity-calibration.md` during Phase 3 (Synthesize). Multiply base weight by modifiers; recompute overall risk and decision per the matrix.
 
 ## JSON output mode
 

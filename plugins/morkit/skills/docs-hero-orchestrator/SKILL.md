@@ -39,21 +39,21 @@ This skill runs as a Claude Code plugin. Path resolution uses these variables:
 
 ```bash
 # Plugin root (set by Claude Code at runtime)
-CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:?must be set by Claude Code}"
+MORKIT_PLUGIN_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:?must be set by Claude Code or MORKIT_PLUGIN_ROOT must be set by Codex}}"
 
 # Python venv (created by /morkit:setup)
-VENV="${HOME}/.claude/plugins/data/docs-hero/.venv"
+VENV="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/docs-hero/.venv"
 PY="${VENV}/bin/python3"
 
 # Skill scripts (within plugin)
-ORCH_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/docs-hero-orchestrator/scripts"
-SRS_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-srs/scripts"
-API_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-api-docs/scripts"
-DB_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-db-design/scripts"
-ARCH_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-system-architecture/scripts"
-STD_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-code-standards/scripts"
-SUM_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-codebase-summary/scripts"
-GUI_SCRIPTS="${CLAUDE_PLUGIN_ROOT}/skills/generate-design-guidelines/scripts"
+ORCH_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/docs-hero-orchestrator/scripts"
+SRS_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-srs/scripts"
+API_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-api-docs/scripts"
+DB_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-db-design/scripts"
+ARCH_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-system-architecture/scripts"
+STD_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-code-standards/scripts"
+SUM_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-codebase-summary/scripts"
+GUI_SCRIPTS="${MORKIT_PLUGIN_ROOT}/skills/generate-design-guidelines/scripts"
 
 # Project paths (always relative to user's cwd, NOT plugin root)
 PROJECT_DOCS_DIR="${PWD}/docs"
@@ -153,7 +153,7 @@ mkdir -p "$PROJECT_TMP"
 #     decisions the assumption is written into the entity's
 #     description prefixed with "[ASSUMPTION] ".
 
-# 3. Dispatch to sub-skills (CLAUDE_PLUGIN_ROOT inherited from env)
+# 3. Dispatch to sub-skills (MORKIT_PLUGIN_ROOT / CLAUDE_PLUGIN_ROOT inherited from env)
 #    $OUTPUTS = user-selected subset, e.g. "srs,api" or "srs,api,db"
 "$PY" "$ORCH_SCRIPTS/dispatch_coordinator.py" init \
   --project-model "$PROJECT_TMP/project-model.json" \

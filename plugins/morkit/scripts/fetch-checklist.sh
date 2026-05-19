@@ -16,7 +16,7 @@
 set -euo pipefail
 
 DOC_URL="https://docs.google.com/document/d/184wY2N2WOUExmZrClvHCfcRCnSQsJYvav6gc6JwL6xc/export?format=md"
-CACHE_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data/spec}"
+CACHE_DIR="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/spec"
 CACHE_FILE="$CACHE_DIR/.checklist-cache.md"
 TTL_SECONDS=$((24 * 3600))
 FORCE_REFRESH=0
@@ -26,7 +26,7 @@ print_usage() {
 Usage: fetch-checklist.sh [--refresh] [--help]
 
 Fetches the Mor Developer Review Checklist (Google Doc) and prints to stdout.
-Cached at ~/.claude/plugins/data/spec/.checklist-cache.md for 24h.
+Cached at ${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-~/.claude/plugins/data}}/spec/.checklist-cache.md for 24h.
 
 Options:
   --refresh   Bypass cache TTL and fetch fresh
