@@ -15,6 +15,16 @@ Cài xong là dùng được — không cần setup gì thêm trong project.
 
 ### Codex CLI
 
+**Native plugin marketplace** (recommended nếu Codex CLI version của bạn có `plugin marketplace`):
+
+```bash
+codex plugin marketplace add mor-duongmh/claude-plugins
+```
+
+Codex tự clone repo, đọc `.agents/plugins/marketplace.json`, list plugin `morkit` available để install.
+
+**Script install** (works trên mọi Codex ≥ 0.120.0):
+
 ```bash
 git clone https://github.com/mor-duongmh/claude-plugins.git ~/.codex/morkit-source
 bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh
@@ -30,7 +40,7 @@ Chi tiết + Windows + hooks setup: [.codex/INSTALL.md](.codex/INSTALL.md).
 
 | Aspect | Claude Code | Codex CLI |
 |---|---|---|
-| Install | `/plugin install morkit@mor-duongmh` | `git clone` + `bash install-codex.sh` |
+| Install | `/plugin install morkit@mor-duongmh` | `codex plugin marketplace add mor-duongmh/claude-plugins` (native) hoặc `git clone` + `bash install-codex.sh` (script fallback) |
 | Skills | `plugins/morkit/skills/` (CC vocab) | `plugins/morkit/skills-codex/` (vocab-translated) |
 | Commands | `plugins/morkit/commands/` (CC vocab) | `plugins/morkit/commands-codex/` (suffix-stripped) |
 | Hooks | `hooks/hooks.json` | `hooks/hooks-codex.json` (multi-tool gate matcher) |

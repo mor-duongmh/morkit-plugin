@@ -7,7 +7,39 @@ Enable morkit skills + working agreements trong Codex qua native skill discovery
 - [Codex CLI](https://developers.openai.com/codex/) ≥ 0.120.0 (`codex --version` để kiểm tra)
 - Git
 
-## Installation (quick — recommended)
+## Installation (1-command — native Codex marketplace) ⭐
+
+Nếu Codex CLI version của bạn support `plugin marketplace` (kiểm tra: `codex plugin marketplace --help`):
+
+```bash
+codex plugin marketplace add mor-duongmh/claude-plugins
+```
+
+Codex sẽ tự:
+- Clone repo về cache (`~/.codex/plugins/marketplaces/mor-duongmh/`)
+- Đọc `.agents/plugins/marketplace.json` (marketplace index)
+- Đọc `plugins/morkit/.codex-plugin/plugin.json` (plugin manifest)
+- Auto-discover `skills-codex/` + `hooks-codex.json` qua manifest fields
+- List plugin `morkit` available để install
+
+Sau đó install plugin (hoặc Codex auto-install nếu UI cho phép):
+```bash
+# Tuỳ Codex UI/CLI version — có thể là menu, có thể là command
+```
+
+Update sau này:
+```bash
+codex plugin marketplace upgrade mor-duongmh
+```
+
+Remove:
+```bash
+codex plugin marketplace remove mor-duongmh
+```
+
+> **Lưu ý**: `codex plugin marketplace` là feature mới của Codex CLI. Nếu command không tồn tại trong CLI version của bạn, dùng installer script ở section dưới.
+
+## Installation (script — works trên mọi Codex ≥ 0.120.0)
 
 ```bash
 git clone https://github.com/mor-duongmh/claude-plugins.git ~/.codex/morkit-source
