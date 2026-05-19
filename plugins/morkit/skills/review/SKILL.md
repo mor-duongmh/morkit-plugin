@@ -1,6 +1,6 @@
 ---
 name: review
-description: Generate the developer review checklist (human gate) for a morkit change, blocking implementation skills until the human flips "Overall Decision: OK". Triggered by /morkit:review or after /morkit:propose finishes.
+description: 'Generate the developer review checklist (human gate) for a morkit change, blocking implementation skills until the human flips "Overall Decision: OK". Triggered by /morkit:review or after /morkit:propose finishes.'
 license: MIT
 ---
 
