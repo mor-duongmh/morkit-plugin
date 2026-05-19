@@ -14,14 +14,6 @@
       "category": "development",
       "author": { "name": "Mor" },
       "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/morkit"
-    },
-    {
-      "name": "morkit-codex",
-      "description": "Mor's all-in-one toolkit for OpenAI Codex CLI. Same morkit feature set (spec workflow, deep-review, docs-hero, brainstorm/plan/execute/TDD) but with Codex-friendly vocab and Codex hook matcher. Separate from 'morkit' (the Claude Code variant) — Codex users install THIS, Claude Code users install 'morkit'. Avoids the picker-duplicate issue caused by Codex walking both skills/ and skills-codex/ inside a shared plugin folder.",
-      "source": "./plugins/morkit-codex",
-      "category": "development",
-      "author": { "name": "Mor" },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/morkit-codex"
     }
   ]
 }
