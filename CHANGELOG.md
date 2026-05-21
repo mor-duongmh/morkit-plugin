@@ -2,6 +2,22 @@
 
 All notable changes to the Mor claude-plugins marketplace are tracked here.
 
+## [morkit@1.2.0] — 2026-05-21
+
+**Removed the docs-hero documentation-generation subsystem.** The `/morkit:*` namespace now covers spec workflow, plan/build skills, and 5-specialist code review only.
+
+### Removed
+
+- **8 skills:** `docs-hero-orchestrator`, `generate-srs`, `generate-api-docs`, `generate-db-design`, `generate-system-architecture`, `generate-code-standards`, `generate-codebase-summary`, `generate-design-guidelines`.
+- **1 agent:** `docs-hero` (documentation QA reviewer).
+- **6 slash commands:** `/morkit:setup`, `/morkit:init`, `/morkit:update-doc`, `/morkit:sync`, `/morkit:apply-sync`, `/morkit:doctor`.
+- **Supporting infra:** `hooks/dh-session-start.sh`, `scripts/setup-venv.sh`, `scripts/doctor.sh`, `requirements.txt` (docs-hero Python venv + pinned deps no longer needed).
+
+### Notes
+
+- Deep Review setup (`scripts/setup.sh`, `graph-status.sh`) and the spec-workflow scripts are unaffected — they never depended on the docs-hero venv.
+- The published docs site under `docs/` still references docs-hero in its hand-written landing pages (`docs.html`, `docs-v2.html`, `index-v2.html`); update those as part of the landing-page redesign.
+
 ## [morkit@1.0.0] — 2026-05-10
 
 **Major consolidation:** All 4 separate plugins merged into ONE plugin called `morkit`. Every skill, agent, and slash command now lives under the unified `/morkit:*` namespace.

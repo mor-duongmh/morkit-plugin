@@ -132,7 +132,7 @@ Every brainstorming session ends with a design log written to:
 `${MORKIT_ROOT:-morkit/output}/specs/YYYY-MM-DD-<topic>-design.md`
 
 This is **required at session end** — the log is the input artifact for
-downstream commands (`/morkit:propose`, `/morkit:init`, function list
+downstream commands (`/morkit:propose`, function list
 discussions). Before saving, confirm with the user:
 
 > "Đã đủ shape để wrap up. Save design log vào
@@ -158,7 +158,7 @@ inputs: <list of files/links consulted>
 <unresolved threads>
 
 ## Next step
-<e.g. /morkit:propose <name> hoặc /morkit:init --inputs <dir>>
+<e.g. /morkit:propose <name>>
 ```
 
 During the session, do NOT persist intermediate snippets without asking.
@@ -168,7 +168,7 @@ Only the final design log is auto-offered at session end.
 
 Think freely. When insights crystallize, you might offer:
 
-- "This feels solid enough to start a change. Want me to run `/morkit:propose <name>` hoặc `/morkit:init`?"
+- "This feels solid enough to start a change. Want me to run `/morkit:propose <name>`?"
 - Or keep exploring - no pressure to formalize
 
 ### When a change exists
@@ -337,7 +337,6 @@ crystallized), summarize and save the design log:
 
 **Next step**:
 - Run `/morkit:propose <name>` to create a change proposal
-- Run `/morkit:init --inputs <dir>` to generate SRS / API / DB docs
 - Keep exploring later — design log is saved
 ```
 

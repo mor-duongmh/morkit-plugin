@@ -1,6 +1,6 @@
 # Mor Claude Plugins
 
-> Marketplace của Mor — một plugin `morkit` consolidates tất cả: spec workflow, brainstorm/execute, code review, doc generation. Một namespace `/morkit:*` cho tất cả.
+> Marketplace của Mor — một plugin `morkit` consolidates tất cả: spec workflow, brainstorm/execute, code review. Một namespace `/morkit:*` cho tất cả.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -21,16 +21,15 @@ Cài xong là dùng được luôn — không cần setup gì thêm trong từng
 
 ## 2. `morkit` có những gì?
 
-Một plugin chứa 4 nhóm chức năng dưới namespace `/morkit:*`:
+Một plugin chứa 3 nhóm chức năng dưới namespace `/morkit:*`:
 
 | Nhóm | Bao gồm | Để làm gì |
 |---|---|---|
 | **Spec workflow** | `propose`, `review`, `archive` | Scaffold proposal/design/tasks + review-checklist gate |
 | **Plan & build** | `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `test-driven-development`, `systematic-debugging`, +8 skills khác | Brainstorm, viết plan, thực thi plan, debug, TDD |
 | **Code review** | `deep-review`, `deep-review-doctor`, `deep-review-post` | Review code bằng 5 chuyên gia AI song song |
-| **Doc generation** | `setup`, `init`, `update`, `sync`, `apply-sync`, `doctor` | Sinh SRS + API + DB doc cho ITO Japan offshore |
 
-Tổng cộng: **22 skills + 9 specialist agents + 15 slash commands** đều có prefix `/morkit:`.
+Tổng cộng: **18 skills + 8 specialist agents + 9 slash commands** đều có prefix `/morkit:`.
 
 ---
 
@@ -80,16 +79,6 @@ Bước 3 là **chốt chặn của con người**. Plugin chặn `/morkit:execu
 | `/morkit:deep-review [target]` | Review trên git diff hoặc PR (5 specialists song song) |
 | `/morkit:deep-review-doctor` | Health-check |
 | `/morkit:deep-review-post` | Post-review hook |
-
-### Doc generation
-| Command | Việc |
-|---|---|
-| `/morkit:setup` | Bootstrap Python venv (~30-60s, 1 lần) |
-| `/morkit:init` | Sinh fresh SRS + API + DB từ ProjectModel JSON |
-| `/morkit:update` | Apply change/plan vào doc |
-| `/morkit:sync` | Scan codebase, đề xuất update |
-| `/morkit:apply-sync` | Apply đề xuất từ sync |
-| `/morkit:doctor` | Health-check docs |
 
 ---
 

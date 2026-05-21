@@ -92,7 +92,7 @@ digraph process {
 - `docs/code-standards.md` — naming, formatting, lint, commit conventions (how to write things)
 - `docs/system-architecture.md` — components, layers, interactions (how things fit together)
 
-If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect (use `/morkit:init` for that). When dispatching an implementer subagent, **paste the relevant excerpts** (not the whole file) into the prompt's context block — the subagent has no inherited context. If a doc conflicts with the plan, surface the conflict to your human partner before dispatching.
+If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect. When dispatching an implementer subagent, **paste the relevant excerpts** (not the whole file) into the prompt's context block — the subagent has no inherited context. If a doc conflicts with the plan, surface the conflict to your human partner before dispatching.
 
 ## Model Selection
 
