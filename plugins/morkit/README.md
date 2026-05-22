@@ -61,6 +61,11 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | `/morkit:deep-review-doctor` | Health-check cài đặt |
 | `/morkit:deep-review-post` | Post-review hook |
 
+### Documentation (writing-docs)
+| Command | Việc |
+|---|---|
+| `/morkit:docs [init\|update\|summarize]` | Sinh/cập nhật bộ tài liệu AI-optimized trong `docs/` (taxonomy 00-overview…90-operations + mỏ neo). LLM-driven, không Python |
+
 ## Plan review gate
 
 Sau `/morkit:propose`, plugin sinh `morkit/output/spec/<name>/review-checklist.md` từ canonical Google Doc. Auto-detect variant (BE/FE × Feature/BugFix/Refactor).

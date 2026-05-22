@@ -2,6 +2,21 @@
 
 All notable changes to the Mor claude-plugins marketplace are tracked here.
 
+## [morkit@1.3.0] — 2026-05-22
+
+**Added the `writing-docs` skill** (`/morkit:docs`) — generates an AI-agent-optimized project documentation set in `docs/`. LLM-driven (no Python), a KISS replacement for the removed docs-hero subsystem.
+
+### Added
+
+- **1 skill:** `writing-docs` with `init | update | summarize` modes.
+- **1 slash command:** `/morkit:docs`.
+- **References:** taxonomy, anchor conventions, 3 workflow guides, and 30 doc-templates (taxonomy `00-overview` … `90-operations`).
+
+### Notes
+
+- Output goes to `docs/` at the target project root. Anchors (MAP files + cross-links + minimal front-matter) let agents load minimal context per task.
+- The 5 flat `example/*-template.md` files were retired; their content is absorbed into `references/doc-templates/`. `example/mail-history-admin/` remains as the reference example.
+
 ## [morkit@1.2.0] — 2026-05-21
 
 **Removed the docs-hero documentation-generation subsystem.** The `/morkit:*` namespace now covers spec workflow, plan/build skills, and 5-specialist code review only.
