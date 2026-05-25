@@ -76,7 +76,7 @@ Không còn `vocab-map.yaml`, `sync-codex-fork.sh`, hay drift detector — khôn
 
 `morkit/output/spec/<name>/` (active) hoặc `morkit/output/spec/archive/<name>/` (đã archive).
 - Marker: `.morkit` trong root folder
-- Override path: `MORKIT_ROOT=path/to/changes` env var
+- Override path: `MORKIT_ROOT=path/to/changes` env var (chỉ thư mục changes; design log của brainstorming nằm ở `design-logs/` cạnh thư mục đó, không nằm trong)
 
 ## Tất cả slash command (sau merge)
 

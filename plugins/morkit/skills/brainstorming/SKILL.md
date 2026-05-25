@@ -129,7 +129,8 @@ This tells you:
 ### Session output (required at session end)
 
 Every brainstorming session ends with a design log written to:
-`${MORKIT_ROOT:-morkit/output}/design-logs/YYYY-MM-DD-<topic>-design.md`
+`morkit/output/design-logs/YYYY-MM-DD-<topic>-design.md`
+(the `design-logs/` folder sits beside the changes folder `${MORKIT_ROOT:-morkit/output/spec}` — never inside it)
 
 This is **required at session end** — the log is the input artifact for
 downstream commands (`/morkit:propose`, function list
@@ -340,7 +341,7 @@ crystallized), summarize and save the design log:
 - Keep exploring later — design log is saved
 ```
 
-Then write this to `${MORKIT_ROOT:-morkit/output}/specs/YYYY-MM-DD-<topic>-design.md`
+Then write this to `morkit/output/design-logs/YYYY-MM-DD-<topic>-design.md`
 using the template in "Session output" above. The log captures what was
 explored so the next session (or a different command like `/morkit:propose`)
 can resume from here. Even if no concrete decision emerged, save what was
