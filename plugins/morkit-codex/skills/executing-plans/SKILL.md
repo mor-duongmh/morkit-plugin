@@ -67,7 +67,7 @@ Load plan, review critically, execute all tasks, report when complete.
 - `docs/code-standards.md` — naming, formatting, lint, commit conventions (how to write things)
 - `docs/system-architecture.md` — components, layers, interactions (how things fit together)
 
-If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect (use `/morkit:init` for that). If a doc exists but conflicts with the plan, surface the conflict to your human partner before proceeding.
+If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect. If a doc exists but conflicts with the plan, surface the conflict to your human partner before proceeding.
 
 ### Step 2: Execute Tasks
 
