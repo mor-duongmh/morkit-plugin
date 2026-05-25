@@ -111,7 +111,7 @@ elif [ ! -f "$RC_FILE" ]; then
 elif grep -q "# >>> morkit-codex >>>" "$RC_FILE"; then
     ok "morkit-codex block present in $RC_FILE"
 else
-    fail "$RC_FILE missing morkit-codex block — 12 skills (propose/review/archive/deep-review/docs-hero) will fail"
+    fail "$RC_FILE missing morkit-codex block — skills (propose/review/archive/deep-review) will fail"
 fi
 RESOLVED_ROOT="${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-}}"
 if [ -n "$RESOLVED_ROOT" ]; then
