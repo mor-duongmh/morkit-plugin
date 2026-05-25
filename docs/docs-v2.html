@@ -1,0 +1,2496 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MORtion · AI Workflow Use Cases</title>
+    <style>
+      /* ──────────────────────────────────────────────────────────
+         Tokens — Paper (light) + Vesper (dark), matched to project
+         ────────────────────────────────────────────────────────── */
+      :root {
+        --bg: #fbf8f2;
+        --bg-elev: #ffffff;
+        --bg-subtle: #f0ece2;
+        --bg-window: #ebe7dd;
+        --fg: #1a1a1a;
+        --fg-muted: #5a5a55;
+        --fg-subtle: #908a7e;
+        --border: #e5dfd0;
+        --border-strong: #c8c0ad;
+        --accent: #b04a2f;
+        --accent-fg: #ffffff;
+        --code-bg: #faf6ec;
+        --code-fg: #1a1a1a;
+        --code-key: #b04a2f;
+        --code-str: #5b7a3a;
+        --code-num: #936a2b;
+        --code-com: #908a7e;
+        --code-prompt: #5b7a3a;
+        --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04);
+        --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+        --shadow-3: 0 16px 48px rgba(0, 0, 0, 0.1);
+        --traffic-red: #ff5f56;
+        --traffic-yellow: #ffbd2e;
+        --traffic-green: #27c93f;
+        --bg-nav: rgba(251, 248, 242, 0.85);
+        --accent-soft: rgba(176, 74, 47, 0.08);
+      }
+      [data-theme="dark"] {
+        --bg: #101010;
+        --bg-elev: #161616;
+        --bg-subtle: #1c1c1c;
+        --bg-window: #0a0a0a;
+        --fg: #ffffff;
+        --fg-muted: #a8a29e;
+        --fg-subtle: #75716c;
+        --border: #2b2b2b;
+        --border-strong: #3a3a3a;
+        --accent: #ff8b5a;
+        --accent-fg: #101010;
+        --code-bg: #0d0d0d;
+        --code-fg: #ffffff;
+        --code-key: #ff8b5a;
+        --code-str: #a3c982;
+        --code-num: #f1d09e;
+        --code-com: #75716c;
+        --code-prompt: #a3c982;
+        --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5);
+        --shadow-3: 0 16px 48px rgba(0, 0, 0, 0.6);
+        --bg-nav: rgba(16, 16, 16, 0.85);
+        --accent-soft: rgba(255, 139, 90, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          "Geist", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        font-feature-settings: "ss01", "cv11";
+      }
+      .mono,
+      pre,
+      code {
+        font-family:
+          "Geist Mono", "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas,
+          monospace;
+        font-feature-settings: "calt" 0;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* Page chrome ─────────────────────────────────────────────── */
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+      }
+      .pagehead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .pagehead h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .pagehead .subtitle {
+        color: var(--fg-muted);
+        font-size: 13px;
+      }
+      .toggle {
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        color: var(--fg);
+        font: inherit;
+        font-size: 12.5px;
+        padding: 7px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .toggle:hover {
+        background: var(--bg-subtle);
+      }
+
+      /* Tabs ────────────────────────────────────────────────────── */
+      .tabs {
+        display: flex;
+        gap: 4px;
+        background: var(--bg-elev);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 4px;
+        margin-bottom: 24px;
+        overflow-x: auto;
+      }
+      .tab {
+        flex: 1;
+        min-width: 220px;
+        background: transparent;
+        border: 0;
+        color: var(--fg-muted);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+        line-height: 1.4;
+      }
+      .tab:hover {
+        color: var(--fg);
+      }
+      .tab.active {
+        background: var(--bg-subtle);
+        color: var(--fg);
+        box-shadow: var(--shadow-1);
+      }
+      .tab .tnum {
+        color: var(--accent);
+        font-weight: 600;
+        margin-right: 6px;
+      }
+      .tab .tdesc {
+        display: block;
+        color: var(--fg-subtle);
+        font-size: 11.5px;
+        margin-top: 2px;
+        font-weight: 400;
+      }
+      .tab.active .tdesc {
+        color: var(--fg-muted);
+      }
+
+      /* Use case panels ─────────────────────────────────────────── */
+      .panel {
+        display: none;
+      }
+      .panel.active {
+        display: block;
+      }
+      .panel-head {
+        margin-bottom: 16px;
+      }
+      .panel-head h2 {
+        margin: 0 0 4px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .panel-head p {
+        margin: 0;
+        color: var(--fg-muted);
+        font-size: 13.5px;
+      }
+      .panel-head p + p {
+        margin-top: 8px;
+      }
+      .panel-head p.callout {
+        background: var(--bg-subtle);
+        border-left: 3px solid var(--accent);
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        color: var(--fg);
+        font-size: 11.5px;
+        font-weight: 500;
+        padding: 4px 9px;
+        border-radius: 999px;
+      }
+      .chip.accent {
+        background: var(--accent);
+        color: var(--accent-fg);
+        border-color: transparent;
+      }
+      .chip.muted {
+        color: var(--fg-muted);
+      }
+
+      /* Phase + Terminal block ──────────────────────────────────── */
+      .phase {
+        margin: 20px 0;
+      }
+      .phase-title {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin: 0 0 8px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .phase-num {
+        color: var(--accent);
+        font-family: "Geist Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .phase-desc {
+        color: var(--fg-muted);
+        font-weight: 400;
+        font-size: 12.5px;
+      }
+      .term {
+        background: var(--code-bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-2);
+      }
+      .term-bar {
+        background: var(--bg-window);
+        border-bottom: 1px solid var(--border);
+        padding: 9px 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .lights {
+        display: inline-flex;
+        gap: 6px;
+        margin-right: 10px;
+      }
+      .light {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--traffic-red);
+      }
+      .light:nth-child(2) {
+        background: var(--traffic-yellow);
+      }
+      .light:nth-child(3) {
+        background: var(--traffic-green);
+      }
+      .term-title {
+        font-family: "Geist Mono", monospace;
+        font-size: 11.5px;
+        color: var(--fg-muted);
+      }
+      .term-body {
+        padding: 14px 16px 16px;
+        font-family: "Geist Mono", monospace;
+        font-size: 12.5px;
+        line-height: 1.65;
+        color: var(--code-fg);
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "Geist Mono", monospace;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-subtle);
+        margin-bottom: 6px;
+      }
+      .label.input {
+        color: var(--code-prompt);
+      }
+      .label.output {
+        color: var(--code-key);
+      }
+      .label.gate {
+        color: var(--accent);
+      }
+      .skill-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 2px 7px;
+        font-family: "Geist Mono", monospace;
+        font-size: 10.5px;
+        color: var(--fg);
+        margin-left: 6px;
+      }
+      .skill-chip.gate {
+        background: var(--accent);
+        color: var(--accent-fg);
+        border-color: transparent;
+      }
+      hr.sep {
+        border: 0;
+        border-top: 1px dashed var(--border);
+        margin: 12px 0;
+      }
+      .tprompt {
+        color: var(--code-prompt);
+        font-weight: 600;
+      }
+      .tcmd {
+        color: var(--code-fg);
+      }
+      .tflag {
+        color: var(--code-key);
+      }
+      .tstr {
+        color: var(--code-str);
+      }
+      .tnum {
+        color: var(--code-num);
+      }
+      .tcom {
+        color: var(--code-com);
+        font-style: italic;
+      }
+      .tok-add {
+        color: var(--code-str);
+      }
+      .tok-rm {
+        color: #d35a4f;
+      }
+      .tok-warn {
+        color: #f1d09e;
+      }
+      .tok-bad {
+        color: #ff7066;
+      }
+      .tok-ok {
+        color: var(--code-str);
+      }
+      .filebox {
+        background: var(--bg-subtle);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin: 8px 0;
+        font-family: "Geist Mono", monospace;
+        font-size: 11.5px;
+        color: var(--fg-muted);
+      }
+      .filebox .fname {
+        color: var(--code-key);
+      }
+
+      /* Footer rail ─────────────────────────────────────────────── */
+      .footrail {
+        margin-top: 32px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        color: var(--fg-subtle);
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      @media (max-width: 720px) {
+        .tabs {
+          flex-direction: column;
+        }
+        .tab {
+          min-width: 0;
+        }
+        .pagehead h1 {
+          font-size: 19px;
+        }
+        .term-body {
+          font-size: 11.5px;
+        }
+      }
+
+      /* ─── v2 LAYOUT: topnav + sidebar + main ─────────────── */
+      .topnav {
+        position: sticky; top: 0; z-index: 20;
+        background: var(--bg-nav);
+        backdrop-filter: saturate(180%) blur(8px);
+        -webkit-backdrop-filter: saturate(180%) blur(8px);
+        border-bottom: 1px solid var(--border);
+      }
+      .topnav-inner {
+        max-width: 1280px; margin: 0 auto;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 10px 24px; gap: 16px;
+      }
+      .brand {
+        display: flex; align-items: center; gap: 8px;
+        font-weight: 700; font-size: 15px; color: var(--fg);
+        text-decoration: none;
+      }
+      .brand:hover { text-decoration: none; }
+      .brand .dot-mark {
+        display: inline-block; width: 18px; height: 18px;
+        border-radius: 5px; background: var(--accent);
+      }
+      .brand .sub { font-weight: 400; color: var(--fg-muted); font-size: 13px; }
+      .topnav-center { flex: 1; display: flex; justify-content: center; max-width: 480px; }
+      .search {
+        width: 100%; max-width: 380px;
+        display: flex; align-items: center; gap: 8px;
+        padding: 6px 12px;
+        background: var(--bg-subtle); border: 1px solid var(--border);
+        border-radius: 8px; font-size: 13px; color: var(--fg-muted);
+        cursor: text;
+      }
+      .search:hover { border-color: var(--border-strong); }
+      .search .placeholder { flex: 1; }
+      .search kbd {
+        font-size: 11px; color: var(--fg-subtle);
+        background: var(--bg); border: 1px solid var(--border);
+        padding: 1px 6px; border-radius: 4px;
+      }
+      .nav-actions { display: flex; align-items: center; gap: 10px; }
+      .nav-actions a, .nav-actions .toggle {
+        background: transparent; color: var(--fg-muted);
+        border: 1px solid var(--border); border-radius: 6px;
+        padding: 5px 10px; font-size: 12px; cursor: pointer;
+        text-decoration: none;
+      }
+      .nav-actions a:hover, .nav-actions .toggle:hover {
+        border-color: var(--border-strong); color: var(--fg); text-decoration: none;
+      }
+      .nav-actions a.primary {
+        background: var(--accent); color: #fff; border-color: var(--accent);
+      }
+      .nav-actions a.primary:hover { opacity: .9; color: #fff; }
+
+      .layout {
+        max-width: 1280px; margin: 0 auto;
+        display: grid; grid-template-columns: 240px 1fr;
+        gap: 40px; padding: 32px 24px 80px;
+      }
+      .sidebar {
+        position: sticky; top: 76px; align-self: start;
+        max-height: calc(100vh - 96px); overflow-y: auto;
+        padding-right: 8px; padding-bottom: 24px;
+      }
+      .sidebar::-webkit-scrollbar { width: 6px; }
+      .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+      .sb-group { margin: 0 0 18px; }
+      .sb-group-title {
+        font-size: 11px; font-weight: 600; text-transform: uppercase;
+        color: var(--fg-subtle); letter-spacing: 0.08em;
+        margin: 0 0 4px; padding: 4px 10px;
+      }
+      .sidebar a {
+        display: block; padding: 5px 10px; margin: 1px 0;
+        border-radius: 5px; color: var(--fg); font-size: 13.5px;
+        text-decoration: none; line-height: 1.4;
+      }
+      .sidebar a:hover {
+        background: var(--bg-subtle); color: var(--accent);
+        text-decoration: none;
+      }
+      .sidebar .uc-link.active {
+        background: var(--accent-soft); color: var(--accent); font-weight: 600;
+      }
+      .sidebar .uc-num { color: var(--fg-subtle); font-size: 12px; margin-right: 6px; }
+      .sidebar .uc-link.active .uc-num { color: var(--accent); }
+      .sidebar .step-list {
+        list-style: none; margin: 2px 0 6px; padding: 0 0 4px 14px;
+        border-left: 1px solid var(--border);
+        display: none;
+      }
+      .sidebar .uc-link.active + .step-list { display: block; }
+      .sidebar .step-list a {
+        padding: 3px 8px; font-size: 12.5px; color: var(--fg-muted);
+        border-radius: 4px;
+      }
+      .sidebar .step-list a:hover { color: var(--accent); }
+      .sidebar .step-list a.active {
+        color: var(--accent); font-weight: 600;
+        background: var(--accent-soft);
+      }
+
+      .content { min-width: 0; }
+      .hero-v2 { padding: 4px 0 16px; margin-bottom: 8px; }
+      .hero-v2 .eyebrow {
+        display: inline-block; font-size: 11px; font-weight: 600;
+        color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;
+        padding: 3px 9px; background: var(--accent-soft);
+        border-radius: 999px; margin-bottom: 14px;
+      }
+      .hero-v2 h1 {
+        font-size: 32px; font-weight: 700; margin: 0 0 14px;
+        letter-spacing: -0.02em; line-height: 1.15;
+      }
+      .hero-v2 .lede {
+        font-size: 16px; color: var(--fg-muted); margin: 0 0 8px;
+        line-height: 1.55; max-width: 720px;
+      }
+      .hero-v2 .lede code { font-size: 0.92em; }
+      .hero-v2 .lede-small { font-size: 13.5px; color: var(--fg-muted); }
+
+      .footer-v2 {
+        margin-top: 56px; padding: 20px 0;
+        border-top: 1px solid var(--border);
+        font-size: 13px; color: var(--fg-muted);
+        display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+      }
+      .footer-v2 a { color: var(--fg-muted); }
+      .footer-v2 a:hover { color: var(--accent); }
+      .footer-v2 .meta-tag { margin-left: auto; color: var(--fg-subtle); font-size: 12px; }
+
+      /* Hide old chrome (not used in v2 but CSS retained for UC content) */
+      .pagehead, .tabs, .footrail { display: none !important; }
+
+      @media (max-width: 960px) {
+        .layout { grid-template-columns: 1fr; gap: 24px; padding: 20px 16px 60px; }
+        .sidebar {
+          position: static; max-height: none; overflow: visible;
+          border-bottom: 1px solid var(--border); padding-bottom: 16px;
+        }
+        .topnav-center { display: none; }
+      }
+      @media (max-width: 600px) {
+        .hero-v2 h1 { font-size: 26px; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topnav">
+      <div class="topnav-inner">
+        <a href="index.html" class="brand">
+          <span class="dot-mark"></span>
+          morkit <span class="sub">/ use cases</span>
+        </a>
+        <div class="topnav-center">
+          <div class="search" role="search" aria-label="Tìm use case">
+            <span>🔍</span>
+            <span class="placeholder">Tìm use case, step, command…</span>
+            <kbd>⌘K</kbd>
+          </div>
+        </div>
+        <div class="nav-actions">
+          <a href="index.html">Docs hub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener" class="primary">GitHub</a>
+          <button id="themeBtn" class="toggle" type="button" title="Đổi sáng/tối">☾ / ☀</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- ─────────────── SIDEBAR ─────────────── -->
+      <aside class="sidebar" aria-label="Use cases nav">
+        <div class="sb-group">
+          <div class="sb-group-title">Use cases</div>
+          <a class="uc-link active" data-target="uc1" href="#uc1">
+            <span class="uc-num">1.</span>Brownfield onboarding
+          </a>
+          <ul class="step-list" data-for="uc1">
+            <li><a href="#uc1-s1">Step 1 · Chuẩn bị inputs</a></li>
+            <li><a href="#uc1-s2">Step 2 · /morkit:init + doc types</a></li>
+            <li><a href="#uc1-s3">Step 3 · Parse + impl detect</a></li>
+            <li><a href="#uc1-s4">Step 4 · 🚦 Plan-approval gate</a></li>
+            <li><a href="#uc1-s5">Step 5 · Render + QA</a></li>
+            <li><a href="#uc1-s6">Step 6 · Team review + update</a></li>
+          </ul>
+          <a class="uc-link" data-target="uc2" href="#uc2">
+            <span class="uc-num">2.</span>Greenfield project
+          </a>
+          <ul class="step-list" data-for="uc2">
+            <li><a href="#uc2-s1">Step 1 · Brainstorm</a></li>
+            <li><a href="#uc2-s2">Step 2 · Function list draft</a></li>
+            <li><a href="#uc2-s3">Step 3 · 🚦 PM/BrSE/BA review</a></li>
+            <li><a href="#uc2-s4">Step 4 · /morkit:init SRS</a></li>
+            <li><a href="#uc2-s5">Step 5 · 🚦 SRS review</a></li>
+            <li><a href="#uc2-s6">Step 6 · /morkit:init HLD</a></li>
+            <li><a href="#uc2-s7">Step 7 · 🚦 Team-wide review</a></li>
+          </ul>
+          <a class="uc-link" data-target="uc3" href="#uc3">
+            <span class="uc-num">3.</span>Feature mới hoàn toàn
+          </a>
+          <a class="uc-link" data-target="uc4" href="#uc4">
+            <span class="uc-num">4.</span>Fix bug
+          </a>
+          <a class="uc-link" data-target="uc5" href="#uc5">
+            <span class="uc-num">5.</span>Code review
+          </a>
+          <a class="uc-link" data-target="uc6" href="#uc6">
+            <span class="uc-num">6.</span>Figma → code (MCP)
+          </a>
+          <a class="uc-link" data-target="uc7" href="#uc7">
+            <span class="uc-num">7.</span>Figma export HTML → mockup
+          </a>
+        </div>
+        <div class="sb-group">
+          <div class="sb-group-title">Tham khảo</div>
+          <a href="index.html">← Docs hub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub →</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank" rel="noopener">README →</a>
+        </div>
+      </aside>
+
+      <!-- ─────────────── MAIN ─────────────── -->
+      <main class="content">
+
+        <section class="hero-v2">
+          <span class="eyebrow">Docs · Use cases</span>
+          <h1>AI Workflow Use Cases</h1>
+          <p class="lede">
+            7 kịch bản dùng Claude Code + marketplace: 5 kịch bản
+            <code>/morkit:*</code> trên repo Notion-clone, cộng 2 kịch bản dựng UI từ
+            Figma (qua Figma MCP hoặc file HTML tự export). Mô phỏng qua giao diện CLI
+            giả định; mỗi UC tách thành các step có Tại sao · Bạn làm · Bạn thấy để người
+            mới theo được.
+          </p>
+          <p class="lede lede-small">
+            Dùng sidebar bên trái chuyển UC, hoặc click step để nhảy thẳng.
+          </p>
+        </section>
+
+      <!-- ──────────── USE CASE 1 — ONBOARD BROWNFIELD ──────────── -->
+      <section id="uc1" class="panel active" role="tabpanel">
+        <div class="panel-head">
+          <h2>Brownfield onboarding — từ partial inputs đến bộ docs team-verified</h2>
+          <p>
+            <b>Tình huống thực tế:</b> bạn vừa được giao một repo brownfield (đã có code,
+            đôi khi có vài tài liệu rời rạc như README, brainstorm, design mockup) nhưng
+            <i>thiếu SRS / API docs / DB design</i> chính thức. UC này hướng dẫn cách
+            dùng <code class="mono">/morkit:init</code> để dựng bộ docs lần đầu, rồi
+            dùng <code class="mono">/morkit:update-doc</code> để duy trì theo feedback của
+            team. Demo trên repo Notion-clone (Next.js 15 · TipTap · Drizzle · Supabase).
+          </p>
+          <p class="callout">
+            <b>Đọc theo thứ tự</b> — mỗi step có 3 phần: <span class="tflag">Tại sao bước
+            này?</span> · <span class="tflag">Bạn làm gì?</span> · <span class="tflag">Bạn
+            thấy gì?</span> Người mới nên chú ý STEP 4 (plan-approval gate) — đây là chỗ
+            quyết định chất lượng cả bộ docs.
+          </p>
+          <div class="meta">
+            <span class="chip accent">input: partial docs + source</span>
+            <span class="chip">6 step</span>
+            <span class="chip">2 human gates</span>
+            <span class="chip">diff engine preserve edits</span>
+            <span class="chip muted">~30 phút realtime · ~120k tokens</span>
+          </div>
+        </div>
+
+        <!-- Step 1 — Chuẩn bị inputs trước khi gõ lệnh -->
+        <div class="phase" id="uc1-s1">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 1</span> Chuẩn bị: cài venv + gom inputs vào <code class="mono">.tmp/</code>
+            <span class="phase-desc">— làm trước khi gõ <code class="mono">/morkit:init</code> · càng nhiều input chất lượng càng ít TBD</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">terminal · ~/Documents/work/Notion-clone (brownfield)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# docs-hero cần Python venv để parse PDF/Excel/Docx và build
+# project-model.json. Lần đầu phải cài, các lần sau bỏ qua.
+# Input càng đủ (README, design, brainstorm, mockup, PDF spec)
+# thì Claude càng có context, gap ít, TBD ít.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tcom"># 1) Cài venv (CHỈ chạy 1 lần đầu cho máy của bạn)</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:setup</span>
+
+<span class="tcom"># 2) Gom mọi tài liệu rời rạc + source vào .tmp/</span>
+<span class="tprompt">$</span> <span class="tcmd">mkdir -p .tmp &amp;&amp; cp</span> <span class="tstr">README.md</span> <span class="tstr">docs/brainstorming/*</span> <span class="tstr">.tmp/</span>
+<span class="tprompt">$</span> <span class="tcmd">cp</span> <span class="tstr">docs/design/website-design.md</span> <span class="tstr">.tmp/</span>
+<span class="tprompt">$</span> <span class="tcmd">ls</span> <span class="tstr">.tmp/</span>
+  README.md  website-design.md  user-stories.md  block-model-notes.md
+
+<span class="label output">▼ Bạn thấy</span>
+  ~/.claude/plugins/data/docs-hero/.venv  <span class="tok-ok">created</span>
+  4 file trong .tmp/  ·  src/ vẫn ở project root (Claude tự scan)
+
+<span class="tcom"># Tip: Nếu chỉ có code, không sao — vẫn chạy được, chỉ là gap
+# blockers nhiều hơn ở STEP 4.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 — Gõ /morkit:init + chọn doc types -->
+        <div class="phase" id="uc1-s2">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 2</span> Gõ <code class="mono">/morkit:init</code> + chọn loại docs muốn sinh
+            <span class="phase-desc">— Claude pre-flight venv · multi-select 7 doc types · không có default</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · multi-select dialog</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Brownfield thường chỉ cần subset docs trước (vd: SRS + API +
+# DB để team kick-off). Các loại còn lại có thể chạy lại lần
+# sau bằng cách gọi /morkit:init thêm lần nữa.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span><span class="skill-chip">/morkit:init</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:init</span> <span class="tflag">--inputs</span> <span class="tstr">.tmp/</span> <span class="tflag">--language</span> <span class="tstr">VN</span>
+
+<span class="label output">▼ Bạn thấy</span>
+Pre-flight check venv...  <span class="tok-ok">✓ ready</span>
+
+<span class="label gate">▼ Dialog hiện ra</span> <span class="tcom">// đây là human gate #1</span>
+  ┌─ Bạn muốn generate những loại tài liệu nào? ─────────────┐
+  │  [<span class="tok-ok">x</span>] SRS               — Software Requirements Spec     │
+  │  [<span class="tok-ok">x</span>] API docs          — REST endpoints + cURL          │
+  │  [<span class="tok-ok">x</span>] DB design         — Tables + Mermaid ERD           │
+  │  [<span class="tok-ok">x</span>] System Arch.      — arc42-lite + component diagram │
+  │  [ ] Code Standards   — Conventional Commits + lint     │
+  │  [ ] Codebase Summary — README-style tech overview      │
+  │  [ ] Design Guidelines — Principles + Patterns + ADR    │
+  └──────────────────────────────────────────────────────────┘
+
+<span class="tcom"># Đây là chế độ multi-select (tick được nhiều ô). Tick ô nào
+# thì Claude generate ô đó. Tick rỗng = abort.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 — Claude tự phân tích (bạn quan sát) -->
+        <div class="phase" id="uc1-s3">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 3</span> Claude tự phân tích — bạn quan sát (~2-3 phút)
+            <span class="phase-desc">— parse inputs · scan source + git + tests · auto-detect Implementation Status</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">docs-hero-orchestrator đang chạy</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Claude phải hiểu repo trước khi viết docs. Nó:
+#   1) Parse các file trong .tmp/ thành cấu trúc (FR/Screen/...)
+#   2) Quét source + git + tests để biết feature nào đã làm,
+#      đang làm, hay chưa làm — gọi là "Implementation Status".
+# Snapshot này sẽ xuất hiện trong SRS §3 (dashboard), giúp PM
+# nhìn ngay trạng thái mà không phải hỏi từng dev.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label output">▼ Bạn thấy (terminal log)</span>
+[parse]   Reading .tmp/ → project-model.json...
+  • 1 README · 3 brainstorming notes · 1 design doc
+  • 35 source files (Next 15 · React 19 · Drizzle · Supabase)
+  • 8 ORM models · 14 API routes · 6 page routes
+  • Identified: 18 FR · 6 Screen · 14 ENDPOINT · 8 TBL · 6 NFR
+
+[impl-status] Auto-detecting status cho 18 FR...
+  ① morkit/output/spec + openspec/changes    →  3 FR <span class="tok-warn">InProgress</span>
+  ② grep FR-ID trong source + git log        →  +2 FR <span class="tok-warn">InProgress</span>
+  ③ grep FR-ID trong test files              →  +2 FR <span class="tok-ok">Verified</span>
+  <span class="tcom">// manual override trong project-model.json THẮNG auto-detect
+  // FR không có signal → NotStarted</span>
+
+╭─ <span class="tflag">Implementation Snapshot</span> ──────────────────────────╮
+│ <span class="tok-ok">Done</span>       <span class="tnum">0</span>   <span class="tok-warn">InProgress</span> <span class="tnum">3</span>   <span class="tok-ok">Verified</span> <span class="tnum">2</span>          │
+│ <span class="tok-bad">Blocked</span>    <span class="tnum">0</span>   <span class="tok-com">NotStarted</span> <span class="tnum">13</span>                      │
+╰──────────────────────────────────────────────────────────╯
+
+<span class="tcom"># Đây CHƯA phải lúc render docs. Claude đang chuẩn bị plan để
+# bạn duyệt ở STEP 4.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 — Đọc docs-plan.md + approve (gate quan trọng nhất) -->
+        <div class="phase" id="uc1-s4">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 4</span> 🚦 Mở <code class="mono">.tmp/docs-plan.md</code> + duyệt plan <i>(gate quan trọng nhất)</i>
+            <span class="phase-desc">— đọc kỹ, fix blocker ngay tại đây · chọn Proceed / Revise / Abort</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">.tmp/docs-plan.md · human gate · KHÔNG được skip</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này QUAN TRỌNG NHẤT? ──────────────────────
+# Đây là CƠ HỘI CUỐI để fix scope trước khi Claude render hàng
+# nghìn dòng docs. Sửa ở đây = chỉnh JSON; sửa sau khi render =
+# chỉnh tay từng file. Đầu tư 5 phút đọc plan, tiết kiệm 1 giờ
+# rewrite sau.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span> <span class="tcom">// 3 việc tuần tự</span>
+  1. Mở <span class="tflag">.tmp/docs-plan.md</span> trong VS Code / editor
+  2. Đọc 6 phần (§0 → §5), tập trung §2 Gaps và §3 Risks
+  3. Quyết: Proceed / Revise / Abort
+
+<span class="label output">▼ docs-plan.md trông như thế này:</span>
+<span class="tflag">§0 Project Overview</span>     · what / phase / stack / stakeholders
+<span class="tflag">§1 Per-doc plan</span>         · mỗi doc lấy nội dung từ input nào
+<span class="tflag">§2 Gaps</span>                  · ⚠ cái thiếu, ❗ blocker bắt buộc fix
+  <span class="tok-bad">[blocker]</span>  G1  FR-004 "Share page" — không có acceptance criteria
+  <span class="tok-warn">[warning]</span>  G2  ENDPOINT /api/pages — request schema không rõ
+  <span class="tok-warn">[warning]</span>  G3  TBL blocks — PK chưa được xác định
+  <span class="tok-com">[info]</span>     G4  NFR perf threshold chưa lượng hoá
+<span class="tflag">§3 Risks</span>                 · scope creep, conflicting reqs, ...
+<span class="tflag">§4 Impl Status snapshot</span>  · preview SRS §3 dashboard
+<span class="tflag">§5 Action mỗi gap</span>        · ask user / placeholder / assumption / drop
+
+<hr class="sep"/>
+<span class="label gate">▼ GATE 2 · Dialog hiện ra</span><span class="skill-chip gate">plan-approval</span>
+  Plan summary: 4 outputs · 1 blocker · 2 warnings · 4 risks
+  → Bạn chọn?
+    ( ) <span class="tok-ok">Proceed</span>       — render docs ngay
+    (•) <span class="tok-warn">Revise plan</span>   — bạn trả lời gì đó, Claude viết lại plan
+    ( ) <span class="tok-bad">Abort</span>         — dừng hoàn toàn
+
+<span class="label input">▶ Bạn chọn Revise + trả lời blocker G1</span>
+  "Share page: owner share read-only link · expiry 7d · revoke anytime"
+
+<span class="tcom"># Claude rewrite plan: G1 chuyển từ [blocker] → resolved.
+# Loop lại GATE 2 → bạn chọn Proceed.</span>
+
+<span class="label output">▼ Claude apply decisions vào project-model.json</span>
+  G2 → ENDPOINT.request_schema = <span class="tstr">"&lt;TBD: request schema&gt;"</span>
+  G3 → TBL.blocks prefix <span class="tstr">"[ASSUMPTION] PK = id UUID v4"</span>
+  G4 → NFR.perf.threshold = <span class="tstr">"&lt;TBD: perf threshold&gt;"</span>
+  G1 → FR-004.acceptance_criteria = [3 ACs từ feedback]
+  <span class="tok-ok">✓</span> sẵn sàng dispatch sang STEP 5
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 — Render docs + QA validate -->
+        <div class="phase" id="uc1-s5">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 5</span> Claude render docs + QA agent validate (~5 phút)
+            <span class="phase-desc">— sub-skills chạy song song · output ra <code class="mono">docs/</code> · QA cross-check</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">docs/ + .docs-hero-meta.json · QA agent run</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Sau khi plan OK, Claude chạy các sub-skill SONG SONG (mỗi loại
+# doc 1 skill riêng) để tiết kiệm thời gian. Render xong, QA
+# agent docs-hero kiểm tra chéo (FR↔Screen↔API↔TBL), BrSE quality,
+# Mermaid syntax. Không cần bạn can thiệp — chỉ chờ.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label output">▼ Bạn thấy (dispatch parallel)</span>
+  ┌─ <span class="tcmd">generate-srs</span>                  ─┐
+  ├─ <span class="tcmd">generate-api-docs</span>             ├──▶ parallel (~3 phút)
+  ├─ <span class="tcmd">generate-db-design</span>            │
+  └─ <span class="tcmd">generate-system-architecture</span>  ─┘
+
+<span class="label output">▼ File ghi ra docs/</span>
+  <span class="tok-add">A</span> docs/srs.md                            <span class="tnum">1247</span> lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Login.md      <span class="tnum">86</span>  lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Page.md       <span class="tnum">142</span> lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Settings.md   <span class="tnum">71</span>  lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Trash.md      <span class="tnum">54</span>  lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Tag.md        <span class="tnum">62</span>  lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Cmd.md        <span class="tnum">78</span>  lines
+  <span class="tok-add">A</span> docs/api-docs.md                       <span class="tnum">523</span> lines
+  <span class="tok-add">A</span> docs/database-design.md (Mermaid ERD)  <span class="tnum">312</span> lines
+  <span class="tok-add">A</span> docs/system-architecture.md            <span class="tnum">418</span> lines
+  <span class="tok-add">A</span> .docs-hero-meta.json (gitignored sidecar)
+
+<span class="label gate">▼ QA agent docs-hero validate</span><span class="skill-chip gate">read-only</span>
+  Cross-ref FR ↔ Screen ↔ API ↔ TBL          <span class="tok-ok">✓ 18/18 mapped</span>
+  Endpoint ↔ api-docs                        <span class="tok-ok">✓ 14/14 mapped</span>
+  Mermaid ERD + component diag syntax        <span class="tok-ok">✓ valid</span>
+  BrSE template (13 sections + IPA-6 NFR)    <span class="tok-ok">✓ pass</span>
+  Impl Status snapshot khớp project-model    <span class="tok-ok">✓ 18/18</span>
+  Vague NFR thresholds                       <span class="tok-warn">1 carry-forward (G4)</span>
+
+✅ <span class="tflag">Bộ docs ready</span> — 2 TBD + 1 ASSUMPTION cần follow-up downstream
+   <span class="tcom">// QA chỉ check, không tự sửa. Bạn ship hay không bạn quyết.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 6 — Team review + /morkit:update-doc -->
+        <div class="phase" id="uc1-s6">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 6</span> Team review → cập nhật qua <code class="mono">/morkit:update-doc</code>
+            <span class="phase-desc">— feedback route đến diff engine · KHÔNG render lại từ đầu · manual edits preserved</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">downstream loop · team review · diff-based update</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Lần đầu Claude render xong, docs CHƯA hoàn hảo. Team review
+# (PM / BE / FE / BrSE / DBA) sẽ phát hiện thiếu UC, sai contract,
+# index thiếu... Bạn KHÔNG chạy lại /morkit:init (sẽ ghi đè
+# manual edits). Thay vào đó dùng /morkit:update-doc với diff engine
+# — chỉ patch phần cần đổi.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm (loop 3 việc)</span>
+  1. Gửi <span class="tstr">docs/</span> cho team review (mỗi role 1 lane checklist)
+  2. Mỗi feedback → viết 1 plan.md ngắn mô tả thay đổi cần áp lên docs
+  3. Áp dụng vào docs bằng <span class="tflag">/morkit:update-doc --from-plan</span>
+
+<span class="label output">▼ Pre-flight (mỗi lần chạy /morkit:update-doc)</span>
+  test -d <span class="tstr">~/.claude/plugins/data/docs-hero/.venv</span>  <span class="tok-ok">✓</span>
+  test -f <span class="tstr">./.docs-hero-meta.json</span>                  <span class="tok-ok">✓</span>  <span class="tcom">// sidecar từ STEP 5</span>
+  <span class="tcom">// thiếu meta? → /morkit:init lại HOẶC /docs-hero:rebuild-meta</span>
+
+<span class="label output">▼ Ví dụ 3 feedback từ review</span>
+  <span class="tflag">PM</span>  · "SRS thiếu UC Share page §3.4"           → plan.md
+  <span class="tflag">BE</span>  · "Thiếu DELETE /api/pages/:id"            → plan.md
+  <span class="tflag">DBA</span> · "Sửa wording NFR perf"                   → plan.md
+
+<hr class="sep"/>
+<span class="label input">▶ Apply từng plan.md vào docs</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/pm-share-page.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/be-delete-route.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/dba-nfr-wording.md</span>
+
+<span class="label output">▼ Diff engine làm gì? (5 bước, atomic)</span>
+  1. <span class="tcmd">parse_plan.py</span> → Delta JSON (ADD/UPDATE/DEPRECATE per entity)
+  2. <span class="tcmd">detect_manual_edits.py</span> → đánh dấu BrSE manual edits cần preserve
+  3. <span class="tcmd">compute_diff.py</span> → patch plan (chỉ phần đổi, không render lại cả file)
+  4. <span class="tcmd">apply_patch.py</span> → atomic write (all-or-nothing, fail = rollback)
+  5. Spawn QA agent <span class="skill-chip gate">docs-hero</span> verify lại cross-ref + BrSE quality
+
+<span class="label output">▼ Output</span>
+  <span class="tok-add">M</span> docs/srs.md              <span class="tok-add">+18</span> <span class="tok-rm">−2</span>   UC §3.4 added
+  <span class="tok-add">M</span> docs/api-docs.md         <span class="tok-add">+12</span> <span class="tok-rm">−0</span>   DELETE documented
+  <span class="tok-add">M</span> docs/srs.md              <span class="tok-add">+2</span>  <span class="tok-rm">−2</span>   NFR perf wording fixed
+  <span class="tok-ok">✓</span> Mọi manual edit của BrSE được preserve (diff engine)
+
+<span class="tprompt">$</span> <span class="tcmd">git add docs/ &amp;&amp; git commit -m</span> <span class="tstr">"docs: address team review"</span>
+
+🔁 Loop lại review → update cho tới khi cả team OK → ✅ ship.
+
+<span class="tcom"># Sẵn sàng dùng làm input cho:
+#   UC3 (feature)  — implement dựa trên SRS §3 + API contract
+#   UC4 (fix bug)  — DB design rõ → debug nhanh hơn
+#   UC5 (review)   — /morkit:deep-review có context tốt từ docs/</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ──────────── USE CASE 2 — GREENFIELD: IDEA → FULL DOC SET ──────────── -->
+      <section id="uc2" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Greenfield project — từ ý tưởng đến bộ docs full team-verified</h2>
+          <p>
+            <b>Tình huống thực tế:</b> bạn được giao 1 dự án greenfield — <i>chưa có
+            code, chưa có docs</i>, chỉ có idea note / requirement / market research.
+            UC này hướng dẫn 7 step từ brainstorm ý tưởng → function list → SRS &amp;
+            screen-spec (tầng business) → API/DB/Arch (tầng technical / HLD) → team
+            sign-off. Cách tiếp cận <b>top-down 2 vòng</b>: chốt business trước, chốt
+            technical sau — tránh tốn công khi business chưa rõ.
+          </p>
+          <p class="callout">
+            <b>Khác UC1 thế nào?</b> UC1 (brownfield) có code &amp; partial docs làm
+            anchor → /morkit:init 1 lần ra hết. UC2 (greenfield) không có anchor → phải
+            brainstorm trước, tách <code class="mono">/morkit:init</code> làm 2 vòng
+            (vòng 1: SRS · vòng 2: HLD) để dừng lại cho PM/BrSE/BA review giữa chừng.
+          </p>
+          <div class="meta">
+            <span class="chip accent">input: idea / requirement only</span>
+            <span class="chip">7 step</span>
+            <span class="chip">3 human gates</span>
+            <span class="chip">2 vòng /morkit:init</span>
+            <span class="chip muted">~2-3 ngày realtime · ~250k tokens</span>
+          </div>
+        </div>
+
+        <!-- Step 1 — Brainstorm cùng agent từ idea/requirement -->
+        <div class="phase" id="uc2-s1">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 1</span> Brainstorm ý tưởng với agent <code class="mono">/morkit:brainstorming</code>
+            <span class="phase-desc">— explore stance · thinking partner free-form · auto-save design log cuối phiên</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · ~/Documents/work/TaskFlow (greenfield, no code yet)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Greenfield = bắt đầu từ 0, không có code/docs làm anchor.
+# Brainstorming skill ở chế độ "explore stance" — thinking
+# partner tò mò, mở thread, dùng ASCII diagram, không bao giờ
+# viết code. Đây không phải workflow cố định: agent điều chỉnh
+# theo idea bạn mang đến, có thể đào sâu 1 hướng hoặc so sánh
+# nhiều hướng, không bị ép theo checklist.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tcom"># 1) Gom mọi input có sẵn vào 1 chỗ</span>
+<span class="tprompt">$</span> <span class="tcmd">mkdir -p .tmp/brainstorm-inputs &amp;&amp; cp</span> <span class="tstr">idea-note.md</span> <span class="tstr">competitor-research.pdf \</span>
+   <span class="tstr">requirement-from-stakeholder.docx</span> <span class="tstr">.tmp/brainstorm-inputs/</span>
+
+<span class="tcom"># 2) Mời agent vào explore mode</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:brainstorming</span>
+
+<span class="label output">▼ Bạn thấy (explore stance — flow tự do, output cố định)</span>
+
+Agent vào chế độ thinking partner: tò mò, mở thread, không vội kết
+luận. Một phiên typical với TaskFlow có thể đi như sau (thứ tự và
+độ sâu agent tự adapt theo bạn):
+
+▸ Đọc inputs trong <span class="tstr">.tmp/brainstorm-inputs/</span> — recent commits nếu repo đã init,
+  idea-note.md, requirement docx
+▸ Hỏi câu mở thread thay vì checklist:
+   "TaskFlow là task manager — nhưng cho IC đơn lẻ hay team?
+    Khác biệt 2 hướng này quyết định data model, billing, SSO..."
+▸ Vẽ <span class="tflag">ASCII diagram</span> khi cần làm rõ (state machine, comparison
+  table, data flow). Ví dụ comparison 3 approach:
+                Multi-tenant SaaS   Self-hosted   Hybrid
+   Onboard       1-click           install        1-click
+   Data privacy  shared            isolated       optional
+   Pricing       subscription      one-off        tiered
+▸ Đào sâu thread bạn quan tâm — pick multi-tenant thì bỏ qua
+  self-hosted, chuyển sang hỏi về billing model
+▸ <span class="tflag">Surface risks &amp; unknowns</span> — vd "OTP qua email tốn $ → cần
+  budget hay nên Magic Link như Notion?"
+▸ Khi session crystallize, agent <span class="tflag">confirm</span> rồi auto-save design log:
+   "Đã đủ shape để wrap up. Save design log vào
+    <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span>?"
+  Bạn OK → file được tạo, đây là input cho STEP 2.
+
+<span class="tcom"># Output: morkit/output/specs/2026-05-11-taskflow-design.md
+#   • Problem framing — vision · target persona · scope IN/OUT
+#   • Approaches considered + lý do pick
+#   • Decisions made
+#   • Open questions còn lại
+#   • Next step: → STEP 2 (convert thành function list)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 — Discuss với AI để rút function list draft -->
+        <div class="phase" id="uc2-s2">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 2</span> Convert design doc → function list draft (cùng AI)
+            <span class="phase-desc">— prose design → bảng FR có cấu trúc · MoSCoW priority · acceptance criteria sơ bộ</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · dialog refinement</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Brainstorm output là prose, KHÔNG phải input ăn được của
+# /morkit:init. /morkit:init cần entities có FR-ID, Screen,
+# ENDPOINT, TBL. Bước này discuss với AI để decompose design
+# doc thành function list dạng bảng — đây là "hợp đồng" giữa
+# PM/BrSE/BA và development team.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tprompt">$</span> Claude, dùng <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span>
+  convert thành function list:
+    • mỗi function → 1 FR-ID (FR-001, FR-002, ...)
+    • columns: ID · Title · Description · MoSCoW · AC draft · Depends-on
+    • group theo Epic (vd Epic-Auth, Epic-Tasks, Epic-Notifications)
+    • thêm user journey table cho từng persona
+
+<span class="label output">▼ Bạn thấy (function-list-draft.md)</span>
+<span class="tflag">Epic-Auth</span>
+| ID     | Title           | MoSCoW | AC draft                 | Deps |
+|--------|-----------------|--------|--------------------------|------|
+| FR-001 | Email signup    | Must   | OTP verify · 60s expiry  | —    |
+| FR-002 | SSO Google      | Should | Onclick · auto-create    | 001  |
+| FR-003 | Forget password | Must   | Email link · 1h expiry   | 001  |
+
+<span class="tflag">Epic-Tasks</span>
+| ID     | Title             | MoSCoW | AC draft                 | Deps |
+|--------|-------------------|--------|--------------------------|------|
+| FR-004 | Create task       | Must   | title required · due opt | 001  |
+| FR-005 | Assign to teammate| Must   | search by name/email     | 004  |
+| FR-006 | Subtask nesting   | Could  | 2 levels max             | 004  |
+...
+
+<span class="tflag">User Journey · Persona "IC engineer"</span>
+  Signup → Create first project → Invite teammate → Create task →
+  Assign → Notify in Slack → Mark done
+
+<span class="tcom"># Iterate cùng AI: thêm FR thiếu, xóa FR ngoài scope, lock MoSCoW
+# Save: .tmp/function-list-draft.md</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 — PM/BrSE/BA review function list -->
+        <div class="phase" id="uc2-s3">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 3</span> 🚦 PM/BrSE/BA review function list theo checklist
+            <span class="phase-desc">— human gate · sửa ở đây cost = 0 · sửa sau khi render SRS = rewrite</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">.tmp/function-list-draft.md · human gate</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Function list là input chính cho /morkit:init ở STEP 4. Một FR
+# sai/thiếu/dư sẽ propagate sang SRS, screen-spec, và toàn bộ
+# HLD ở vòng sau. Đây là gate rẻ nhất — chỉ là markdown table.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+  1. Gửi <span class="tstr">.tmp/function-list-draft.md</span> cho PM / BrSE / BA
+  2. Reviewer tick checklist 5 mục:
+  3. Feedback inline (comment hoặc track changes)
+  4. Bạn merge feedback → <span class="tstr">.tmp/function-list-v1.md</span> (locked)
+
+<span class="label gate">▼ Checklist function list</span><span class="skill-chip gate">PM·BrSE·BA</span>
+
+╭─ <span class="tflag">PM</span> · business value ─────────────────────────────────╮
+│ [ ] Mỗi FR có business value rõ ràng                    │
+│ [ ] Target persona đúng (IC / Manager / Admin)          │
+│ [ ] MoSCoW priority hợp lý cho MVP                      │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BrSE</span> · template-ready ────────────────────────────────╮
+│ [ ] FR-ID format đúng (FR-NNN)                          │
+│ [ ] Mỗi FR có AC draft đo lường được                    │
+│ [ ] Traceability: Epic ↔ FR ↔ user journey              │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BA</span> · scope ─────────────────────────────────────────╮
+│ [ ] Scope IN/OUT rõ — không creep                       │
+│ [ ] Dependency tracked (FR-005 deps FR-004)             │
+│ [ ] User journey cover edge case quan trọng             │
+╰─────────────────────────────────────────────────────────╯
+
+<span class="label output">▼ Bạn thấy</span>
+  Feedback ví dụ:
+    PM   · "FR-006 subtask nesting đẩy sang v2 (out-of-scope MVP)"
+    BrSE · "FR-002 SSO Google: AC thêm 'fail-fallback về email signup'"
+    BA   · "Thiếu Epic-Notifications: in-app + email digest"
+
+  → Bạn merge → <span class="tstr">.tmp/function-list-v1.md</span> · 24 FR locked · Epic-Notif added
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 — /morkit:init vòng 1 → chọn SRS (kèm screen-spec) -->
+        <div class="phase" id="uc2-s4">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 4</span> <code class="mono">/morkit:init</code> vòng 1 — chọn SRS (kèm screen-specs)
+            <span class="phase-desc">— input function-list + idea docs · multi-select chỉ tick SRS · render docs tầng business</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · /morkit:init (vòng 1)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao chỉ chọn SRS ở vòng 1? ────────────────────────
+# Top-down approach: chốt tầng business (SRS + screen-spec)
+# trước khi tốn công vẽ HLD (API/DB/Arch). PM/BrSE/BA cần ký
+# duyệt SRS trước khi technical team (BE/FE/DBA) join. Nếu
+# chọn hết 7 loại 1 lần → tới khi PM phản hồi, phải redo cả
+# DB/API → lãng phí.
+# Lưu ý: flag `srs` của docs-hero TỰ kèm screen-specs/SCREEN-*.md
+# (không cần flag riêng).
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tcom"># 1) Gom function list + design doc + idea docs vào .tmp/</span>
+<span class="tprompt">$</span> <span class="tcmd">cp</span> <span class="tstr">.tmp/function-list-v1.md</span> <span class="tstr">.tmp/brainstorm-inputs/*</span> <span class="tstr">.tmp/</span>
+<span class="tprompt">$</span> <span class="tcmd">cp</span> <span class="tstr">morkit/output/specs/2026-05-11-taskflow-design.md</span> <span class="tstr">.tmp/</span>
+
+<span class="tcom"># 2) Chạy /morkit:setup nếu lần đầu, rồi /morkit:init</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:init</span> <span class="tflag">--inputs</span> <span class="tstr">.tmp/</span> <span class="tflag">--language</span> <span class="tstr">VN</span>
+
+<span class="label gate">▼ Multi-select dialog</span> <span class="tcom">// CHỈ tick SRS</span>
+  [<span class="tok-ok">x</span>] SRS               — Software Requirements Spec (+screen-specs)
+  [ ] API docs          — để vòng 2
+  [ ] DB design         — để vòng 2
+  [ ] System Arch.      — để vòng 2
+  [ ] Code Standards    — để vòng 2 (tuỳ team)
+  [ ] Codebase Summary  — để vòng 2 (tuỳ team)
+  [ ] Design Guidelines — để vòng 2 (tuỳ team)
+
+<span class="label output">▼ Bạn thấy</span>
+Pre-flight venv... <span class="tok-ok">✓</span>
+Parse → project-model.json
+  • 24 FR (từ function-list-v1.md) · 12 Screen (từ user journey) · 6 NFR
+  • 0 ENDPOINT · 0 TBL (greenfield, chưa có code)
+Impl status snapshot:
+  Done <span class="tnum">0</span>  InProgress <span class="tnum">0</span>  Verified <span class="tnum">0</span>  NotStarted <span class="tnum">24</span>
+  <span class="tcom">// expected — greenfield chưa có code/spec-changes để scan</span>
+
+docs-plan.md viết ra .tmp/ · gate Proceed/Revise/Abort
+  Gaps thường gặp ở greenfield:
+    <span class="tok-warn">[warning]</span> Screen state default/loading/empty/error chưa spec
+    <span class="tok-com">[info]</span>    NFR threshold chưa lượng hoá (perf, scale)
+  → Bạn chọn Proceed (greenfield ít blocker hơn brownfield)
+
+<span class="label output">▼ Render</span>
+  <span class="tok-add">A</span> docs/srs.md                            <span class="tnum">1480</span> lines
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Signup.md     <span class="tnum">92</span>
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-Dashboard.md  <span class="tnum">156</span>
+  <span class="tok-add">A</span> docs/screen-specs/SCREEN-TaskList.md   <span class="tnum">134</span>
+  ... (12 screen-specs)
+  <span class="tok-add">A</span> .docs-hero-meta.json (sidecar)
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 — PM/BrSE/BA review SRS + screen-specs -->
+        <div class="phase" id="uc2-s5">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 5</span> 🚦 PM/BrSE/BA review SRS + screen-specs theo checklist
+            <span class="phase-desc">— chốt tầng business trước khi technical team build HLD · feedback → /morkit:update-doc</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">docs/srs.md + docs/screen-specs/ · human gate</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# SRS lần đầu render KHÔNG hoàn hảo — luôn cần PM/BrSE/BA fine-
+# tune. Nhưng KHÔNG re-run /morkit:init (sẽ ghi đè manual edits).
+# Dùng /morkit:update-doc --from-plan với diff engine — chỉ patch
+# phần đổi, manual edits preserved.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm (loop)</span>
+  1. Gửi <span class="tstr">docs/srs.md</span> + <span class="tstr">docs/screen-specs/</span> cho PM/BrSE/BA
+  2. Mỗi feedback → viết 1 plan.md ngắn vào .tmp/
+  3. Apply: <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/&lt;feedback&gt;.md</span>
+  4. Loop tới khi 3 lane đều OK
+
+<span class="label gate">▼ Checklist SRS &amp; screen-specs</span><span class="skill-chip gate">PM·BrSE·BA</span>
+
+╭─ <span class="tflag">PM</span> · business correctness ──────────────────────────╮
+│ [ ] §3 Use cases khớp product vision                    │
+│ [ ] §5 Business rules đầy đủ (login retry, RBAC, ...)  │
+│ [ ] §7 NFR ưu tiên đúng (perf? a11y? scalability?)     │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BrSE</span> · template ITO Japan ──────────────────────────╮
+│ [ ] 13 sections + 2 appendices đầy đủ                   │
+│ [ ] NFR có IPA-6 categories                             │
+│ [ ] Traceability matrix FR↔Screen mapped                │
+│ [ ] Acceptance/UAT scenarios đầy đủ                     │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BA</span> · screen flow ────────────────────────────────────╮
+│ [ ] Mỗi screen có state default/loading/empty/error    │
+│ [ ] Transition đúng — không deadlock screen flow        │
+│ [ ] Edge case cover (offline · permission denied · ...) │
+╰─────────────────────────────────────────────────────────╯
+
+<span class="label output">▼ Ví dụ feedback → apply qua /morkit:update-doc</span>
+  PM   · "Thiếu UC §3.7 'Bulk archive tasks'"
+  BrSE · "NFR perf TTI cần threshold cụ thể: 1.8s p95"
+  BA   · "SCREEN-TaskList thiếu empty state với CTA"
+
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/pm-bulk-archive.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/brse-nfr-tti.md</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> <span class="tstr">.tmp/ba-empty-state.md</span>
+
+  <span class="tok-add">M</span> docs/srs.md                            <span class="tok-add">+28</span> <span class="tok-rm">−4</span>
+  <span class="tok-add">M</span> docs/screen-specs/SCREEN-TaskList.md   <span class="tok-add">+12</span> <span class="tok-rm">−0</span>
+  <span class="tok-ok">✓</span> diff engine preserve BrSE manual edits
+
+🚦 <span class="tflag">Sign-off</span>: PM/BrSE/BA all OK → tầng business chốt → STEP 6
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 6 — /morkit:init vòng 2 → HLD docs -->
+        <div class="phase" id="uc2-s6">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 6</span> <code class="mono">/morkit:init</code> vòng 2 — HLD (API + DB + Arch + ...)
+            <span class="phase-desc">— SRS đã chốt làm anchor · render tầng technical · technical team chuẩn bị build</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · /morkit:init (vòng 2 · HLD)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao tách vòng 2? ──────────────────────────────────
+# SRS đã chốt = anchor cho HLD. /morkit:init vòng 2 đọc lại
+# docs/srs.md + project-model.json + screen-specs để derive:
+#   - API contract (từ FR + Screen)
+#   - DB schema (từ data items mention trong SRS)
+#   - System Architecture (từ tech-stack constraint + NFR)
+# Technical team (BE/FE/DBA/Architect) join từ STEP 6 trở đi.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span>
+<span class="tcom"># Cùng /morkit:init, cùng .tmp/, nhưng tick các flag còn lại</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:init</span> <span class="tflag">--inputs</span> <span class="tstr">.tmp/</span> <span class="tflag">--language</span> <span class="tstr">VN</span>
+
+<span class="label gate">▼ Multi-select dialog</span> <span class="tcom">// tick HLD docs còn lại</span>
+  [ ] SRS               — đã có ở STEP 4, KHÔNG tick lại
+  [<span class="tok-ok">x</span>] API docs          — REST endpoints + cURL + error codes
+  [<span class="tok-ok">x</span>] DB design         — Tables + Mermaid ERD
+  [<span class="tok-ok">x</span>] System Arch.      — arc42-lite + component diagram
+  [<span class="tok-ok">x</span>] Code Standards    — Conventional Commits + lint
+  [<span class="tok-ok">x</span>] Codebase Summary  — README-style tech overview
+  [<span class="tok-ok">x</span>] Design Guidelines — Principles + Patterns + ADR
+
+<span class="label output">▼ Bạn thấy</span>
+Parse → project-model.json
+  • Reuse 24 FR · 12 Screen · 6 NFR từ vòng 1
+  • Derive: 18 ENDPOINT (từ FR+Screen) · 9 TBL (từ data items)
+
+docs-plan.md cho HLD — gaps thường gặp:
+  <span class="tok-bad">[blocker]</span> ENDPOINT POST /api/tasks/bulk-archive — request schema chưa rõ
+  <span class="tok-warn">[warning]</span> TBL tasks — soft delete strategy chưa quyết
+  <span class="tok-com">[info]</span>     ADR pending: choose Postgres vs MySQL
+
+  → Bạn chọn Revise: trả lời blocker · loop · chọn Proceed
+
+<span class="label output">▼ Render (parallel · ~5 phút)</span>
+  <span class="tok-add">A</span> docs/api-docs.md                <span class="tnum">680</span> lines · 18 endpoints
+  <span class="tok-add">A</span> docs/database-design.md         <span class="tnum">412</span> lines · Mermaid ERD
+  <span class="tok-add">A</span> docs/system-architecture.md     <span class="tnum">520</span> lines · arc42-lite
+  <span class="tok-add">A</span> docs/code-standards.md          <span class="tnum">186</span> lines
+  <span class="tok-add">A</span> docs/codebase-summary.md        <span class="tnum">94</span>  lines
+  <span class="tok-add">A</span> docs/design-guidelines.md       <span class="tnum">312</span> lines
+  <span class="tok-add">A</span> docs/adr/ADR-001-postgres.md    <span class="tnum">68</span>  lines
+  <span class="tok-add">A</span> docs/adr/ADR-002-rest-vs-grpc.md <span class="tnum">54</span> lines
+
+<span class="label gate">▼ QA agent docs-hero validate</span>
+  Cross-ref FR ↔ Screen ↔ ENDPOINT ↔ TBL    <span class="tok-ok">✓ 24/24 mapped</span>
+  Mermaid ERD + arc42 component diag        <span class="tok-ok">✓ valid</span>
+  BrSE template + IPA-6 NFR                 <span class="tok-ok">✓ pass</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 7 — Cả team review tất cả docs -->
+        <div class="phase" id="uc2-s7">
+          <h3 class="phase-title">
+            <span class="phase-num">STEP 7</span> 🚦 Cả team review TẤT CẢ docs theo checklist
+            <span class="phase-desc">— PM·BrSE·BA·BE·FE·DBA·Architect · cross-doc consistency · sign-off ship</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">docs/ full set · team-wide gate</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Greenfield "ready to ship" = đủ docs để start /morkit:propose +
+# /morkit:executing-plans cho feature đầu tiên. Cả team review
+# để đảm bảo cross-doc consistency: FR-001 trong SRS phải có
+# endpoint trong api-docs phải có table trong db-design. Một
+# inconsistency = blocker cho dev.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label gate">▼ Checklist team-wide</span><span class="skill-chip gate">PM·BrSE·BA·BE·FE·DBA·Arch</span>
+
+╭─ <span class="tflag">PM·BrSE·BA</span> · business + screen ─────────────────────╮
+│ [<span class="tok-ok">x</span>] re-confirm SRS + screen-specs (đã chốt STEP 5)     │
+│ [ ] §13 Acceptance/UAT scenarios runnable               │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">BE</span> · API contract feasible ──────────────────────────╮
+│ [ ] Mỗi ENDPOINT có request/response schema rõ          │
+│ [ ] Error codes consistent (HTTP + business error)      │
+│ [ ] Auth: bearer / cookie / API key xác định            │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">FE</span> · screen-spec build-able ──────────────────────────╮
+│ [ ] Mỗi screen-spec có mock + component breakdown       │
+│ [ ] State machine đầy đủ                                │
+│ [ ] Design tokens link đến design-guidelines.md         │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">DBA</span> · ERD &amp; data model ────────────────────────────╮
+│ [ ] PK / FK / index hợp lý                              │
+│ [ ] Normal form 3NF (trừ deliberate denormalize có ADR) │
+│ [ ] Soft delete / audit fields có policy                │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tflag">Architect</span> · system architecture ────────────────────╮
+│ [ ] arc42 8 sections đầy đủ                             │
+│ [ ] Component diagram khớp với code structure dự kiến   │
+│ [ ] Cross-cutting concerns (logging, auth, observability)│
+│ [ ] ADRs đầy đủ cho key decisions                       │
+╰─────────────────────────────────────────────────────────╯
+
+<span class="label output">▼ Feedback loop</span>
+  Mỗi role raise 1-3 feedback → bạn viết plan.md cho từng cái
+  → <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span> apply lần lượt
+  → diff engine preserve BrSE/PM manual edits từ STEP 5
+
+🔁 Re-loop tới khi tất cả lane OK → ✅ <span class="tflag">Bộ docs greenfield ready</span>
+
+<span class="tok-ok">✓</span> Sẵn sàng start implementation:
+   1) <span class="tcmd">/morkit:propose</span> <span class="tstr">"feature-X"</span>        — create morkit change
+   2) review-checklist gate
+   3) <span class="tcmd">/morkit:executing-plans</span> feature-X — TDD-driven implement
+   4) <span class="tcmd">/morkit:update-doc</span> <span class="tflag">--from-plan</span>    — keep docs in sync
+
+<span class="tcom"># Greenfield 2-3 ngày realtime nhưng tiết kiệm cả tháng rework
+# nếu skip docs đi thẳng vào code.</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ──────────── USE CASE 3 — FEATURE ──────────── -->
+      <section id="uc3" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Feature mới hoàn toàn — kích hoạt TipTap editor</h2>
+          <p>
+            Bootstrap đã port design tokens và sample journal read-only. Change này wire
+            TipTap thật: typing, slash menu logic, drag-handle decoration, mention +
+            page-link nodes, code-block lowlight. Atom = BLOCK với UUID v4.
+          </p>
+          <div class="meta">
+            <span class="chip accent">PR #1</span>
+            <span class="chip">13 commits</span>
+            <span class="chip">38/38 tests ✓</span>
+            <span class="chip">build ✓ 229 kB</span>
+            <span class="chip muted">~25 phút realtime · ~150k tokens</span>
+          </div>
+        </div>
+
+        <!-- Phase 0 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 0</span> Khám phá repo
+            <span class="phase-desc">— hiểu trạng thái 3 nhánh, đề xuất hướng đi</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · ~/Documents/work/Notion-clone</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:brainstorming</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:brainstorming</span> <span class="tstr">tìm hiểu giúp tôi repo Notion-clone bao gồm các nhánh của nó</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT</span>
+Đang ở <span class="tflag">explore mode</span> — đọc repo, không implement.
+
+  <span class="tcom">// branches discovered</span>
+  origin/brainstorming  4e5c629   <span class="tcom">// 2 nhánh trỏ cùng commit</span>
+  origin/docs           4e5c629
+  origin/greenfield     67bae32 ← default, working line
+
+  <span class="tcom">// active morkit change</span>
+  bootstrap-mortion-v1  status: in-progress  tasks 0/64
+
+⚠ Tension #1 — code đã ship vượt scope của bootstrap (sidebar, command
+  palette, blocks renderer) nhưng tasks.md = 0 ticked.
+⚠ Tension #2 — review-checklist gate vẫn = PENDING dù code đã land.
+
+→ Đề xuất: tách <span class="tflag">editor-wire-v1</span> change để wire TipTap thật trước khi persistence.
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 1 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 1</span> Sinh morkit artifacts
+            <span class="phase-desc">— proposal · design · tasks · checklist · spec</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:propose</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:propose</span> <span class="tstr">"editor-wire-v1: TipTap live editing with block UUIDs,
+  slash menu trigger, drag-handle, in-memory only"</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT</span>
+[<span class="tflag">Context7</span>] Verifying TipTap 3.22 API surface...                    <span class="tok-ok">OK</span>
+[<span class="tflag">Context7</span>] Verifying lowlight v3 + extension-code-block-lowlight... <span class="tok-ok">OK</span>
+[<span class="tflag">Context7</span>] tiptap drag-handle peer deps audit...                    <span class="tok-warn">heavy</span>
+
+Đã tạo:
+  <span class="tflag">morkit/output/spec/editor-wire-v1/</span>
+    ├── proposal.md          (40 dòng)
+    ├── design.md            (126 dòng — có ## Tech Stack section)
+    ├── tasks.md             (173 dòng — Superpowers header + 11 task groups)
+    ├── review-checklist.md  (FE-Feature variant, 126 dòng)
+    └── specs/editor/spec.md (123 dòng — 8 Requirements, 17 Scenarios)
+
+🚦 <span class="tok-warn">GATE</span>: review-checklist.md có "<span class="tok-warn">Overall Decision: PENDING</span>".
+   Hãy đọc + tick các mục, đặt OK trước khi /morkit:executing-plans.
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2 — Gate -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 2</span> 🚦 Human review gate
+            <span class="phase-desc">— người ký, agent KHÔNG được đặt OK thay</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">morkit/output/spec/editor-wire-v1/review-checklist.md</span>
+            </div>
+            <div class="term-body">
+<span class="label gate">▼ HUMAN GATE</span><span class="skill-chip gate">plan-review-gate</span>
+
+<span class="tcom"># Plan Review Checklist — `editor-wire-v1`</span>
+- [<span class="tok-ok">x</span>] Plan có nêu rõ mục tiêu (SMART)
+- [<span class="tok-ok">x</span>] IN/OUT scope rõ ràng
+- [<span class="tok-ok">x</span>] TDD task structure (5-step cycle)
+- [<span class="tok-ok">x</span>] Component tree liệt kê file path
+- [ ] UI states default/loading/empty/error/disabled    <span class="tok-warn">← gap (defer)</span>
+- [ ] ARIA labels cho drag handle, slash menu           <span class="tok-warn">← gap (defer)</span>
+...
+- Quyết định: <span class="tok-ok">OK</span> — 4 minors accepted as v1 trade-off.
+
+```
+<span class="tok-ok">Overall Decision: OK</span>
+```
+<span class="tcom">> signed: duongmh @ 2026-05-10</span>
+<span class="tcom">> PreToolUse hook giờ đã cho phép /morkit:executing-plans, /morkit:subagent-driven-development, …</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 3</span> Thực thi 11 task groups (TDD strict)
+            <span class="phase-desc">— mỗi group: read → red → green → verify → commit</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · feature/editor-wire-v1</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:executing-plans</span><span class="skill-chip">test-driven-development</span>
+<span class="tprompt">$</span> <span class="tcmd">git checkout -b feature/editor-wire-v1</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:executing-plans</span> <span class="tstr">morkit/output/spec/editor-wire-v1/tasks.md</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT (rút gọn — 11 groups)</span>
+▶ <span class="tflag">Group 1/11</span> — Vitest + RTL setup
+  RED:   tests/sanity.test.ts             <span class="tok-bad">FAIL</span> (no config)
+  GREEN: vitest.config.ts                 <span class="tok-ok">PASS</span> 2/2
+  ✓ commit <span class="tok-ok">af7dae3</span> chore(test): set up Vitest + Testing Library
+
+▶ <span class="tflag">Group 2/11</span> — UUID utility
+  RED:   tests/lib/uuid.test.ts           <span class="tok-bad">FAIL</span> (regex unmet)
+  GREEN: lib/uuid.ts (Web Crypto)         <span class="tok-ok">PASS</span> 4/4
+  ✓ commit <span class="tok-ok">c814ed4</span> feat(lib): add uuid() generator
+
+▶ <span class="tflag">Group 3/11</span> — BlockUuid extension
+  RED:   block-uuid.test.ts               <span class="tok-bad">FAIL</span> (id null)
+  <span class="tcom">// debug: appendTransaction không fire ở initial content load</span>
+  <span class="tcom">// fix: parseHTML default uuid() khi missing data-id</span>
+  GREEN: components/editor/extensions/block-uuid.ts  <span class="tok-ok">PASS</span> 8/8
+  ✓ commit <span class="tok-ok">59dab16</span> feat(editor): add BlockUuid extension
+
+▶ Group  4/11 → <span class="tok-ok">53b15fb</span> feat(editor): replace Blocks with live Editor
+▶ Group  5/11 → <span class="tok-ok">ee2d59d</span> feat(editor): wire slash menu via @tiptap/suggestion
+▶ Group  6/11 → <span class="tok-ok">814eace</span> feat(editor): drag-handle decoration (DnD UX deferred)
+▶ Group  7/11 → <span class="tok-ok">7b91250</span> feat(editor): Mention (@) + PageLink ([[) nodes
+▶ Group  8/11 → <span class="tok-ok">1db79dd</span> feat(editor): code block + lowlight
+▶ Group  9/11 → <span class="tok-ok">bff55f3</span> test(editor): keyboard passthrough (⌘K, ⌘⇧L…)
+▶ Group 10/11 → <span class="tok-ok">1676421</span> docs(readme): Status v0 → v1
+▶ Group 11/11 — E2E verify
+
+  <span class="tprompt">$</span> <span class="tcmd">npm run lint &amp;&amp; npm run typecheck &amp;&amp; npm test &amp;&amp; npm run build</span>
+  ✔ No ESLint warnings or errors
+  ✔ tsc --noEmit clean
+  ✔ Test Files  9 passed (9) · Tests  <span class="tok-ok">34 passed (34)</span>
+  ✔ Build       <span class="tok-ok">✓ Compiled successfully</span> · /  229 kB · 332 kB FLJ
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 4</span> Self-review (deep-review trên local
+            diff)
+            <span class="phase-desc">— 5 subagent song song trước khi push</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · /morkit:deep-review --diff</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:deep-review</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:deep-review</span> <span class="tflag">--diff</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT</span>
+[<span class="tflag">deep-review</span>] Building call graph (uvx code-review-graph)...
+[<span class="tflag">deep-review</span>] Spawning 5 subagents in parallel...
+  <span class="tok-com">• risk · security · pattern · tests · convention</span>
+
+╭─ <span class="tok-bad">Risk</span> ────────────────────────────────────────────╮
+│ <span class="tok-warn">MAJOR</span>  .claude-flow/data/pending-insights.jsonl       │
+│         tooling telemetry leaked (44 lines)             │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tok-bad">Security</span> ────────────────────────────────────────╮
+│ <span class="tok-warn">MAJOR</span>  blocks-to-html.ts:38 — data-id raw interp.  │
+│ <span class="tok-warn">MAJOR</span>  npm audit: 1 HIGH (6 moderate)              │
+╰─────────────────────────────────────────────────────────╯
+╭─ <span class="tok-warn">Pattern</span>     3 Minor (naming, render() trap, classNames) ╮
+╭─ <span class="tok-warn">Tests</span>       1 Major (no XSS test for Block.text)        ╮
+╭─ <span class="tok-ok">Convention</span>  ✓ clean                                       ╮
+
+Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-com">7 Minor</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 5 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 5</span> Push + mở PR
+            <span class="phase-desc">— stop sau PR để human review</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">git + gh CLI</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span>
+<span class="tprompt">$</span> <span class="tcmd">git push -u origin feature/editor-wire-v1</span>
+<span class="tprompt">$</span> <span class="tcmd">gh pr create --base greenfield --title</span> <span class="tstr">"feat: wire TipTap editor (editor-wire-v1)"</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT</span>
+<span class="tok-add">+</span> [new branch]      feature/editor-wire-v1 → feature/editor-wire-v1
+<span class="tok-ok">https://github.com/mor-nhatlq/Notion-clone/pull/1</span>
+
+<span class="tcom"># 35 files · +4806/−1104 (incl. lock)
+# 13 commits, conventional, no Co-Authored-By</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────── USE CASE 4 — BUG FIX ──────────── -->
+      <section id="uc4" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Bug fix — Unicode normalize trong CommandPalette</h2>
+          <p>
+            Bug nhỏ thực sự (≤2 file): cmdk default filter không normalize
+            Unicode. Tiếng Việt có dấu ở 2 form (NFC <code class="mono">â</code> vs NFD
+            <code class="mono">a + ◌̂</code>) sẽ silent miss khi data và input form
+            khác nhau. Theo CLAUDE.md project: NO swarm cho 1-2 line fix → pipeline
+            rút gọn không qua /morkit:propose.
+          </p>
+          <div class="meta">
+            <span class="chip accent">PR #2</span>
+            <span class="chip">2 commits</span>
+            <span class="chip">build ✓</span>
+            <span class="chip muted">~3 phút realtime</span>
+          </div>
+        </div>
+
+        <!-- Phase 0 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 0</span> systematic-debugging
+            <span class="phase-desc">— ép quy trình 5 bước, xác định root cause</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · greenfield</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:systematic-debugging</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:systematic-debugging</span> <span class="tstr">"CommandPalette không match
+  item có dấu khi user gõ form khác"</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT (5 bước)</span>
+📋 <span class="tflag">1. Reproduce minimal</span>
+   ✓ ⌘K → gõ "Phân" (NFD via Unikey) → expected "Phân tích"
+     actual: empty list
+
+📊 <span class="tflag">2. Quan sát thực tế vs mong đợi</span>
+   - cmdk default filter: chuỗi.toLowerCase().includes(query)
+   - Tiếng Việt 2 form: NFC (U+00E2) vs NFD (U+0061 U+0302)
+   - .includes() so sánh bytes → mismatch khi form khác
+
+🌳 <span class="tflag">3. Hypothesis tree</span>
+   H1 — Unicode normalization mismatch (NFC vs NFD)         ✓ likely
+   H2 — components/cmd/command-palette.tsx override filter
+   H3 — COMMANDS data có NBSP / combining mark
+
+🔬 <span class="tflag">4. Falsify</span>
+   <span class="tprompt">&gt;&gt;</span> <span class="tcmd">JSON.stringify("Phân")</span>  → "Phân"
+   <span class="tprompt">&gt;&gt;</span> <span class="tcmd">JSON.stringify("Phân")</span> → "Phân"
+   <span class="tok-ok">✓ Confirmed H1</span> — H2/H3 skip
+
+📍 <span class="tflag">5. Root cause</span>
+   <span class="filebox">📄 <span class="fname">components/cmd/command-palette.tsx</span> (line ~57)
+       Filter prop chưa normalize Unicode. cmdk dùng raw compare.</span>
+
+💡 Fix: thêm filter custom dùng String.prototype.normalize('NFC')
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 1 — branch + fix -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 1</span> Branch riêng + fix tay
+            <span class="phase-desc">— 2 file, không qua /morkit:propose</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · fix/cmdk-unicode-normalize</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span>
+<span class="tprompt">$</span> <span class="tcmd">git checkout greenfield &amp;&amp; git checkout -b fix/cmdk-unicode-normalize</span>
+<span class="tprompt">$</span> <span class="tcom"># Edit components/cmd/command-palette.tsx</span>
+<hr class="sep"/>
+<span class="label output">▼ DIFF</span>
+<span class="tok-add">+ /**</span>
+<span class="tok-add">+  * Normalize a string for fuzzy substring matching that's robust to:</span>
+<span class="tok-add">+  * - Unicode form differences (NFC precomposed â vs NFD a + combining ◌̂)</span>
+<span class="tok-add">+  * - Case differences (English ASCII fold).</span>
+<span class="tok-add">+  */</span>
+<span class="tok-add">+ function normalizeForSearch(value: string): string {</span>
+<span class="tok-add">+   return value.normalize("NFC").toLowerCase()</span>
+<span class="tok-add">+ }</span>
+
+      <span class="tcmd">&lt;Command</span>
+        <span class="tcmd">onKeyDown=&#123;(e) =&gt; { if (e.key === "Tab") e.preventDefault() &#125;&#125;</span>
+<span class="tok-add">+       filter={(value, search) =&gt; {</span>
+<span class="tok-add">+         const v = normalizeForSearch(value)</span>
+<span class="tok-add">+         const s = normalizeForSearch(search)</span>
+<span class="tok-add">+         return v.includes(s) ? 1 : 0</span>
+<span class="tok-add">+       }}</span>
+      <span class="tcmd">&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2 verify -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 2</span> Verify
+            <span class="phase-desc">— greenfield chưa có vitest baseline</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">npm</span>
+            </div>
+            <div class="term-body">
+<span class="tprompt">$</span> <span class="tcmd">npm run lint &amp;&amp; npm run typecheck &amp;&amp; npm run build</span>
+
+<span class="tok-ok">✔ No ESLint warnings or errors</span>
+<span class="tok-ok">✔ tsc --noEmit clean</span>
+<span class="tok-ok">✔ Compiled successfully · / route 159 kB</span>
+
+<span class="tcom"># Tests cho normalizeForSearch sẽ thêm sau khi PR #1 merge
+# (vitest baseline có trên feature/editor-wire-v1, chưa lan tới greenfield)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 3 — push -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 3</span> Push + PR #2
+            <span class="phase-desc">— bonus chore: .claude-flow/ vào gitignore</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">git + gh</span>
+            </div>
+            <div class="term-body">
+<span class="tprompt">$</span> <span class="tcmd">git add -A &amp;&amp; git commit -m</span> <span class="tstr">"fix(cmd): normalize Unicode (NFC) before
+  command palette filter"</span>
+<span class="tprompt">$</span> <span class="tcmd">git commit -m</span> <span class="tstr">"chore(gitignore): add .claude-flow/ + untrack telemetry"</span>
+<span class="tprompt">$</span> <span class="tcmd">git push -u origin fix/cmdk-unicode-normalize</span>
+<span class="tprompt">$</span> <span class="tcmd">gh pr create --base greenfield</span>
+
+<span class="tok-ok">https://github.com/mor-nhatlq/Notion-clone/pull/2</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────── USE CASE 5 — REVIEW ──────────── -->
+      <section id="uc5" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Code review — /morkit:deep-review &lt;PR#&gt;</h2>
+          <p>
+            Plugin <code class="mono">deep-review</code> spawn 5 specialist subagent
+            song song (risk · security · pattern · tests · convention) trên diff. Đọc
+            CLAUDE.md ưu tiên cao nhất. Output là bảng findings có
+            file:line cụ thể, severity-ranked, kết luận Approve / Request changes.
+          </p>
+          <div class="meta">
+            <span class="chip accent">comment trên PR #1 + #2</span>
+            <span class="chip">5 subagent song song</span>
+            <span class="chip">code-review-graph MCP</span>
+            <span class="chip muted">không thay thế plan-review-gate</span>
+          </div>
+        </div>
+
+        <!-- Phase 0 — checkout + invoke -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 0</span> Checkout + invoke deep-review
+            <span class="phase-desc">— hoặc /morkit:deep-review --diff trên local</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span><span class="skill-chip">/morkit:deep-review</span>
+<span class="tprompt">$</span> <span class="tcmd">gh pr checkout 1</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:deep-review</span> <span class="tnum">1</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT</span>
+[<span class="tflag">deep-review</span>] Fetching PR 1 metadata + diff...
+[<span class="tflag">deep-review</span>] PR diff: 35 files, +4806 −1104
+[<span class="tflag">deep-review</span>] Building call graph (uvx code-review-graph)...
+[<span class="tflag">deep-review</span>] Reading <span class="tcmd">CLAUDE.md</span> as highest-priority context...
+[<span class="tflag">deep-review</span>] Spawning <span class="tok-warn">5 subagents</span> in parallel:
+
+  ▸ risk         (blast radius, breakage)
+  ▸ security     (XSS, secrets, audit)
+  ▸ pattern      (naming, conventions, structure)
+  ▸ tests        (coverage, edge cases)
+  ▸ convention   (lint, format, project rules)
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 1 — render report -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 1</span> Render 5-section report
+            <span class="phase-desc">— severity-ranked findings có file:line</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">deep-review report · PR #1</span>
+            </div>
+            <div class="term-body">
+╭─ 🔴 <span class="tok-bad">Risk</span> ─────────────────────────────────────────────────╮
+│ <span class="tok-warn">MAJOR</span> .claude-flow/data/pending-insights.jsonl              │
+│       Tooling telemetry leaked into PR (44 lines).         │
+│       <span class="tok-ok">→ Fix:</span> add .claude-flow/ to .gitignore + git rm cached │
+│ <span class="tok-com">MINOR</span> components/editor/slash-menu.tsx (orphan UI shell)    │
+╰────────────────────────────────────────────────────────────╯
+
+╭─ 🟠 <span class="tok-bad">Security</span> ─────────────────────────────────────────────╮
+│ <span class="tok-warn">MAJOR</span> blocks-to-html.ts:38 — data-id="${b.id}"            │
+│       Latent XSS once persistence-v1 lands.                 │
+│       <span class="tok-ok">→ Fix:</span> escapeHtml(b.id) before interpolation         │
+│ <span class="tok-warn">MAJOR</span> npm audit: 1 HIGH (6 moderate)                       │
+│   <span class="tok-ok">OK</span> Link.configure protocols whitelist + rel noopener      │
+│   <span class="tok-ok">OK</span> No dangerouslySetInnerHTML in our code                  │
+╰────────────────────────────────────────────────────────────╯
+
+╭─ 🟡 <span class="tok-warn">Pattern</span> ──────────────────────────────────────────────╮
+│ <span class="tok-com">MINOR</span> naming inconsistency: BlockUuid / DragHandle (no Node)│
+│       vs MentionNode / PageLinkNode (with Node)             │
+│ <span class="tok-com">MINOR</span> Suggestion render() returns no-op handles ("looks done")│
+│ <span class="tok-com">MINOR</span> editor.tsx 150-char Tailwind className chain          │
+│   <span class="tok-ok">OK</span> ensureIds() helper extracted, single source            │
+╰────────────────────────────────────────────────────────────╯
+
+╭─ 🟢 <span class="tok-warn">Tests</span> ────────────────────────────────────────────────╮
+│ <span class="tok-warn">MAJOR</span> No XSS test for blocksToHtml(Block.text)              │
+│       Add: expect(...).not.toContain('&lt;script&gt;')             │
+│   <span class="tok-ok">OK</span> 34/34 pass · uuid 1000-uniqueness · BlockUuid          │
+│   <span class="tok-ok">OK</span> keyboard-passthrough parametric (4 combos)             │
+╰────────────────────────────────────────────────────────────╯
+
+╭─ ⚪ <span class="tok-ok">Convention</span> ─────────────────────────────────────────────╮
+│   <span class="tok-ok">OK</span> No semis, double quotes per .prettierrc                │
+│   <span class="tok-ok">OK</span> Conventional Commits, no Co-Authored-By                │
+│   <span class="tok-ok">OK</span> JSDoc on every extension explaining intent             │
+│   <span class="tok-ok">OK</span> TS strict, no any, noUncheckedIndexedAccess            │
+╰────────────────────────────────────────────────────────────╯
+
+  <span class="tflag">Summary</span>: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-com">7 Minor</span>
+  <span class="tflag">Recommendation</span>: <span class="tok-warn">Request changes</span> — fix .claude-flow leak +
+                  data-id escape (5+5 phút) trước merge.
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2 — loop khép kín -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 2</span> Khép vòng lặp với fix commit
+            <span class="phase-desc">— review feedback → fix → re-review</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">cycle</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT (after review feedback)</span>
+<span class="tprompt">$</span> <span class="tcom"># RED test cho XSS contract</span>
+<span class="tprompt">$</span> <span class="tcmd">npm test tests/editor/blocks-to-html.test.ts</span>  <span class="tok-bad">2 fail</span>
+<span class="tprompt">$</span> <span class="tcom"># GREEN: escapeHtml(b.id) + escape full text trước replace markup</span>
+<span class="tprompt">$</span> <span class="tcmd">npm test</span>                                       <span class="tok-ok">38/38 pass</span>
+<span class="tprompt">$</span> <span class="tcmd">git commit -m</span> <span class="tstr">"fix(editor): escape data-id and Block.text (XSS hardening)"</span>
+<span class="tprompt">$</span> <span class="tcmd">git push</span>
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT (PR #1 updated)</span>
+   1676421..3e694c9  feature/editor-wire-v1 → feature/editor-wire-v1
+<span class="tcom"># 2/4 Major resolved trong cùng PR.
+# 7 Minor + 2 Major còn lại defer sang editor-polish-v1.</span>
+
+<span class="tflag">Pipeline khép vòng</span>:
+  Use case 2 (feature) ─▶ PR #1
+                            │
+              <span class="tcom">Use case 4 review</span>
+                            ▼
+              <span class="tcom">findings posted</span>
+                            │
+              ────────────────────────
+              ▼
+       <span class="tcom">Use case 3-style fix on same PR</span>
+                            ▼
+              <span class="tok-ok">PR #1 updated</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────── USE CASE 6 — FIGMA → CODE (MCP) ──────────── -->
+      <section id="uc6" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Figma → code — 4 bước MCP chuẩn</h2>
+          <p>
+            Có Figma URL (hoặc đang chọn node trên Figma desktop), muốn dựng thành code
+            khớp 1:1 với design. <strong>Figma chỉ để LẤY design</strong>: skill
+            <code>figma-implement-design</code> + Figma MCP chạy 4 lệnh theo thứ tự cố
+            định, thu hẹp dần (ảnh → cấu trúc node → ngữ cảnh chi tiết → token biến) để
+            trích xuất design-as-code + token. <strong>Phần BUILD bàn giao sang
+            morkit</strong> — plan · TDD · verify theo convention dự án.
+          </p>
+          <div class="meta">
+            <span class="chip accent">figma-implement-design</span>
+            <span class="chip">Figma MCP</span>
+            <span class="chip">1:1 fidelity</span>
+            <span class="chip muted">screenshot → metadata → context → variables</span>
+          </div>
+        </div>
+
+        <!-- Phase 0 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 0</span> Lấy node-id
+            <span class="phase-desc">— parse từ URL hoặc lấy selection trên Figma desktop</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code · figma</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span><span class="skill-chip">figma-implement-design</span>
+<span class="tprompt">$</span> <span class="tcom"># User dán Figma URL</span>
+<span class="tstr">https://figma.com/design/kL9xQn2VwM8/DesignSystem?node-id=42-15</span>
+<hr class="sep"/>
+<span class="label output">▼ PARSE</span>
+   fileKey = <span class="tok-ok">kL9xQn2VwM8</span>      <span class="tcom"># segment sau /design/</span>
+   nodeId  = <span class="tok-ok">42-15</span>            <span class="tcom"># query param node-id</span>
+
+<span class="tcom"># Hoặc dùng figma-desktop MCP: chọn node trong app → khỏi cần URL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 1 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 1</span> get_screenshot
+            <span class="phase-desc">— ảnh chuẩn thị giác, giữ xuyên suốt để validate cuối</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">figma-mcp</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ CALL</span><span class="skill-chip">figma-implement-design</span>
+<span class="tprompt">&gt;&gt;</span> <span class="tcmd">get_screenshot</span>(fileKey=<span class="tstr">"kL9xQn2VwM8"</span>, nodeId=<span class="tstr">"42-15"</span>)
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT</span>
+   <span class="tok-ok">✓ PNG</span> render của frame → mỏ neo thị giác (source of truth)
+   <span class="tcom"># Mọi bước sau đối chiếu lại ảnh này, không để code trôi khỏi design</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 2</span> get_metadata
+            <span class="phase-desc">— bản đồ node cấp cao, chọn child cần lấy chi tiết</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">figma-mcp</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ CALL</span><span class="skill-chip">figma-implement-design</span>
+<span class="tprompt">&gt;&gt;</span> <span class="tcmd">get_metadata</span>(fileKey=<span class="tstr">"kL9xQn2VwM8"</span>, nodeId=<span class="tstr">"42-15"</span>)
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT (cây node)</span>
+   📦 42-15  Card/Pricing            <span class="tflag">FRAME</span>
+   ├─ 42-16  Header                  TEXT
+   ├─ 42-20  PriceRow                AUTO-LAYOUT
+   └─ 42-31  CTAButton               INSTANCE → Button
+
+<span class="tcom"># Payload quá to / bị truncate? → dùng metadata chọn đúng child,
+# rồi gọi get_design_context riêng cho từng node con (vd 42-31)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 3</span> get_design_context
+            <span class="phase-desc">— layout / typography / component (trả React + Tailwind)</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">figma-mcp</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ CALL</span><span class="skill-chip">figma-implement-design</span>
+<span class="tprompt">&gt;&gt;</span> <span class="tcmd">get_design_context</span>(fileKey=<span class="tstr">"kL9xQn2VwM8"</span>, nodeId=<span class="tstr">"42-15"</span>)
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT</span>
+   - Auto Layout: vertical, gap 16, padding 24
+   - Typography: Inter 14/20, weight 600
+   - Fills: token <span class="tok-ok">surface/card</span>, border <span class="tok-ok">border/subtle</span>
+   - Trả mẫu code <span class="tflag">React + Tailwind</span> — coi như mô tả design, KHÔNG phải code cuối
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 4</span> get_variable_defs
+            <span class="phase-desc">— token màu / spacing / font → map sang design system dự án</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">figma-mcp</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ CALL</span><span class="skill-chip">figma-implement-design</span>
+<span class="tprompt">&gt;&gt;</span> <span class="tcmd">get_variable_defs</span>(fileKey=<span class="tstr">"kL9xQn2VwM8"</span>, nodeId=<span class="tstr">"42-15"</span>)
+<hr class="sep"/>
+<span class="label output">▼ OUTPUT (biến Figma → token dự án)</span>
+   surface/card     #FFFFFF   →  <span class="tok-ok">--color-surface-card</span>
+   border/subtle    #E5E7EB   →  <span class="tok-ok">--color-border-subtle</span>
+   space/4          16px      →  <span class="tok-ok">--space-4</span>
+
+<span class="tcom"># Ưu tiên token design system dự án thay vì hardcode giá trị từ Figma</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 5 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 5</span> Bàn giao sang morkit — dựng + validate 1:1
+            <span class="phase-desc">— design-as-code của Figma chỉ là nháp; morkit dựng đúng convention rồi verify</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ HANDOFF → morkit</span><span class="skill-chip">/morkit:writing-plans</span><span class="skill-chip">/morkit:test-driven-development</span><span class="skill-chip">/morkit:verification-before-completion</span>
+   Figma design-as-code = bản nháp / spec → morkit dựng đúng convention dự án
+<hr class="sep"/>
+<span class="label output">▼ CHECKLIST validate (so với ảnh PHASE 1)</span>
+   <span class="tok-ok">[✓]</span> Layout: spacing / căn lề / kích thước khớp
+   <span class="tok-ok">[✓]</span> Typography: font / size / weight / line-height khớp
+   <span class="tok-ok">[✓]</span> Màu: dùng token, không hardcode
+   <span class="tok-ok">[✓]</span> Reuse component design system thay vì tạo mới
+   <span class="tok-ok">[✓]</span> Asset lấy từ payload Figma (localhost src), không thêm icon package
+   <span class="tok-ok">[✓]</span> Trạng thái hover / active / disabled đúng design
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────── USE CASE 7 — FIGMA EXPORT HTML → MOCKUP ──────────── -->
+      <section id="uc7" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Figma export HTML → Claude đọc file → mockup UI</h2>
+          <p>
+            Không qua Figma MCP. Bạn (hoặc designer) tự dùng plugin export ngay trong
+            Figma — Dev Mode export, <code class="mono">html.to.design</code>, "Figma to
+            HTML"… — để xuất design ra file <code class="mono">.html</code> + thư mục
+            asset. Sau đó đưa file cho Claude đọc và dựng lại UI trong stack đích. Hợp khi
+            máy chưa nối được Figma MCP, hoặc design do bên thứ ba gửi sang dạng file.
+            <strong>Figma chỉ tạo design-as-HTML</strong>; phần dựng lại dùng skill
+            morkit (plan → build → verify).
+          </p>
+          <div class="meta">
+            <span class="chip accent">không cần MCP</span>
+            <span class="chip">file .html</span>
+            <span class="chip">mockup</span>
+            <span class="chip muted">export thủ công → Read → dựng lại</span>
+          </div>
+        </div>
+
+        <!-- Phase 0 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 0</span> Export trên Figma (thủ công)
+            <span class="phase-desc">— thao tác trong Figma, ngoài Claude</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">Figma · plugin export</span>
+            </div>
+            <div class="term-body">
+<span class="label output">▼ THAO TÁC TRONG FIGMA</span>
+   1. Chọn frame / page cần export
+   2. Chạy plugin export HTML (vd <span class="tok-ok">html.to.design</span> / Dev Mode)
+   3. Lưu kết quả ra ổ đĩa:
+      📄 <span class="fname">design-export/index.html</span>
+      📁 <span class="fname">design-export/assets/</span> (ảnh, font, svg)
+
+<span class="tcom"># Không dùng Figma MCP ở use case này — HTML là sản phẩm bạn tự xuất</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 1 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 1</span> Đưa file cho Claude
+            <span class="phase-desc">— Claude đọc thẳng file .html bằng Read</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code</span>
+            </div>
+            <div class="term-body">
+<span class="label input">▶ INPUT</span>
+<span class="tprompt">$</span> <span class="tcmd">Đọc design-export/index.html rồi dựng lại màn này bằng React + design system của dự án</span>
+<hr class="sep"/>
+<span class="label output">▼ CLAUDE</span>
+<span class="tprompt">&gt;&gt;</span> <span class="tcmd">Read</span>(<span class="tstr">"design-export/index.html"</span>)
+   <span class="tok-ok">✓</span> nạp ~640 dòng HTML + inline style
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 2</span> Phân tích cấu trúc từ HTML
+            <span class="phase-desc">— bóc layout / style / spacing từ markup export</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code</span>
+            </div>
+            <div class="term-body">
+<span class="label output">▼ BÓC TÁCH</span><span class="skill-chip">/morkit:writing-plans</span>
+   - Cấu trúc: header · hero · grid 3 card · footer
+   - Spacing: padding 24, gap 16 (đọc từ inline style)
+   - Màu: <span class="tok-ok">#0F172A</span> nền, <span class="tok-ok">#6366F1</span> accent
+   - Font: Inter 16/24; tiêu đề 28/36 weight 700
+   - Asset: ảnh trong <span class="fname">assets/</span> → map sang public/ của dự án
+
+<span class="tcom"># HTML export thường absolute-position + inline style → KHÔNG bê nguyên,
+# chỉ dùng làm spec để dựng lại bằng layout chuẩn của dự án</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="phase">
+          <h3 class="phase-title">
+            <span class="phase-num">PHASE 3</span> Mockup lại trong stack đích
+            <span class="phase-desc">— dựng component + token dự án, đối chiếu HTML gốc</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"
+                ><span class="light"></span><span class="light"></span
+                ><span class="light"></span
+              ></span>
+              <span class="term-title">claude-code</span>
+            </div>
+            <div class="term-body">
+<span class="label output">▼ DỰNG LẠI</span><span class="skill-chip">/morkit:executing-plans</span><span class="skill-chip">/morkit:verification-before-completion</span>
+<span class="tok-add">+ components/pricing/PricingSection.tsx</span>
+   - Layout bằng flex/grid chuẩn (bỏ absolute-position của export)
+   - Reuse <span class="tok-ok">&lt;Card/&gt;</span>, <span class="tok-ok">&lt;Button/&gt;</span> có sẵn thay vì div thuần
+   - Màu / spacing trỏ token design system, không hardcode
+
+<span class="label output">▼ VALIDATE</span>
+   <span class="tok-ok">[✓]</span> Mở cạnh nhau: HTML export vs component dựng lại → khớp bố cục
+   <span class="tok-ok">[✓]</span> Responsive theo breakpoint dự án (export thường fixed-width)
+   <span class="tok-ok">[✓]</span> (nếu còn nối Figma MCP) <span class="tcmd">get_screenshot</span> frame gốc → đối chiếu pixel
+   <span class="tok-ok">[✓]</span> npm run build · typecheck sạch
+            </div>
+          </div>
+        </div>
+      </section>
+
+        <div class="footer-v2">
+          <a href="index.html">← Docs hub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank" rel="noopener">README</a>
+          <span class="meta-tag">v2 layout · claudekit-style hub</span>
+        </div>
+
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        const ucLinks = document.querySelectorAll(".sidebar .uc-link");
+        const stepLinks = document.querySelectorAll(".sidebar .step-list a");
+        const panels = document.querySelectorAll(".panel");
+
+        function activate(targetUc) {
+          ucLinks.forEach((l) => {
+            l.classList.toggle("active", l.dataset.target === targetUc);
+          });
+          panels.forEach((p) => p.classList.toggle("active", p.id === targetUc));
+        }
+
+        // UC link click: switch panel, scroll to top
+        ucLinks.forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            activate(link.dataset.target);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            history.replaceState(null, "", "#" + link.dataset.target);
+          });
+        });
+
+        // Step link click: activate parent UC first, then scroll to step
+        stepLinks.forEach((a) => {
+          a.addEventListener("click", (e) => {
+            e.preventDefault();
+            const hash = a.getAttribute("href"); // #ucN-sN
+            const m = hash.match(/^#(uc\d)/);
+            if (!m) return;
+            activate(m[1]);
+            requestAnimationFrame(() => {
+              const t = document.querySelector(hash);
+              if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+            history.replaceState(null, "", hash);
+          });
+        });
+
+        // Init: read URL hash and activate matching UC
+        (function initFromHash() {
+          const hash = location.hash;
+          if (!hash) return;
+          const m = hash.match(/^#(uc\d)/);
+          if (!m) return;
+          activate(m[1]);
+          setTimeout(() => {
+            const t = document.querySelector(hash);
+            if (t) t.scrollIntoView({ block: "start" });
+          }, 50);
+        })();
+
+        // Theme toggle (preserve key for backward compat with original)
+        const themeBtn = document.getElementById("themeBtn");
+        const root = document.documentElement;
+        const KEY = "mortion.usecases.theme";
+        const stored = localStorage.getItem(KEY);
+        if (stored) root.setAttribute("data-theme", stored);
+        themeBtn?.addEventListener("click", () => {
+          const cur = root.getAttribute("data-theme") || "light";
+          const next = cur === "dark" ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem(KEY, next);
+        });
+
+        // Step active tracking via IntersectionObserver
+        if ("IntersectionObserver" in window) {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((e) => {
+                if (!e.isIntersecting) return;
+                const id = e.target.id;
+                stepLinks.forEach((a) => {
+                  a.classList.toggle("active", a.getAttribute("href") === "#" + id);
+                });
+              });
+            },
+            { rootMargin: "-100px 0px -65% 0px" }
+          );
+          document.querySelectorAll(".panel .phase[id]").forEach((el) => io.observe(el));
+        }
+      })();
+    </script>
+  </body>
+</html>
