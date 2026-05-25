@@ -8,7 +8,7 @@ node_modules/
 __pycache__/
 *.pyc
 .claude
-plans
+plans/templates
 CLAUDE.md
 release-manifest.json
 .repomixignore
