@@ -12,4 +12,4 @@ The skill generates/maintains a `docs/` documentation set optimized for AI agent
 - `update` — refresh existing docs against code changes
 - `summarize` — quick refresh of SOURCE-MAP + DOCUMENT-MAP
 
-Output goes to `docs/` at the target project root. Anchors (MAP files + cross-links + minimal front-matter) let agents load minimal context per task. No Python — fully LLM-driven.
+Output goes to `docs/` at the target project root. Anchors (MAP files + cross-links + minimal front-matter) let agents load minimal context per task. `init`/`update` also write a thin pointer block into the root `CLAUDE.md` (and `AGENTS.md` when Codex is detected) through an approve gate. No Python — fully LLM-driven.

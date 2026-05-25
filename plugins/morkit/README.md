@@ -105,7 +105,7 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 ### Documentation (writing-docs)
 | Command | Việc |
 |---|---|
-| `/morkit:docs [init\|update\|summarize]` | Sinh/cập nhật bộ tài liệu AI-optimized trong `docs/` (taxonomy 00-overview…90-operations + mỏ neo). LLM-driven, không Python |
+| `/morkit:docs [init\|update\|summarize]` | Sinh/cập nhật bộ tài liệu AI-optimized trong `docs/` (taxonomy 00-overview…90-operations + mỏ neo) + con trỏ `CLAUDE.md`/`AGENTS.md` ở root. LLM-driven, không Python |
 
 ## Plan review gate
 

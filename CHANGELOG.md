@@ -2,6 +2,21 @@
 
 All notable changes to the Mor claude-plugins marketplace are tracked here.
 
+## [morkit@1.4.0] — 2026-05-25
+
+**`writing-docs` now wires the docs graph into the harness.** `init`/`update` generate a thin pointer block in the root `CLAUDE.md` (and `AGENTS.md` when Codex is detected) so a cold-start agent is sent into `docs/`.
+
+### Added
+
+- **Agent-instructions output:** root `CLAUDE.md` / `AGENTS.md` get a marker-bounded pointer block (orientation + links to DOCUMENT-MAP / AI-CODING-GUIDE / INVARIANTS). The first skill output allowed outside `docs/`.
+- **Reference:** `references/agent-instructions.md` (block template, 3-state machine, Codex detection, approve gate).
+- **Flag:** `--agents` to force `AGENTS.md`.
+
+### Notes
+
+- Safety: the skill owns only the `<!-- morkit:docs:start --> … <!-- :end -->` block; content outside it is never touched. Every write goes through an approve gate (AskUserQuestion + Edit diff). No Python, no hash/merge-engine (KISS).
+- `CLAUDE.md` is always generated; `AGENTS.md` only when Codex is detected (existing `AGENTS.md` / `.codex/` / `--agents`).
+
 ## [morkit@1.3.0] — 2026-05-22
 
 **Added the `writing-docs` skill** (`/morkit:docs`) — generates an AI-agent-optimized project documentation set in `docs/`. LLM-driven (no Python), a KISS replacement for the removed docs-hero subsystem.

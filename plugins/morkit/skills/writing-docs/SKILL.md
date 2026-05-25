@@ -30,11 +30,13 @@ Parse the first word of the arguments:
 - `summarize` → load `references/summarize-workflow.md`
 - empty / unclear → AskUserQuestion (above)
 
-Flags: `[path]` target dir (default: cwd) · `--scope project|module` · `--yes` (skip the post-scout gate).
+Flags: `[path]` target dir (default: cwd) · `--scope project|module` · `--yes` (skip the post-scout gate) · `--agents` (also write `AGENTS.md`).
+
+`init` and `update` finish by generating/refreshing the root `CLAUDE.md` (+ `AGENTS.md` when Codex is detected) per `references/agent-instructions.md`.
 
 ## Shared Context
 
-Output lives in `docs/` at the **target project root** (NOT `morkit/output/` — these are project docs every agent and human looks for).
+Output lives in `docs/` at the **target project root** (NOT `morkit/output/` — these are project docs every agent and human looks for). **One exception:** the root agent-instruction files `CLAUDE.md` / `AGENTS.md` are written at the project (and per-module) root as a thin pointer into `docs/` — see `references/agent-instructions.md`.
 
 Taxonomy (core-6 always; create the rest only when scout finds the matching component):
 ```
@@ -57,5 +59,6 @@ Conventions (full detail: `references/taxonomy.md` + `references/anchor-conventi
 
 ## Constraints
 - LLM-driven only — no Python, no external CLI dependency. Keep morkit self-contained.
-- Generation order is ALWAYS **Scout → Content → MAP** (never write a MAP before its content exists).
+- Generation order is ALWAYS **Scout → Content → MAP → agent-instructions** (never write a MAP before its content exists; agent-instructions last because the pointer links to the MAP/guide it just produced).
 - Create a folder/file only when the project actually has the matching component (no empty folders).
+- All output stays in `docs/` EXCEPT `CLAUDE.md` / `AGENTS.md` at the root — those are written only through the marker-block + approve gate in `references/agent-instructions.md` (never touch content outside the marker block).

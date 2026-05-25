@@ -45,10 +45,19 @@ From the content written in Stage 3, generate the indexes so links resolve to re
 - `00-overview/DOCUMENT-MAP` (directory roles + read paths + canonical source rules)
 - `20-design/DESIGN-MAP`, `40-ai-coding/AI-CODING-GUIDE` (meta-index → links), README (root thin + per-folder)
 
+## Stage 4b — Generate Agent Instructions (AFTER anchors)
+
+Now that the MAP/guide files exist, write the root pointer per `references/agent-instructions.md`:
+- Build the **B-refined block**: orientation (1–2 sentences, sourced from the DOCUMENT-MAP/README opening line) + 3 task pointers (DOCUMENT-MAP, AI-CODING-GUIDE, INVARIANTS). Drop a pointer if its target was not generated.
+- Apply the state machine: `[A]` create / `[B]` append at end / `[C]` replace inside marker. Never touch content outside the marker block.
+- `CLAUDE.md` always; `AGENTS.md` only when Codex is detected (existing `AGENTS.md` / `.codex/` / `--agents`).
+- Approve gate per file (AskUserQuestion + Edit diff).
+- per-module scope: repeat for each module root, pointing to that module's docs.
+
 ## Stage 5 — Validate
 
 - Size: each file ~100 LOC; >800 → split.
-- Cross-links: every relative link resolves to an existing file (no broken links).
+- Cross-links: every relative link resolves to an existing file (no broken links). Include the `CLAUDE.md`/`AGENTS.md` pointer links.
 - Front-matter present where required (`source_files` on code-derived docs).
 - Traceability: FR/NFR/INV IDs consistent; TEST-MATRIX.Ref codes exist.
 - Output a short report: what was created, gaps, oversize files.
