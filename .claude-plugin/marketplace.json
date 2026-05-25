@@ -13,7 +13,7 @@
       "source": "./plugins/morkit",
       "category": "development",
       "author": { "name": "Mor" },
-      "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/morkit"
+      "homepage": "https://github.com/mor-duongmh/morkit-plugin/tree/main/plugins/morkit"
     }
   ]
 }

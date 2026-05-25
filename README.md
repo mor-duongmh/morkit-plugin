@@ -1,1 +1,1 @@
-Documentation: https://mor-duongmh.github.io/claude-plugins/
+Documentation: https://mor-duongmh.github.io/morkit-plugin/

@@ -7,8 +7,8 @@
     "email": "duong@mor.company",
     "url": "https://github.com/mor-duongmh"
   },
-  "homepage": "https://github.com/mor-duongmh/claude-plugins/tree/main/plugins/morkit",
-  "repository": "https://github.com/mor-duongmh/claude-plugins",
+  "homepage": "https://github.com/mor-duongmh/morkit-plugin/tree/main/plugins/morkit",
+  "repository": "https://github.com/mor-duongmh/morkit-plugin",
   "license": "MIT",
   "keywords": [
     "spec",
@@ -23,11 +23,11 @@
   "interface": {
     "displayName": "morkit (Codex)",
     "shortDescription": "Spec workflow + deep code review + AI-agent doc generation for Codex CLI",
-    "longDescription": "All-in-one Codex CLI toolkit, single-source with the Claude Code variant. Consolidates: spec workflow (propose/review/archive) + brainstorming/writing-plans/executing-plans/TDD/subagent-driven-development skills + 5-specialist parallel code review (deep-review, native multi_agent) + AI-agent documentation generation (writing-docs — docs/ taxonomy + AGENTS.md/CLAUDE.md pointer). Single /morkit:* namespace via AGENTS.md bridge. INSTALL: codex plugin marketplace add mor-duongmh/claude-plugins, then install plugin 'morkit'.",
+    "longDescription": "All-in-one Codex CLI toolkit, single-source with the Claude Code variant. Consolidates: spec workflow (propose/review/archive) + brainstorming/writing-plans/executing-plans/TDD/subagent-driven-development skills + 5-specialist parallel code review (deep-review, native multi_agent) + AI-agent documentation generation (writing-docs — docs/ taxonomy + AGENTS.md/CLAUDE.md pointer). Single /morkit:* namespace via AGENTS.md bridge. INSTALL: codex plugin marketplace add mor-duongmh/morkit-plugin, then install plugin 'morkit'.",
     "developerName": "Mor",
     "category": "Development",
     "capabilities": ["Interactive", "Write"],
-    "websiteURL": "https://mor-duongmh.github.io/claude-plugins/",
+    "websiteURL": "https://mor-duongmh.github.io/morkit-plugin/",
     "defaultPrompt": [
       "Bắt đầu propose spec change mới cho feature X",
       "Chạy deep-review cho diff hiện tại",

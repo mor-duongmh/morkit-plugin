@@ -22,7 +22,7 @@ Bản Codex chạy **advisory**: review gate, slash-command, subagent-dispatch l
 Nếu Codex CLI support `plugin marketplace`:
 
 ```bash
-codex plugin marketplace add mor-duongmh/claude-plugins
+codex plugin marketplace add mor-duongmh/morkit-plugin
 ```
 
 Codex đọc `.agents/plugins/marketplace.json` → plugin `morkit` (source `./plugins/morkit`) → auto-discover `skills/` + `hooks.json`.
@@ -38,7 +38,7 @@ codex plugin marketplace remove mor-duongmh
 ## Installation (script — mọi Codex ≥ 0.120.0)
 
 ```bash
-git clone https://github.com/mor-duongmh/claude-plugins.git ~/.codex/morkit-source
+git clone https://github.com/mor-duongmh/morkit-plugin.git ~/.codex/morkit-source
 bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh
 ```
 
@@ -56,7 +56,7 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/doctor-codex.sh
 
 1. **Clone:**
    ```bash
-   git clone https://github.com/mor-duongmh/claude-plugins.git ~/.codex/morkit-source
+   git clone https://github.com/mor-duongmh/morkit-plugin.git ~/.codex/morkit-source
    ```
 
 2. **Symlink skills:**

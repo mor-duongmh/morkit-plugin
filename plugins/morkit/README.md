@@ -7,7 +7,7 @@
 ### Claude Code
 
 ```
-/plugin add marketplace github:mor-duongmh/claude-plugins
+/plugin add marketplace github:mor-duongmh/morkit-plugin
 /plugin install morkit@mor-duongmh
 ```
 
@@ -18,7 +18,7 @@ Cài xong là dùng được — không cần setup gì thêm trong project.
 **Native plugin marketplace** (Codex CLI ≥ 0.131):
 
 ```bash
-codex plugin marketplace add mor-duongmh/claude-plugins
+codex plugin marketplace add mor-duongmh/morkit-plugin
 ```
 
 Codex sẽ list plugin `morkit`. **Codex users install `morkit`** — cùng một nguồn với Claude Code; skills giữ Claude vocab và được dịch lúc chạy qua `using-morkit/references/codex-tools.md`.
@@ -26,7 +26,7 @@ Codex sẽ list plugin `morkit`. **Codex users install `morkit`** — cùng mộ
 **Script install** (Codex < 0.131 hoặc fallback):
 
 ```bash
-git clone https://github.com/mor-duongmh/claude-plugins.git ~/.codex/morkit-source
+git clone https://github.com/mor-duongmh/morkit-plugin.git ~/.codex/morkit-source
 bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh
 ```
 
@@ -36,7 +36,7 @@ Verify: `bash ~/.codex/morkit-source/plugins/morkit/scripts/doctor-codex.sh`. Ch
 
 | Aspect | Claude Code | Codex CLI |
 |---|---|---|
-| Install | `/plugin install morkit@mor-duongmh` | `codex plugin marketplace add mor-duongmh/claude-plugins` → install **`morkit`** |
+| Install | `/plugin install morkit@mor-duongmh` | `codex plugin marketplace add mor-duongmh/morkit-plugin` → install **`morkit`** |
 | Plugin folder | `plugins/morkit/` | `plugins/morkit/` (**cùng nguồn**) |
 | Skills | `plugins/morkit/skills/` (Claude vocab) | `plugins/morkit/skills/` (symlink `~/.agents/skills/morkit`; dịch qua `codex-tools.md`) |
 | Commands | `plugins/morkit/commands/` | `plugins/morkit/commands/` (bridge qua AGENTS.md) |
