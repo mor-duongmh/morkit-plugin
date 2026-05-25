@@ -48,7 +48,7 @@ The skill knows these but does NOT scaffold them by default.
 
 ## Scale: project-level vs per-module
 
-The reference example (`example/mail-history-admin/`) is **module-scoped**. The skill supports both:
+The reference example (`references/example/mail-history-admin/`) is **module-scoped**. The skill supports both:
 
 - **project-level** — one taxonomy under `docs/`. Each module/feature is a `*-SYS-SPEC` in `20-design/10-features/`.
 - **per-module** — each module gets its own taxonomy (e.g. `docs/m/<module>/00-overview/…`). Fits monorepos / large multi-module apps.
