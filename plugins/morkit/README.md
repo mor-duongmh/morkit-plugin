@@ -1,13 +1,13 @@
 # morkit — Mor's all-in-one toolkit (Claude Code + Codex)
 
-> Một plugin, một namespace `/morkit:*` — từ brainstorm đến code review, từ scaffold đến doc generation. Hỗ trợ **Claude Code** (native plugin) và **OpenAI Codex CLI** (qua skill discovery + AGENTS.md bridge).
+> Một plugin, một namespace `/morkit:*` — từ spec & brainstorm đến execute và code review.
 
 ## Cài đặt
 
 ### Claude Code
 
 ```
-/plugin add marketplace github:mor-duongmh/claude-plugins
+/plugin add marketplace github:mor-duongmh/morkit-plugin
 /plugin install morkit@mor-duongmh
 ```
 
@@ -18,39 +18,42 @@ Cài xong là dùng được — không cần setup gì thêm trong project.
 **Native plugin marketplace** (Codex CLI ≥ 0.131):
 
 ```bash
-codex plugin marketplace add mor-duongmh/claude-plugins
+codex plugin marketplace add mor-duongmh/morkit-plugin
 ```
 
-Codex sẽ list 2 plugins: `morkit` (Claude Code variant) và `morkit-codex` (Codex variant). **Codex users install `morkit-codex`** (skills + vocab Codex-friendly, hooks gate dùng matcher `apply_patch|Edit|Write`).
+Codex sẽ list plugin `morkit`. **Codex users install `morkit`** — cùng một nguồn với Claude Code; skills giữ Claude vocab và được dịch lúc chạy qua `using-morkit/references/codex-tools.md`.
 
 **Script install** (Codex < 0.131 hoặc fallback):
 
 ```bash
-git clone https://github.com/mor-duongmh/claude-plugins.git ~/.codex/morkit-source
-bash ~/.codex/morkit-source/plugins/morkit-codex/scripts/install-codex.sh
+git clone https://github.com/mor-duongmh/morkit-plugin.git ~/.codex/morkit-source
+bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh
 ```
 
-Verify: `bash ~/.codex/morkit-source/plugins/morkit-codex/scripts/doctor-codex.sh`. Chi tiết: [plugins/morkit-codex/.codex/INSTALL.md](../morkit-codex/.codex/INSTALL.md).
+Verify: `bash ~/.codex/morkit-source/plugins/morkit/scripts/doctor-codex.sh`. Chi tiết: [plugins/morkit/.codex/INSTALL.md](.codex/INSTALL.md).
 
 ## Claude Code vs Codex CLI
 
 | Aspect | Claude Code | Codex CLI |
 |---|---|---|
-| Install | `/plugin install morkit@mor-duongmh` | `codex plugin marketplace add mor-duongmh/claude-plugins` → install **`morkit-codex`** |
-| Plugin folder | `plugins/morkit/` | `plugins/morkit-codex/` (**tách riêng**, không phải sub-folder) |
-| Skills | `plugins/morkit/skills/` (Claude vocab) | `plugins/morkit-codex/skills/` (vocab-translated) |
-| Commands | `plugins/morkit/commands/` | `plugins/morkit-codex/commands/` (suffix-stripped) |
-| Hooks | `plugins/morkit/hooks/hooks.json` | `plugins/morkit-codex/hooks/hooks.json` (multi-tool gate matcher) |
-| Slash | Native `/morkit:X` | `$morkit:X` picker hoặc AGENTS.md bridge cho `/morkit:X` |
-| Doctor | `/plugin doctor` | `bash plugins/morkit-codex/scripts/doctor-codex.sh` |
+| Install | `/plugin install morkit@mor-duongmh` | `codex plugin marketplace add mor-duongmh/morkit-plugin` → install **`morkit`** |
+| Plugin folder | `plugins/morkit/` | `plugins/morkit/` (**cùng nguồn**) |
+| Skills | `plugins/morkit/skills/` (Claude vocab) | `plugins/morkit/skills/` (symlink `~/.agents/skills/morkit`; dịch qua `codex-tools.md`) |
+| Commands | `plugins/morkit/commands/` | `plugins/morkit/commands/` (bridge qua AGENTS.md) |
+| Hooks | `plugins/morkit/hooks/hooks.json` (matcher `Skill\|apply_patch\|Edit\|Write`) | cùng file, wire qua `--with-hooks` |
+| Slash | Native `/morkit:X` | AGENTS.md bridge cho `/morkit:X` (đọc `commands/X.md`) |
+| Subagent | Native `Agent` tool | Native `multi_agent` (`spawn_agent`) |
+| Doctor | `/plugin doctor` | `bash plugins/morkit/scripts/doctor-codex.sh` |
+| Review gate | Cưỡng chế | Advisory (mặc định OFF; `--with-hooks` để bật) |
 
-### Separate-plugin approach (vì sao có `plugins/morkit-codex/`)
+### Single-source approach (vì sao KHÔNG fork)
 
-Claude Code và Codex CLI dùng vocab + tool naming khác nhau (`Skill tool` vs skill discovery, `TodoWrite` vs to-do, `ExitPlanMode` vs plan-confirm...). Earlier iteration đã thử sibling-folder pattern (`skills/` + `skills-codex/` trong cùng `plugins/morkit/`) — nhưng Codex CLI 0.130 walks ANY `skills/` directory inside an installed plugin folder, kể cả khi plugin.json explicitly declares `"skills": "./skills-codex/"`. Kết quả: mỗi skill xuất hiện 2 lần trong picker. Fix: tách hoàn toàn 2 plugins (`morkit/` cho CC, `morkit-codex/` cho Codex). Mỗi plugin có `skills/` riêng. Codex chỉ install plugin nó cần → no duplicate. CC users hoàn toàn không bị ảnh hưởng (marketplace.json giờ list 2 plugin tách biệt).
+Trước đây morkit fork sang `plugins/morkit-codex/` (vocab-swap qua `sync-codex-fork.sh`). Cách đó gây duplication + drift (2 bản skill phải đồng bộ tay) và scale `O(harness × skills)`. Theo mô hình của superpowers, morkit nay dùng **một nguồn** `plugins/morkit/skills/` cho cả hai harness:
 
-`plugins/morkit-codex/` được sinh **deterministically** từ `plugins/morkit/` qua `scripts/sync-codex-fork.sh` với vocab map `codex/vocab-map.yaml`. Tài liệu chi tiết: [`plugins/morkit-codex/AGENTS.md`](../morkit-codex/AGENTS.md), [`plugins/morkit-codex/.codex/INSTALL.md`](../morkit-codex/.codex/INSTALL.md).
+- **Claude Code**: harness auto-load `skills/`.
+- **Codex**: symlink `~/.agents/skills/morkit` → `plugins/morkit/skills/`; agent đọc `using-morkit/references/codex-tools.md` để dịch vocab (`Skill tool`→skill discovery, `Agent tool`→`spawn_agent`, `TodoWrite`→`update_plan`) và dùng native Codex features.
 
-**Cho contributors edit `plugins/morkit/skills/` hoặc `plugins/morkit/commands/`**: chạy `bash scripts/check-codex-drift.sh` trước khi commit để CI không cảnh báo về sự lệch giữa CC plugin và Codex plugin. Nếu drift, chạy `bash scripts/sync-codex-fork.sh` để regenerate `plugins/morkit-codex/skills/` + `plugins/morkit-codex/commands/` + baselines.
+Không còn `vocab-map.yaml`, `sync-codex-fork.sh`, hay drift detector — không có bản fork để lệch. Lưu ý: trên Codex, review gate/slash/subagent là **advisory** (xem [.codex/INSTALL.md](.codex/INSTALL.md) — "Chế độ Advisory").
 
 ## Quy trình điển hình
 
@@ -73,7 +76,7 @@ Claude Code và Codex CLI dùng vocab + tool naming khác nhau (`Skill tool` vs 
 
 `morkit/output/spec/<name>/` (active) hoặc `morkit/output/spec/archive/<name>/` (đã archive).
 - Marker: `.morkit` trong root folder
-- Override path: `MORKIT_ROOT=path/to/changes` env var
+- Override path: `MORKIT_ROOT=path/to/changes` env var (chỉ thư mục changes; design log của brainstorming nằm ở `design-logs/` cạnh thư mục đó, không nằm trong)
 
 ## Tất cả slash command (sau merge)
 
@@ -102,29 +105,10 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | `/morkit:deep-review-doctor` | Health-check cài đặt |
 | `/morkit:deep-review-post` | Post-review hook |
 
-### Document generation (từ docs-hero)
+### Documentation (writing-docs)
 | Command | Việc |
 |---|---|
-| `/morkit:setup` | Bootstrap Python venv (~30-60s, 1 lần) |
-| `/morkit:init` | Sinh fresh docs từ ProjectModel JSON — chọn 1+ trong 7 outputs |
-| `/morkit:update-doc` | Apply change/plan vào doc |
-| `/morkit:sync` | Scan codebase, đề xuất update (API / DB / arch / standards / summary) |
-| `/morkit:apply-sync` | Apply đề xuất từ sync |
-| `/morkit:doctor` | Health-check docs-hero |
-
-#### `/morkit:init` outputs (multi-select gate)
-
-| Flag | Doc generated | Standard | Sync? |
-|---|---|---|---|
-| `srs` | `docs/srs.md` + `docs/screen-specs/SCREEN-*.md` | BrSE ITO Japan (13 sections) | ❌ |
-| `api` | `docs/api-docs.md` | REST + cURL + error codes | ✅ |
-| `db` | `docs/database-design.md` | Tables + Mermaid ERD | ✅ |
-| `arch` | `docs/system-architecture.md` | [arc42](https://docs.arc42.org/home/) lite (8 sections) + Mermaid components | ✅ |
-| `standards` | `docs/code-standards.md` | [Conventional Commits](https://www.conventionalcommits.org/) + auto-extracted lint/format | ✅ |
-| `summary` | `docs/codebase-summary.md` | README-style (tech stack / layout / packages / LOC) | ✅ |
-| `guidelines` | `docs/design-guidelines.md` + `docs/adr/{id}-{slug}.md` | [MADR](https://adr.github.io/madr/) ADRs + Principles + Patterns | ❌ (manual) |
-
-`/morkit:init` always asks via AskUserQuestion (multi-select) which outputs to generate before invoking renderers. Codebase-driven outputs (`api`, `db`, `arch`, `standards`, `summary`) also support a 2-step sync flow (`/morkit:sync` → user ticks proposal → `/morkit:apply-sync`).
+| `/morkit:docs [init\|update\|summarize]` | Sinh/cập nhật bộ tài liệu AI-optimized trong `docs/` (taxonomy 00-overview…90-operations + mỏ neo) + con trỏ `CLAUDE.md`/`AGENTS.md` ở root. LLM-driven, không Python |
 
 ## Plan review gate
 
@@ -158,7 +142,7 @@ cd plugins/morkit/tests
 bash run-all.sh
 ```
 
-20 test files (incl. Codex fork sync + E2E), cross-platform CI matrix (macOS + Ubuntu).
+15 test files (single-source Codex install/marketplace/docs/doctor + spec workflow), cross-platform CI matrix (macOS + Ubuntu).
 
 ## License
 

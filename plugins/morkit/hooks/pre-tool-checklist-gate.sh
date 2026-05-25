@@ -16,8 +16,8 @@
 #    skills (executing-plans, subagent-driven-development, legacy openspec-apply-change).
 #    CHANGE_DIR is resolved via "most recently modified" heuristic.
 #
-# 2. Codex (multi-tool path): Codex CLI has no `Skill` tool, so hooks-codex.json
-#    matches the broader file-mutation tools apply_patch|Edit|Write. These fire
+# 2. Codex (multi-tool path): Codex CLI has no `Skill` tool, so the unified
+#    hooks.json matcher also covers file-mutation tools apply_patch|Edit|Write. These fire
 #    on EVERY file edit, so the gate self-determines whether it's actually in
 #    an executing-plans context by checking the MORKIT_CURRENT_CHANGE env var.
 #    The Codex executing-plans skill is responsible for exporting this.

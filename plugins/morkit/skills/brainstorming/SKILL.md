@@ -129,14 +129,15 @@ This tells you:
 ### Session output (required at session end)
 
 Every brainstorming session ends with a design log written to:
-`${MORKIT_ROOT:-morkit/output}/specs/YYYY-MM-DD-<topic>-design.md`
+`morkit/output/design-logs/YYYY-MM-DD-<topic>-design.md`
+(the `design-logs/` folder sits beside the changes folder `${MORKIT_ROOT:-morkit/output/spec}` — never inside it)
 
 This is **required at session end** — the log is the input artifact for
-downstream commands (`/morkit:propose`, `/morkit:init`, function list
+downstream commands (`/morkit:propose`, function list
 discussions). Before saving, confirm with the user:
 
 > "Đã đủ shape để wrap up. Save design log vào
->  `morkit/output/specs/<date>-<topic>-design.md`?"
+>  `morkit/output/design-logs/<date>-<topic>-design.md`?"
 
 On user OK, write the file using this template:
 
@@ -158,7 +159,7 @@ inputs: <list of files/links consulted>
 <unresolved threads>
 
 ## Next step
-<e.g. /morkit:propose <name> hoặc /morkit:init --inputs <dir>>
+<e.g. /morkit:propose <name>>
 ```
 
 During the session, do NOT persist intermediate snippets without asking.
@@ -168,7 +169,7 @@ Only the final design log is auto-offered at session end.
 
 Think freely. When insights crystallize, you might offer:
 
-- "This feels solid enough to start a change. Want me to run `/morkit:propose <name>` hoặc `/morkit:init`?"
+- "This feels solid enough to start a change. Want me to run `/morkit:propose <name>`?"
 - Or keep exploring - no pressure to formalize
 
 ### When a change exists
@@ -337,11 +338,10 @@ crystallized), summarize and save the design log:
 
 **Next step**:
 - Run `/morkit:propose <name>` to create a change proposal
-- Run `/morkit:init --inputs <dir>` to generate SRS / API / DB docs
 - Keep exploring later — design log is saved
 ```
 
-Then write this to `${MORKIT_ROOT:-morkit/output}/specs/YYYY-MM-DD-<topic>-design.md`
+Then write this to `morkit/output/design-logs/YYYY-MM-DD-<topic>-design.md`
 using the template in "Session output" above. The log captures what was
 explored so the next session (or a different command like `/morkit:propose`)
 can resume from here. Even if no concrete decision emerged, save what was
@@ -355,7 +355,7 @@ explored.
 - **Don't fake understanding** - If something is unclear, dig deeper
 - **Don't rush** - Discovery is thinking time, not task time
 - **Don't force structure** - Let patterns emerge naturally
-- **Auto-capture at session end** - Save final design log to `morkit/output/specs/`. During the session, ask before persisting intermediate snippets
+- **Auto-capture at session end** - Save final design log to `morkit/output/design-logs/`. During the session, ask before persisting intermediate snippets
 - **Do visualize** - A good diagram is worth many paragraphs
 - **Do explore the codebase** - Ground discussions in reality
 - **Do question assumptions** - Including the user's and your own

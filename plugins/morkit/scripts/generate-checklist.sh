@@ -158,7 +158,7 @@ cat > "$TARGET" <<EOF
 
 > **Human gate.** Tick the items below honestly. Set **Overall Decision: OK** at the
 > bottom only when you're satisfied with the plan. Until that happens, the plugin
-> blocks \`/morkit:executing-plans\`, \`/morkit:executing-plans\`, and
+> blocks \`/morkit:executing-plans\` and
 > \`/morkit:subagent-driven-development\` for this change.
 
 ## Meta

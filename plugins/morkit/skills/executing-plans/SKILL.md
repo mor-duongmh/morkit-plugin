@@ -29,7 +29,7 @@ Load plan, review critically, execute all tasks, report when complete.
 - `docs/code-standards.md` — naming, formatting, lint, commit conventions (how to write things)
 - `docs/system-architecture.md` — components, layers, interactions (how things fit together)
 
-If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect (use `/morkit:init` for that). If a doc exists but conflicts with the plan, surface the conflict to your human partner before proceeding.
+If a doc is missing, skip it silently — do NOT block on missing docs and do NOT generate them as a side effect. If a doc exists but conflicts with the plan, surface the conflict to your human partner before proceeding.
 
 ### Step 2: Execute Tasks
 
@@ -117,13 +117,18 @@ When you encounter a library API you're not 100% certain about — query Context
 
 ## Pre-flight: developer review checklist must be approved (Mor overlay)
 
-**BEFORE starting any work in this skill** — especially before reading the plan, dispatching subagents, or making any code change — verify the OpenSpec change has an approved review checklist.
+**BEFORE starting any work in this skill** — especially before reading the plan, dispatching subagents, or making any code change — verify the morkit change has an approved review checklist.
 
 ```bash
-# Detect most recent non-archive change
-CHANGE_DIR="$(find openspec/changes -mindepth 1 -maxdepth 1 -type d ! -name 'archive' \
+# Resolve the changes folder: canonical morkit dir, with legacy openspec fallback.
+SEARCH_ROOT="${MORKIT_ROOT:-morkit/output/spec}"
+[ -d "$SEARCH_ROOT" ] || SEARCH_ROOT="openspec/changes"
+
+# Detect most recent non-archive change. No change found → nothing to gate.
+CHANGE_DIR="$(find "$SEARCH_ROOT" -mindepth 1 -maxdepth 1 -type d ! -name 'archive' \
                 -exec stat -f "%m %N" {} \; 2>/dev/null \
               | sort -rn | head -1 | awk '{print $2}')"
+[ -n "$CHANGE_DIR" ] || exit 0
 CHECKLIST="$CHANGE_DIR/review-checklist.md"
 
 if [ ! -f "$CHECKLIST" ]; then
@@ -136,7 +141,7 @@ if ! grep -qE '^[[:space:]]*Overall Decision:[[:space:]]*OK[[:space:]]*$' "$CHEC
 fi
 ```
 
-Skip this gate ONLY when there is no `openspec/changes/` folder in the project (this skill is being used outside the spec-driven workflow).
+Skip this gate ONLY when neither `morkit/output/spec/` nor `openspec/changes/` exists (this skill is being used outside the spec-driven workflow).
 
 The plugin's PreToolUse hook also enforces this at the harness level. This skill-level check is defense-in-depth: if the hook is bypassed (e.g., disabled in user settings), this check still refuses to proceed.
 

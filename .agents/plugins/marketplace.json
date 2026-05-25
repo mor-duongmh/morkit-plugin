@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "morkit-codex",
+      "name": "morkit",
       "source": {
         "source": "local",
-        "path": "./plugins/morkit-codex"
+        "path": "./plugins/morkit"
       },
       "policy": {
         "installation": "AVAILABLE",

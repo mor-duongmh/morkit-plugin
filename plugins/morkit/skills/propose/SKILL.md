@@ -4,11 +4,13 @@ description: Propose a new morkit change with all artifacts generated in one ste
 license: MIT
 ---
 
+# Propose a change
+
 Create a new morkit change with all artifacts in `${MORKIT_ROOT:-morkit/output/spec}/<name>/`:
 
 - `proposal.md` — what & why
 - `design.md` — how, including Tech Stack
-- `tasks.md` — TDD-ready, Superpowers header
+- `tasks.md` — TDD-ready, task-list header
 - `.meta.json` — name, created_at, schema_version, archived flag
 - `review-checklist.md` — auto-generated from canonical Google Doc (human gate)
 
@@ -46,7 +48,7 @@ When ready to implement, run `/morkit:executing-plans` (blocked until review-che
    Edit the three files (Edit tool) replacing template placeholders with substantive content:
    - `proposal.md`: Why, What changes (concrete bullets), Impact (affected components/users/migration), Out of scope.
    - `design.md`: Architecture, **Tech Stack** (REQUIRED — verify libraries via Context7 if uncertain), Data model, API contract, Open questions.
-   - `tasks.md`: keep the Superpowers header line, Goal/Architecture/Tech Stack summary matching design.md, File Structure (New / Modified / Deleted), and Task N blocks each with `**Files:**` + TDD `- [ ]` checkboxes.
+   - `tasks.md`: keep the task-list header line, Goal/Architecture/Tech Stack summary matching design.md, File Structure (New / Modified / Deleted), and Task N blocks each with `**Files:**` + TDD `- [ ]` checkboxes.
 
 4. **Validate the tasks.md**
 

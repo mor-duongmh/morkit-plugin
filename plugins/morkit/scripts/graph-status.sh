@@ -11,7 +11,7 @@
 #   ~10s for 500 files → ~0.02s per file
 #   Non-linear due to edges → use 0.025s/file + 5s overhead, cap at file count.
 
-set -u
+set -uo pipefail
 
 print_kv() { printf "%s=%s\n" "$1" "$2"; }
 

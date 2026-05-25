@@ -37,28 +37,22 @@ OFFENDERS=()
 # Paths are relative to repo root for stable reporting.
 # ---------------------------------------------------------------------------
 SCOPE_FILES=(
-    # scripts (8)
-    "plugins/morkit/scripts/doctor.sh"
+    # scripts (6)
     "plugins/morkit/scripts/scaffold-change.sh"
-    "plugins/morkit/scripts/setup-venv.sh"
     "plugins/morkit/scripts/migrate-from-openspec.sh"
     "plugins/morkit/scripts/install-codex.sh"
     "plugins/morkit/scripts/doctor-codex.sh"
     "plugins/morkit/scripts/lib/common.sh"
     "plugins/morkit/scripts/fetch-checklist.sh"
 
-    # hooks (5)
+    # hooks (4)
     "plugins/morkit/hooks/hooks.json"
     "plugins/morkit/hooks/pre-tool-checklist-gate.sh"
-    "plugins/morkit/hooks/dh-session-start.sh"
     "plugins/morkit/hooks/first-run-tools.sh"
     "plugins/morkit/hooks/session-start.sh"
 
     # skills SKILL.md (auto-discovered below — kept dynamic so newly-added
     # skills also get linted)
-
-    # python (1)
-    "plugins/morkit/skills/docs-hero-orchestrator/scripts/dispatch_coordinator.py"
 )
 
 # Dynamic skill discovery (every SKILL.md under plugins/morkit/skills/)

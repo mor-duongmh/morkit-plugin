@@ -12,6 +12,18 @@ Skills use Claude Code tool names. When you encounter these in a skill, use your
 | `Skill` tool (invoke a skill) | Skills load natively — just follow the instructions |
 | `Read`, `Write`, `Edit` (files) | Use your native file tools |
 | `Bash` (run commands) | Use your native shell tools |
+| `${CLAUDE_PLUGIN_ROOT}` (plugin path) | `${MORKIT_PLUGIN_ROOT}` (see [Plugin root resolution](#plugin-root-resolution)) |
+
+## Plugin root resolution
+
+Skills/scripts reference the plugin install dir via a cascade:
+`${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT:-<derived>}}`. In Codex the canonical
+var is **`MORKIT_PLUGIN_ROOT`** — exported into your shell rc by
+`scripts/install-codex.sh` (it also aliases `CLAUDE_PLUGIN_ROOT` to the same value
+for legacy refs). No file rewriting is needed: the same Claude-vocab skill files
+resolve correctly on both harnesses through this cascade. If `MORKIT_PLUGIN_ROOT`
+is unset, re-run `install-codex.sh` or `export` it to your morkit checkout's
+`plugins/morkit`.
 
 ## Subagent dispatch requires multi-agent support
 
@@ -69,6 +81,38 @@ This approach compensates for Codex's plugin system not yet supporting an `agent
 field in `plugin.json`. When `RawPluginManifest` gains an `agents` field, the
 plugin can symlink to `agents/` (mirroring the existing `skills/` symlink) and
 skills can dispatch named agent types directly.
+
+## Codex executing-plans pre-flight (checklist gate)
+
+The plugin's PreToolUse hook (`hooks/pre-tool-checklist-gate.sh`) blocks
+`apply_patch` / `Edit` / `Write` until the active change's `review-checklist.md`
+has `Overall Decision: OK`. In Codex there is no `Skill` tool, so the hook narrows
+by env var: **if `MORKIT_CURRENT_CHANGE` is unset, the gate fails open** and file
+edits proceed unguarded.
+
+**BEFORE issuing any file edit while running `executing-plans` /
+`subagent-driven-development`** (and before dispatching implementer subagents,
+which inherit the controller's env), export the active change name so the gate can
+resolve `${MORKIT_ROOT:-morkit/output/spec}/$MORKIT_CURRENT_CHANGE`:
+
+```bash
+# Detect the active change (most recently modified non-archive dir), export basename.
+CHANGE_DIR=$(find "${MORKIT_ROOT:-morkit/output/spec}" \
+                  -mindepth 1 -maxdepth 1 -type d ! -name archive -print0 \
+                  2>/dev/null \
+    | xargs -0 -I{} sh -c \
+        'stat -f "%m %N" "$1" 2>/dev/null || stat -c "%Y %n" "$1"' _ {} \
+    | sort -rn | head -1 | sed 's/^[0-9]* //')
+
+if [[ -n "$CHANGE_DIR" ]]; then
+    export MORKIT_CURRENT_CHANGE="$(basename "$CHANGE_DIR")"
+fi
+```
+
+If `MORKIT_CURRENT_CHANGE` is already set leave it alone — the snippet only
+auto-detects when unset. The gate only engages when Codex hooks are enabled
+(`install-codex.sh --with-hooks` + `codex features enable codex_hooks`); see the
+Advisory note in `AGENTS.md`.
 
 ## Environment Detection
 

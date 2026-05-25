@@ -15,6 +15,10 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"   # provides file_mtime
+
 DOC_URL="https://docs.google.com/document/d/184wY2N2WOUExmZrClvHCfcRCnSQsJYvav6gc6JwL6xc/export?format=md"
 CACHE_DIR="${MORKIT_DATA:-${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data}}/spec"
 CACHE_FILE="$CACHE_DIR/.checklist-cache.md"
@@ -43,12 +47,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 mkdir -p "$CACHE_DIR" 2>/dev/null || true
-
-# Cross-platform mtime
-file_mtime() {
-    local f="$1"
-    stat -f %m "$f" 2>/dev/null || stat -c %Y "$f"
-}
 
 cache_age() {
     [[ -f "$CACHE_FILE" ]] || { echo 99999999; return; }

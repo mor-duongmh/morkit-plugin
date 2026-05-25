@@ -48,11 +48,11 @@ morkit ships a set of named workflows as files under `commands/<name>.md`. When 
 **On platforms without native slash discovery (Codex CLI, Copilot CLI, etc.)** — treat the slash as a request and resolve manually:
 
 1. Extract `<name>` from the `/morkit:<name>` text in the user's message
-2. Read `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/commands/<name>.md` (cascade — first env var that's set wins). Fallback path if neither is set: `~/.codex/morkit-source/plugins/morkit-codex/commands/<name>.md`
+2. Read `${MORKIT_PLUGIN_ROOT:-${CLAUDE_PLUGIN_ROOT}}/commands/<name>.md` (cascade — first env var that's set wins). Fallback path if neither is set: `~/.codex/morkit-source/plugins/morkit/commands/<name>.md`
 3. Follow the instructions in that file (most just wrap a skill of the same name)
 4. If `commands/<name>.md` doesn't exist, fallback: invoke the skill named `<name>` directly via skill discovery
 
-Available command names (as of v1.x): `init`, `setup`, `propose`, `review`, `archive`, `brainstorming`, `write-plan`, `execute-plan`, `deep-review`, `deep-review-doctor`, `deep-review-post`, `doctor`, `sync`, `apply-sync`, `update-doc`.
+Available command names (as of v1.x): `propose`, `review`, `archive`, `brainstorming`, `write-plan`, `execute-plan`, `deep-review`, `deep-review-doctor`, `deep-review-post`, `docs`.
 
 > Do NOT guess what `/morkit:<name>` means without reading the file — the workflows have specific pre-flight checks, argument parsing, and AskUserQuestion prompts that the wrapper file encodes.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Deep Review plugin: one-time setup. Idempotent via marker file.
-set -e
+set -eo pipefail
 
 MARKER_DIR="${HOME}/.claude/morkit:deep-review"
 MARKER="${MARKER_DIR}/.setup-done"

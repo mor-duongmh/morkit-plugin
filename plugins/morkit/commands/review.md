@@ -1,6 +1,6 @@
 ---
 name: "morkit:review"
-description: Generate or refresh the developer review checklist (human gate) for an OpenSpec change. Blocks /morkit:executing-plans and Superpowers implementation skills until "Overall Decision: OK" is set.
+description: Generate or refresh the developer review checklist (human gate) for a morkit change. Blocks /morkit:executing-plans and morkit implementation skills until "Overall Decision: OK" is set.
 category: Workflow
 tags: [spec, review, gate, checklist, human]
 ---
@@ -18,7 +18,7 @@ The skill will:
 - Auto-detect the variant unless overridden
 - Show the path to the generated file and remind the user to fill it out and set `Overall Decision: OK`
 
-The plugin's PreToolUse hook will refuse `/morkit:executing-plans`, `/morkit:executing-plans`, and `/morkit:subagent-driven-development` for the change until the file shows `Overall Decision: OK`.
+The plugin's PreToolUse hook will refuse `/morkit:executing-plans` and `/morkit:subagent-driven-development` for the change until the file shows `Overall Decision: OK`.
 
 **Usage:**
 ```

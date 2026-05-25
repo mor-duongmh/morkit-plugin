@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-# test-install-codex.sh — coverage for scripts/install-codex.sh
-# (Task 8 of codex-fork-skills-clone).
+# test-install-codex.sh — coverage for scripts/install-codex.sh (single-source).
 #
 # All cases use mktemp dirs for AGENTS_HOME / CODEX_HOME / HOME — real
 # user home is never touched.
 #
 # Cases covered:
-#   1. Fresh install (--yes, no hooks) → skills symlink + AGENTS.md
-#      symlink + rc env block; reports skill count.
-#   2. skills/ missing in plugin → script errors with helpful message
-#      mentioning sync-codex-fork.sh.
+#   1. Fresh install (--yes, no hooks) → skills symlink (→ plugin/skills exactly)
+#      + AGENTS.md symlink + rc env block; reports skill count.
+#   2. skills/ missing in plugin → script errors with "not found".
 #   3. --uninstall removes symlinks and rc block.
 #   4. --with-hooks --yes creates ~/.codex/hooks.json as a symlink to
 #      hooks.json (cross-repo updates propagate).
@@ -22,8 +20,9 @@ TEST_NAME="install-codex"
 HELPER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . "$HELPER_DIR/test-helper.sh"
 
-# Codex install script now lives in the sibling morkit-codex plugin (post-fix/codex-separate-plugin).
-CODEX_PLUGIN_ROOT="$(cd "$TEST_PLUGIN_ROOT/../morkit-codex" && pwd)"
+# Single-source: Codex install script + skills/commands/AGENTS/hooks all live in
+# the one morkit plugin (no separate morkit-codex fork).
+CODEX_PLUGIN_ROOT="$TEST_PLUGIN_ROOT"
 SCRIPT="$CODEX_PLUGIN_ROOT/scripts/install-codex.sh"
 
 # ---------------------------------------------------------------------------
@@ -86,11 +85,11 @@ OUT="$(run_install "$SANDBOX" --yes)"
 RC=$?
 assert_equal "$RC" "0" "install exits 0"
 
-# Skill symlink points to skills/ (not skills/)
+# Skill symlink must point exactly at the plugin's skills/ dir (single source).
 SKILL_LINK="$SANDBOX/agents-home/skills/morkit"
 if [[ -L "$SKILL_LINK" ]]; then
     TARGET="$(readlink "$SKILL_LINK")"
-    assert_contains "$TARGET" "skills" "skill symlink target ends in skills"
+    assert_equal "$TARGET" "$SANDBOX/plugin/skills" "skill symlink target is plugin/skills exactly"
 else
     _fail "skill symlink missing: $SKILL_LINK"
 fi
@@ -111,7 +110,7 @@ assert_contains "$OUT" "skills discovered" "summary reports skill count"
 # ---------------------------------------------------------------------------
 # Case 2: skills/ missing → helpful error
 # ---------------------------------------------------------------------------
-echo "[case 2] missing skills/ shows sync-codex-fork.sh hint"
+echo "[case 2] missing skills/ → fails with clear error"
 SANDBOX="$(make_sandbox)"
 rm "$SANDBOX/plugin/skills"  # remove the symlink so dir is missing
 
@@ -119,7 +118,7 @@ OUT="$(run_install "$SANDBOX" --yes 2>&1)"
 RC=$?
 assert_not_equal "$RC" "0" "install fails when skills/ missing"
 assert_contains "$OUT" "skills" "error mentions skills"
-assert_contains "$OUT" "sync-codex-fork.sh" "error hints at sync-codex-fork.sh"
+assert_contains "$OUT" "not found" "error states skills/ not found"
 
 # ---------------------------------------------------------------------------
 # Case 3: --uninstall cleanup
@@ -161,9 +160,13 @@ if [[ -L "$HOOKS_JSON" ]]; then
     TARGET="$(readlink "$HOOKS_JSON")"
     assert_contains "$TARGET" "hooks.json" "hooks.json symlinked to hooks.json"
 fi
-# Whether symlinked or copied, content must include the PreToolUse matcher
+# Whether symlinked or copied, content must include the UNIFIED PreToolUse matcher
+# (both the Claude `Skill` trigger AND the Codex file-mutation tools) plus the
+# widened SessionStart matcher — single hooks.json gates on both harnesses.
 CONTENT="$(cat "$HOOKS_JSON")"
-assert_contains "$CONTENT" "apply_patch|Edit|Write" "hooks.json includes pre-tool matcher"
+assert_contains "$CONTENT" "apply_patch|Edit|Write" "hooks.json includes Codex pre-tool matcher"
+assert_contains "$CONTENT" "Skill" "hooks.json keeps the Claude Skill trigger in the matcher"
+assert_contains "$CONTENT" "startup|resume|clear" "hooks.json SessionStart matcher widened for both harnesses"
 
 # ---------------------------------------------------------------------------
 # Case 5: idempotency — re-run install does not duplicate rc block

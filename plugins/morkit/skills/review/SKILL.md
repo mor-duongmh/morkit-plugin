@@ -4,6 +4,8 @@ description: 'Generate the developer review checklist (human gate) for a morkit 
 license: MIT
 ---
 
+# Review checklist (human gate)
+
 Generate or refresh the **developer review checklist** for a morkit change. This file is the human gate that the plugin's PreToolUse hook checks before allowing implementation skills to run.
 
 The skill never modifies the user's review judgement — it only prepares the file. The human is the one who reads, ticks, and flips the decision.
@@ -77,7 +79,7 @@ The skill never modifies the user's review judgement — it only prepares the fi
 **Example output**
 
 ```
-✓ Wrote /path/to/openspec/changes/add-csv-export/review-checklist.md
+✓ Wrote /path/to/morkit/output/spec/add-csv-export/review-checklist.md
   Variant: BE - Feature
 
 Next steps:
