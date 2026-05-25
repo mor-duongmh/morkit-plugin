@@ -50,7 +50,7 @@ From the content written in Stage 3, generate the indexes so links resolve to re
 Now that the MAP/guide files exist, write the root pointer per `references/agent-instructions.md`:
 - Build the **B-refined block**: orientation (1–2 sentences, sourced from the DOCUMENT-MAP/README opening line) + 3 task pointers (DOCUMENT-MAP, AI-CODING-GUIDE, INVARIANTS). Drop a pointer if its target was not generated.
 - Apply the state machine: `[A]` create / `[B]` append at end / `[C]` replace inside marker. Never touch content outside the marker block.
-- `CLAUDE.md` always; `AGENTS.md` only when Codex is detected (existing `AGENTS.md` / `.codex/` / `--agents`).
+- Write the harness's agent-instruction file (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex); add the other when detected (existing file / its config / `--agents`).
 - Approve gate per file (AskUserQuestion + Edit diff).
 - per-module scope: repeat for each module root, pointing to that module's docs.
 

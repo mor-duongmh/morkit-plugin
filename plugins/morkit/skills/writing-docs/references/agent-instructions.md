@@ -8,15 +8,20 @@ because only `CLAUDE.md` (Claude Code) / `AGENTS.md` (Codex) are auto-loaded by 
 
 ## Which files
 
-- **`CLAUDE.md`** — ALWAYS generate (primary target is Claude Code).
-- **`AGENTS.md`** — ONLY when Codex usage is detected; same block content as CLAUDE.md, different wrapper file.
+Generate the agent-instruction file **your harness auto-loads** at cold start:
 
-Codex detected if ANY of:
-- `AGENTS.md` already exists at the target root, OR
-- a Codex config is present (`.codex/`, or a nested `AGENTS.md`), OR
-- the user passed `--agents`.
+- **Claude Code** → `CLAUDE.md`
+- **Codex** → `AGENTS.md`
 
-No signal → generate `CLAUDE.md` only; do NOT create a stray `AGENTS.md`.
+Both files hold the SAME block (below) — only the filename differs. Also write the
+*other* harness's file when its usage is detected, so either cold-start path lands the pointer.
+
+Other-harness detected if ANY of:
+- the other file already exists at the target root, OR
+- that harness's config is present (`.codex/` or a nested `AGENTS.md` for Codex; Claude settings for Claude Code), OR
+- the user forced it (`--agents` to also write `AGENTS.md`).
+
+No signal → write only your harness's file; do NOT create a stray counterpart.
 
 ## The block (B-refined: orientation + task pointers)
 

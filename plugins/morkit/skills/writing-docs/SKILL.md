@@ -32,7 +32,7 @@ Parse the first word of the arguments:
 
 Flags: `[path]` target dir (default: cwd) · `--scope project|module` · `--yes` (skip the post-scout gate) · `--agents` (also write `AGENTS.md`).
 
-`init` and `update` finish by generating/refreshing the root `CLAUDE.md` (+ `AGENTS.md` when Codex is detected) per `references/agent-instructions.md`.
+`init` and `update` finish by generating/refreshing the root agent-instruction file your harness auto-loads (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex; + the other when detected) per `references/agent-instructions.md`.
 
 ## Shared Context
 
