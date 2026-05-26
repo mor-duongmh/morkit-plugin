@@ -700,8 +700,7 @@
           Tất cả có thể gọi trực tiếp qua tiền tố lệnh <code>/morkit:*</code>.
         </p>
         <p class="lede-small">
-          Gói gọn <strong>10 lệnh (command) · 8 tác nhân (agent) · 19 kỹ năng (skill)</strong> trong một plugin duy nhất.
-          Chọn lối vào bên dưới hoặc sử dụng thanh điều hướng (sidebar).
+          Gói gọn <strong>10 command · 8 agent · 19 skill</strong> trong một plugin duy nhất.
         </p>
       </section>
 
@@ -734,7 +733,7 @@
         <a class="card" href="#docs">
           <div class="card-label">Tự động sinh tài liệu</div>
           <div class="card-title">Tài liệu tối ưu cho AI agent</div>
-          <p class="card-desc">Skill <code>writing-docs</code> sinh bộ <code>docs/</code> có taxonomy + mỏ neo (MAP) + file nhỏ liên kết chéo, giúp AI agent nạp đúng context tối thiểu mỗi task. LLM-driven, không Python — chế độ init / update / summarize.</p>
+          <p class="card-desc">Skill <code>writing-docs</code> sinh bộ <code>docs/</code> có taxonomy + mỏ neo (MAP) + file nhỏ liên kết chéo, giúp AI agent nạp đúng context tối thiểu mỗi task. LLM-driven, không Python. <code>/morkit:init</code> khởi tạo lần đầu; <code>/morkit:docs</code> bảo trì (update / summarize).</p>
           <span class="card-arrow">Xem lệnh sinh tài liệu →</span>
         </a>
         <a class="card" href="#companion">
@@ -860,12 +859,12 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
           </tr>
           <tr>
             <td><strong>Tự động sinh tài liệu (Doc generation)</strong></td>
-            <td><a href="commands/docs.html"><code>/morkit:docs</code></a></td>
-            <td>Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy + mỏ neo (MAP), file nhỏ liên kết chéo. LLM-driven, không Python — chế độ init / update / summarize.</td>
+            <td><a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/docs.html"><code>/morkit:docs</code></a></td>
+            <td>Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy + mỏ neo (MAP), file nhỏ liên kết chéo. LLM-driven, không Python. <code>/morkit:init</code> khởi tạo lần đầu; <code>/morkit:docs</code> bảo trì (update / summarize).</td>
           </tr>
         </tbody>
       </table>
-      <p class="lede-small">Tổng cộng bao gồm <strong>19 kỹ năng chuyên biệt (skill) + 8 tác nhân thông minh (agent) + 10 lệnh tắt (slash command)</strong>, tất cả đều được tích hợp tiền tố <code>/morkit:</code>.</p>
+      <p class="lede-small">Tổng cộng bao gồm <strong>19 kỹ năng chuyên biệt (skill) + 8 tác nhân thông minh (agent) + 11 lệnh tắt (slash command)</strong>, tất cả đều được tích hợp tiền tố <code>/morkit:</code>.</p>
 
       <!-- ─────────────── §3 COMMAND TABLES ─────────────── -->
       <h2 id="commands">4. Danh sách các lệnh (command)</h2>
@@ -975,8 +974,12 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
         </thead>
         <tbody>
           <tr>
+            <td><a href="commands/init.html"><code>/morkit:init</code></a></td>
+            <td><strong>Khởi tạo lần đầu</strong> — quét codebase (brownfield hoặc greenfield), dựng bộ tài liệu tối ưu cho AI agent: taxonomy (<code>00-overview…90-operations</code>) + mỏ neo MAP + file nhỏ liên kết chéo + con trỏ <code>CLAUDE.md</code>/<code>AGENTS.md</code> ở root. LLM-driven, không Python.</td>
+          </tr>
+          <tr>
             <td><a href="commands/docs.html"><code>/morkit:docs</code></a></td>
-            <td>Sinh/cập nhật bộ tài liệu dự án tối ưu cho AI agent: taxonomy (<code>00-overview…90-operations</code>) + mỏ neo MAP + file nhỏ liên kết chéo. LLM-driven, không Python. Chế độ: <code>init</code> | <code>update</code> | <code>summarize</code>.</td>
+            <td><strong>Bảo trì</strong> bộ docs đã có. Chế độ: <code>update</code> (làm mới theo thay đổi code) | <code>summarize</code> (refresh nhanh SOURCE-MAP + DOCUMENT-MAP).</td>
           </tr>
         </tbody>
       </table>

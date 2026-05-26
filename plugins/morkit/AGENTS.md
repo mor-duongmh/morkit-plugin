@@ -19,7 +19,7 @@ Codex auto-discover qua `~/.agents/skills/morkit/<name>/SKILL.md`. Skill files d
 - **Spec workflow**: `propose`, `review`, `archive`
 - **Brainstorm/plan/execute**: `brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`, `test-driven-development`, `systematic-debugging`, `verification-before-completion`, `using-git-worktrees`, `finishing-a-development-branch`, `requesting-code-review`, `receiving-code-review`, `dispatching-parallel-agents`, `writing-skills`, `using-morkit`
 - **Deep review**: `deep-review`
-- **Docs generation**: `writing-docs` (chế độ init / update / summarize — sinh bộ tài liệu `docs/` tối ưu cho AI agent: taxonomy + anchor, kèm con trỏ vào AGENTS.md/CLAUDE.md ở root)
+- **Docs generation**: `writing-docs` (sinh bộ tài liệu `docs/` tối ưu cho AI agent: taxonomy + anchor, kèm con trỏ vào AGENTS.md/CLAUDE.md ở root). Entry: `/morkit:init` cho khởi tạo lần đầu (chế độ `init`); `/morkit:docs` cho bảo trì (chế độ `update` / `summarize`)
 
 ## Slash-command bridge (Claude Code parity)
 

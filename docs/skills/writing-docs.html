@@ -186,8 +186,8 @@ td code { font-size: 12px; }
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
     <li>LLM-driven hoàn toàn — <strong>không Python</strong>, dispatch qua Task tool / dispatching-parallel-agents</li>
-    <li>3 chế độ:</li>
-    <li><ul><li><code>init</code> — quét codebase, dựng taxonomy (<code>00-overview</code> … <code>90-operations</code>)</li><li><code>update</code> — làm mới docs theo thay đổi code</li><li><code>summarize</code> — refresh nhanh SOURCE-MAP + DOCUMENT-MAP</li></ul></li>
+    <li>3 chế độ, 2 lối vào:</li>
+    <li><ul><li><code>init</code> (qua <code>/morkit:init</code>) — quét codebase, dựng taxonomy (<code>00-overview</code> … <code>90-operations</code>)</li><li><code>update</code> (qua <code>/morkit:docs</code>) — làm mới docs theo thay đổi code</li><li><code>summarize</code> (qua <code>/morkit:docs</code>) — refresh nhanh SOURCE-MAP + DOCUMENT-MAP</li></ul></li>
     <li>Mỏ neo: MAP files + cross-link + front-matter nhẹ → agent load context tối thiểu mỗi task</li>
     <li><code>init</code>/<code>update</code> ghi pointer block vào <code>CLAUDE.md</code> gốc (và <code>AGENTS.md</code> khi phát hiện Codex) qua approve gate</li>
     <li>CHỈ viết tài liệu — KHÔNG sửa code ứng dụng</li>
@@ -212,6 +212,7 @@ td code { font-size: 12px; }
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
+    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/docs.html"><div class="ttl">/morkit:docs</div><div class="sub">Doc generation · command</div></a>
   </div>
 

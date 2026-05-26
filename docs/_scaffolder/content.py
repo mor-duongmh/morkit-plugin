@@ -36,7 +36,7 @@ GROUPS = {
         "skills":   ["deep-review"],
     },
     "doc-gen": {
-        "commands": ["docs"],
+        "commands": ["init", "docs"],
         "skills": ["writing-docs"],
     },
     "misc": {
@@ -429,8 +429,8 @@ CURATED = {
         "lede": "Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy có cấu trúc + file mỏ neo (MAP) + file nhỏ liên kết chéo, để agent nạp đúng context tối thiểu mỗi task.",
         "details": [
             "LLM-driven hoàn toàn — <strong>không Python</strong>, dispatch qua Task tool / dispatching-parallel-agents",
-            "3 chế độ:",
-            "<ul><li><code>init</code> — quét codebase, dựng taxonomy (<code>00-overview</code> … <code>90-operations</code>)</li><li><code>update</code> — làm mới docs theo thay đổi code</li><li><code>summarize</code> — refresh nhanh SOURCE-MAP + DOCUMENT-MAP</li></ul>",
+            "3 chế độ, 2 lối vào:",
+            "<ul><li><code>init</code> (qua <code>/morkit:init</code>) — quét codebase, dựng taxonomy (<code>00-overview</code> … <code>90-operations</code>)</li><li><code>update</code> (qua <code>/morkit:docs</code>) — làm mới docs theo thay đổi code</li><li><code>summarize</code> (qua <code>/morkit:docs</code>) — refresh nhanh SOURCE-MAP + DOCUMENT-MAP</li></ul>",
             "Mỏ neo: MAP files + cross-link + front-matter nhẹ → agent load context tối thiểu mỗi task",
             "<code>init</code>/<code>update</code> ghi pointer block vào <code>CLAUDE.md</code> gốc (và <code>AGENTS.md</code> khi phát hiện Codex) qua approve gate",
             "CHỈ viết tài liệu — KHÔNG sửa code ứng dụng",
@@ -443,14 +443,23 @@ CURATED = {
         "example_args": "init   # hoặc update / summarize",
         "example_note": "Đầu ra ở docs/ của project đích. Mỗi file nhỏ, liên kết chéo, có MAP làm mỏ neo cho agent.",
     },
-    "commands.docs": {
-        "lede": "Sinh bộ tài liệu dự án tối ưu cho AI agent (taxonomy + mỏ neo). Shortcut gọi skill writing-docs.",
+    "commands.init": {
+        "lede": "Khởi tạo lần đầu bộ tài liệu dự án tối ưu cho AI agent (taxonomy + mỏ neo) — chạy một lần cho mỗi dự án, brownfield hay greenfield.",
         "when_to_use": [
-            "Khi muốn dựng hoặc cập nhật docs/ cho dự án",
-            "Khi cần docs mà AI agent điều hướng được với context tối thiểu",
+            "Khi lần đầu dựng docs/ cho một dự án (chưa có taxonomy 00-overview)",
+            "Khi muốn AI agent điều hướng codebase với context tối thiểu",
         ],
-        "example_args": "init   # hoặc update / summarize",
-        "example_note": "Command alias gọi thẳng skill writing-docs. Chế độ: init | update | summarize. LLM-driven, không Python.",
+        "example_args": "init   # quét codebase rồi dựng docs/ + con trỏ CLAUDE.md/AGENTS.md",
+        "example_note": "Quét codebase (read-only) → dựng taxonomy 00-overview … 90-operations + mỏ neo + con trỏ ở root. Gọi skill writing-docs (chế độ init). Bảo trì sau đó dùng /morkit:docs update | summarize. LLM-driven, không Python.",
+    },
+    "commands.docs": {
+        "lede": "Bảo trì bộ tài liệu dự án đã có (taxonomy + mỏ neo). Shortcut gọi skill writing-docs. Khởi tạo lần đầu dùng /morkit:init.",
+        "when_to_use": [
+            "Khi code đổi và muốn làm mới docs đã có (update)",
+            "Khi cần refresh nhanh các file MAP (summarize)",
+        ],
+        "example_args": "update   # hoặc summarize",
+        "example_note": "Command alias gọi thẳng skill writing-docs. Chế độ: update | summarize. Khởi tạo lần đầu dùng /morkit:init. LLM-driven, không Python.",
     },
 
     # ====================================================================

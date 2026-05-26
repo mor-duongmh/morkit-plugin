@@ -52,7 +52,7 @@ morkit ships a set of named workflows as files under `commands/<name>.md`. When 
 3. Follow the instructions in that file (most just wrap a skill of the same name)
 4. If `commands/<name>.md` doesn't exist, fallback: invoke the skill named `<name>` directly via skill discovery
 
-Available command names (as of v1.x): `propose`, `review`, `archive`, `brainstorming`, `write-plan`, `execute-plan`, `deep-review`, `deep-review-doctor`, `deep-review-post`, `docs`.
+Available command names (as of v1.x): `propose`, `review`, `archive`, `brainstorming`, `write-plan`, `execute-plan`, `deep-review`, `deep-review-doctor`, `deep-review-post`, `init`, `docs`.
 
 > Do NOT guess what `/morkit:<name>` means without reading the file — the workflows have specific pre-flight checks, argument parsing, and AskUserQuestion prompts that the wrapper file encodes.
 

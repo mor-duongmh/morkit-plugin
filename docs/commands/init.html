@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › docs</title>
+<title>morkit › command › init</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,24 +173,24 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">docs</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
   <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>morkit:docs</h1>
-  <p class="lede">Bảo trì bộ tài liệu dự án đã có (taxonomy + mỏ neo). Shortcut gọi skill writing-docs. Khởi tạo lần đầu dùng /morkit:init.</p>
+  <h1>morkit:init</h1>
+  <p class="lede">Khởi tạo lần đầu bộ tài liệu dự án tối ưu cho AI agent (taxonomy + mỏ neo) — chạy một lần cho mỗi dự án, brownfield hay greenfield.</p>
 
   <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:docs [tham số]</code></pre>
+  <pre><code>/morkit:init [tham số]</code></pre>
   <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi code đổi và muốn làm mới docs đã có (update)</li>
-  <li>Khi cần refresh nhanh các file MAP (summarize)</li>
+  <li>Khi lần đầu dựng docs/ cho một dự án (chưa có taxonomy 00-overview)</li>
+  <li>Khi muốn AI agent điều hướng codebase với context tối thiểu</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -199,13 +199,13 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:docs update   # hoặc summarize</code></pre>
+    <pre><code>$ /morkit:init init   # quét codebase rồi dựng docs/ + con trỏ CLAUDE.md/AGENTS.md</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Command alias gọi thẳng skill writing-docs. Chế độ: update | summarize. Khởi tạo lần đầu dùng /morkit:init. LLM-driven, không Python.</p>
+  <p class="lede" style="font-size:14px;">Quét codebase (read-only) → dựng taxonomy 00-overview … 90-operations + mỏ neo + con trỏ ở root. Gọi skill writing-docs (chế độ init). Bảo trì sau đó dùng /morkit:docs update | summarize. LLM-driven, không Python.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/docs.html"><div class="ttl">/morkit:docs</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../skills/writing-docs.html"><div class="ttl">writing-docs</div><div class="sub">Doc generation · skill</div></a>
   </div>
 
