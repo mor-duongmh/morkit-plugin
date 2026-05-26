@@ -4,6 +4,18 @@
 
 Quick refresh of the two most important anchors without touching the full taxonomy. Use for a fast "where is everything now" pass.
 
+## Examples
+
+```bash
+# Quick "where is everything now" refresh of SOURCE-MAP + DOCUMENT-MAP
+/morkit:docs summarize
+
+# Summarize a project in another directory
+/morkit:docs summarize ../api-service
+```
+
+Outcome: light read-only scout → `00-overview/SOURCE-MAP` + `DOCUMENT-MAP` refreshed → `updated` bumped → short report. Feature specs, tests, and design docs are NOT touched — use `/morkit:docs update` for those.
+
 ## Steps
 
 1. **Light scout** (read-only): directory tree, entry points, key symbols, routes, data stores. Cheaper than init's full scout.

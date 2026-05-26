@@ -441,7 +441,7 @@ CURATED = {
             "Khi cần refresh nhanh các file MAP (summarize)",
         ],
         "example_args": "init   # hoặc update / summarize",
-        "example_note": "Đầu ra ở docs/ của project đích. Mỗi file nhỏ, liên kết chéo, có MAP làm mỏ neo cho agent.",
+        "example_note": "Đầu ra ở docs/ của project đích. Ví dụ theo chế độ: `/morkit:init` (dựng taxonomy lần đầu) · `/morkit:docs update` (làm mới doc lệch theo code) · `/morkit:docs summarize` (refresh nhanh SOURCE-MAP + DOCUMENT-MAP). Mỗi file nhỏ, liên kết chéo, có MAP làm mỏ neo cho agent.",
     },
     "commands.init": {
         "lede": "Khởi tạo lần đầu bộ tài liệu dự án tối ưu cho AI agent (taxonomy + mỏ neo) — chạy một lần cho mỗi dự án, brownfield hay greenfield.",
@@ -449,8 +449,8 @@ CURATED = {
             "Khi lần đầu dựng docs/ cho một dự án (chưa có taxonomy 00-overview)",
             "Khi muốn AI agent điều hướng codebase với context tối thiểu",
         ],
-        "example_args": "init   # quét codebase rồi dựng docs/ + con trỏ CLAUDE.md/AGENTS.md",
-        "example_note": "Quét codebase (read-only) → dựng taxonomy 00-overview … 90-operations + mỏ neo + con trỏ ở root. Gọi skill writing-docs (chế độ init). Bảo trì sau đó dùng /morkit:docs update | summarize. LLM-driven, không Python.",
+        "example_args": "# quét codebase rồi dựng docs/ + con trỏ CLAUDE.md/AGENTS.md",
+        "example_note": "Quét codebase (read-only) → dựng taxonomy 00-overview … 90-operations + mỏ neo + con trỏ ở root. Ví dụ cụ thể: `/morkit:init` (hỏi scale project/module) · `/morkit:init ../new-service --yes` (bỏ gate sau scout) · `/morkit:init --scope module --agents` (monorepo, ghi thêm AGENTS.md). Bảo trì sau đó dùng /morkit:docs update | summarize. LLM-driven, không Python.",
     },
     "commands.docs": {
         "lede": "Bảo trì bộ tài liệu dự án đã có (taxonomy + mỏ neo). Shortcut gọi skill writing-docs. Khởi tạo lần đầu dùng /morkit:init.",
@@ -458,8 +458,8 @@ CURATED = {
             "Khi code đổi và muốn làm mới docs đã có (update)",
             "Khi cần refresh nhanh các file MAP (summarize)",
         ],
-        "example_args": "update   # hoặc summarize",
-        "example_note": "Command alias gọi thẳng skill writing-docs. Chế độ: update | summarize. Khởi tạo lần đầu dùng /morkit:init. LLM-driven, không Python.",
+        "example_args": "update --yes        # hoặc: summarize",
+        "example_note": "Ví dụ cụ thể: `/morkit:docs update` (liệt kê doc lệch rồi hỏi scope) · `/morkit:docs update --yes` (cập nhật hết, bỏ gate) · `/morkit:docs update ../api-service` (project khác) · `/morkit:docs summarize` (refresh nhanh SOURCE-MAP + DOCUMENT-MAP). Khởi tạo lần đầu dùng /morkit:init. LLM-driven, không Python.",
     },
 
     # ====================================================================

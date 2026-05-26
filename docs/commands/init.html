@@ -199,9 +199,9 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:init init   # quét codebase rồi dựng docs/ + con trỏ CLAUDE.md/AGENTS.md</code></pre>
+    <pre><code>$ /morkit:init # quét codebase rồi dựng docs/ + con trỏ CLAUDE.md/AGENTS.md</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Quét codebase (read-only) → dựng taxonomy 00-overview … 90-operations + mỏ neo + con trỏ ở root. Gọi skill writing-docs (chế độ init). Bảo trì sau đó dùng /morkit:docs update | summarize. LLM-driven, không Python.</p>
+  <p class="lede" style="font-size:14px;">Quét codebase (read-only) → dựng taxonomy 00-overview … 90-operations + mỏ neo + con trỏ ở root. Ví dụ cụ thể: `/morkit:init` (hỏi scale project/module) · `/morkit:init ../new-service --yes` (bỏ gate sau scout) · `/morkit:init --scope module --agents` (monorepo, ghi thêm AGENTS.md). Bảo trì sau đó dùng /morkit:docs update | summarize. LLM-driven, không Python.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
