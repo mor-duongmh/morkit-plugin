@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 /**
  * Claude Flow Agent Router
- * Routes tasks to optimal agents based on learned patterns
+ * Routes tasks to optimal agents based on learned patterns.
+ * Tier computation and harness-aware model mapping via model-router.js.
  */
 
 'use strict';
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { computeTierWithPolicy } = require('./model-router.js');
 
 const DEFAULT_POLICY_PATH = path.join(__dirname, 'model-policy.json');
 
@@ -78,27 +80,78 @@ const TASK_PATTERNS = {
   'deploy|docker|ci|cd|pipeline|infrastructure': 'devops',
 };
 
-function routeTask(task) {
+/**
+ * Route a task prompt to an agent, optionally computing tier and model.
+ *
+ * @param {string} task - Task description prompt.
+ * @param {object} [opts]
+ * @param {string}   [opts.harness="claude"]   - Model harness: "claude" or "codex".
+ * @param {number|null} [opts.complexityScore] - SEAM for Task 4.
+ * @param {function}    [opts.adaptiveAdjust]  - SEAM for Task 5.
+ * @returns {{ agent, confidence, reason } | { agent, tier, model, confidence, reason, escalators }}
+ *   Returns the enriched shape when policy loads successfully; falls back to the
+ *   base shape when policy is unavailable (backward compatible).
+ */
+function routeTask(task, opts) {
   const taskLower = task.toLowerCase();
 
-  // Check patterns
-  for (const [pattern, agent] of Object.entries(TASK_PATTERNS)) {
+  // Keyword match → agent + confidence + reason
+  let agent = 'coder';
+  let confidence = 0.5;
+  let reason = 'Default routing - no specific pattern matched';
+
+  for (const [pattern, matchedAgent] of Object.entries(TASK_PATTERNS)) {
     const regex = new RegExp(pattern, 'i');
     if (regex.test(taskLower)) {
-      return {
-        agent,
-        confidence: 0.8,
-        reason: `Matched pattern: ${pattern}`,
-      };
+      agent = matchedAgent;
+      confidence = 0.8;
+      reason = `Matched pattern: ${pattern}`;
+      break;
     }
   }
 
-  // Default to coder for unknown tasks
-  return {
-    agent: 'coder',
-    confidence: 0.5,
-    reason: 'Default routing - no specific pattern matched',
-  };
+  // Attempt to load policy for enriched routing
+  const policy = loadPolicy();
+  if (!policy) {
+    // Backward-compatible fallback: return base shape only
+    return { agent, confidence, reason };
+  }
+
+  const harness = (opts && opts.harness) || 'claude';
+  const complexityScore = (opts && opts.complexityScore != null) ? opts.complexityScore : null;
+  const adaptiveAdjust = (opts && typeof opts.adaptiveAdjust === 'function') ? opts.adaptiveAdjust : null;
+
+  const { tier, model, escalators } = computeTierWithPolicy({
+    agent,
+    confidence,
+    prompt: task,
+    policy,
+    harness,
+    complexityScore,
+    adaptiveAdjust,
+  });
+
+  return { agent, tier, model, confidence, reason, escalators };
+}
+
+/**
+ * Compute tier for a given agent/confidence/prompt against the default policy.
+ * Exposed for direct testing of tier logic without going through routeTask's
+ * pattern-matching. Falls back to the default policy path.
+ *
+ * @param {object} opts
+ * @param {string}  opts.agent
+ * @param {number}  opts.confidence
+ * @param {string}  opts.prompt
+ * @param {string} [opts.harness="claude"]
+ * @returns {{ tier: number, model: string, escalators: string[] }}
+ */
+function computeTier({ agent, confidence, prompt, harness = 'claude' }) {
+  const policy = loadPolicy();
+  if (!policy) {
+    throw new Error('computeTier requires a loadable policy; model-policy.json is missing or invalid');
+  }
+  return computeTierWithPolicy({ agent, confidence, prompt, policy, harness });
 }
 
 // CLI
@@ -112,4 +165,4 @@ if (task) {
   console.log('\nAvailable agents:', Object.keys(AGENT_CAPABILITIES).join(', '));
 }
 
-module.exports = { routeTask, loadPolicy, AGENT_CAPABILITIES, TASK_PATTERNS };
+module.exports = { routeTask, computeTier, loadPolicy, AGENT_CAPABILITIES, TASK_PATTERNS };
