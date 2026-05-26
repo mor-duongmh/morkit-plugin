@@ -1,0 +1,38 @@
+{
+  "simple": [
+    "fix a typo in the README",
+    "rename a variable to a more descriptive name",
+    "add a comment explaining what this function does",
+    "format the code according to the style guide",
+    "change the error message text",
+    "update the version number in package.json",
+    "remove an unused import statement",
+    "add a missing semicolon",
+    "correct a spelling mistake in a log message",
+    "change a boolean flag default value"
+  ],
+  "medium": [
+    "implement a REST API endpoint to fetch user profiles",
+    "add input validation to the login form",
+    "write unit tests for the payment processing module",
+    "refactor the database query to use an ORM",
+    "add pagination to the product listing page",
+    "implement a caching layer for frequently accessed data",
+    "migrate the authentication from JWT to session cookies",
+    "add error handling and retry logic to the API client",
+    "create a React component for displaying notifications",
+    "integrate a third-party email service into the application"
+  ],
+  "complex": [
+    "design and implement a distributed event sourcing system with CQRS pattern across multiple microservices",
+    "build a real-time collaborative document editing feature with operational transformation and conflict resolution",
+    "architect a multi-tenant SaaS platform with data isolation, billing, and role-based access control",
+    "implement a machine learning pipeline for fraud detection with feature engineering and model serving",
+    "migrate a monolithic application to a microservices architecture with zero downtime deployment",
+    "design a globally distributed database with eventual consistency and partition tolerance",
+    "implement a compiler front-end with lexer, parser, and semantic analysis for a domain-specific language",
+    "build a high-throughput message queue system with guaranteed delivery and at-least-once semantics",
+    "create a kubernetes operator to manage the lifecycle of stateful database clusters",
+    "implement an OAuth 2.0 authorization server with PKCE, refresh token rotation, and introspection endpoint"
+  ]
+}
