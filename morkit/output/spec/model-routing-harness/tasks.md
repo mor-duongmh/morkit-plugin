@@ -21,16 +21,15 @@
 - `claude-plugins/.claude/helpers/complexity-scorer.cjs` — embedding-based complexity score + keyword escalators
 - `claude-plugins/.claude/helpers/embeddings/complexity-refset.json` — seeded labelled reference set
 - `claude-plugins/.claude/hooks/pretooluse-agent-gate.cjs` — Claude PreToolUse(Agent) enforcement
-- `claude-plugins/plugins/morkit/hooks/subagent-start-gate.sh` — Codex SubagentStart gate
-- `claude-plugins/plugins/morkit/hooks/userpromptsubmit-route.sh` — Codex UserPromptSubmit injector
+- `claude-plugins/plugins/morkit/hooks/userpromptsubmit-route.sh` — Codex UserPromptSubmit injector (advisory)
 - `claude-plugins/.codex/agents/*.toml` (or config block) — Codex custom agents with model baked per agent_type
 
 ### Modified files
 
 - `claude-plugins/.claude/helpers/router.js` — emit `{ agent, tier, model, confidence, reason, escalators }`
-- `claude-plugins/.claude/helpers/hook-handler.cjs` — route handler prints routing plan incl. tier/model; new `agent-gate` + `subagent-outcome` handlers
+- `claude-plugins/.claude/helpers/hook-handler.cjs` — route handler prints routing plan incl. tier/model; new `agent-gate` + outcome (`Stop`/`PostToolUse`) handlers
 - `claude-plugins/.claude/settings.json` — add `PreToolUse(Agent)` + `PostToolUse(Agent)` matchers; keep scope to claude-plugins
-- `claude-plugins/plugins/morkit/hooks/hooks.json` — add `UserPromptSubmit` + `SubagentStart` + `SubagentStop` events
+- `claude-plugins/plugins/morkit/hooks/hooks.json` — add `UserPromptSubmit` + `Stop` events (NO `SubagentStart`/`SubagentStop` — absent in Codex v0.130.0 per spike)
 - `claude-plugins/plugins/morkit/skills/using-morkit/references/codex-tools.md` — document `fork_turns:"none"` requirement for model override
 - `claude-plugins/plugins/morkit/skills/subagent-driven-development/SKILL.md` — link abstract tiers to policy + concrete models
 
@@ -48,11 +47,11 @@
 
 **TDD steps:**
 
-- [ ] Write a probe: enable `multi_agent`, call `spawn_agent({model, fork_turns:"none"})`, assert the worker runs the overridden model (Q1: v1 vs v2)
-- [ ] Write a probe: register a `SubagentStart` Codex hook that exits non-zero; assert whether the spawn is blocked or only annotated (Q2)
-- [ ] Write a probe: run `embeddings_generate`/`intelligence.cjs` offline (no network); assert a vector is produced without API (Q3)
-- [ ] Record results in `spike-findings.md`; decide strict-vs-advisory for Codex gate and embeddings-on/off for V1
-- [ ] Commit
+- [x] Q1: `spawn_agent` model override under `multi_agent` v1 → VERIFIED-YES (needs `fork_turns:"none"`; v2 not required)
+- [x] Q2: Codex `SubagentStart` block → VERIFIED-NO (event absent in v0.130.0) → Codex gate = ADVISORY
+- [x] Q3: offline embeddings via `embeddings_*` local ONNX → VERIFIED-YES (`intelligence.cjs` is NOT an embedder)
+- [x] Recorded results in `spike-findings.md`; updated design.md + Tasks 4/5/7
+- [x] Commit (`46bc6aa`)
 
 ---
 
@@ -105,7 +104,8 @@
 - [ ] Write failing test: scorer returns a bucket + a complexity-confidence in [0,1] via cosine to ref-set
 - [ ] Write failing test: when `complexity.enabled=false` or embeddings unavailable, scorer returns `null` and router uses keyword-only path
 - [ ] Write failing test: strict deny only engages when complexity-confidence ≥ `confidenceMin`; below ⇒ `warn`
-- [ ] Implement scorer wired to `embeddings_*`/`intelligence.cjs`
+- [ ] Implement scorer wired to `embeddings_*` (local ONNX `Xenova/all-MiniLM-L6-v2`, 384-dim, cosine) — NOT `intelligence.cjs` (it has no embeddings)
+- [ ] Pin/vendor the ONNX model so V1 has no first-run network dependency
 - [ ] Commit
 
 ---
@@ -122,7 +122,8 @@
 - [ ] Write failing test: `recordOutcome(agent,bucket,tier,outcome)` persists rows keyed by `(agent,bucket)`
 - [ ] Write failing test: a bucket with ≥`minSamples` repeated retry/escalate auto-bumps base tier by +1
 - [ ] Write failing test: hysteresis prevents bump/unbump oscillation within `hysteresis` window
-- [ ] Implement outcome logging + `adaptiveAdjust(agent,bucket,tier)`
+- [ ] Write failing test: Codex outcome is captured at `Stop`/`PostToolUse` (no `SubagentStop` in v0.130.0)
+- [ ] Implement outcome logging + `adaptiveAdjust(agent,bucket,tier)` (intelligence.cjs as persistence backing, not embedder)
 - [ ] Refactor for clarity
 - [ ] Commit
 
@@ -146,12 +147,13 @@
 
 ---
 
-## Task 7: Codex enforcement (inject + custom agents + SubagentStart gate)
+## Task 7: Codex enforcement (advisory — inject + model-baked custom agents)
+
+> Re-scoped per spike Q2: Codex v0.130.0 has NO `SubagentStart`/`SubagentStop` hook, so there is no strict pre-spawn gate. Enforcement = `UserPromptSubmit` inject + model baked per `agent_type` in custom agents (correct-by-construction) + `fork_turns:"none"` for per-call override. A strict gate is deferred behind a future-build feature check.
 
 **Files:**
 
 - Create: `claude-plugins/plugins/morkit/hooks/userpromptsubmit-route.sh`
-- Create: `claude-plugins/plugins/morkit/hooks/subagent-start-gate.sh`
 - Create: `claude-plugins/.codex/agents/*.toml` (or `[agents.*]` config block)
 - Modify: `claude-plugins/plugins/morkit/hooks/hooks.json`
 - Modify: `claude-plugins/plugins/morkit/skills/using-morkit/references/codex-tools.md`
@@ -160,9 +162,10 @@
 
 - [ ] Write failing test: `userpromptsubmit-route.sh` emits the same `[ROUTING]` additionalContext line as Claude (shared router invoked with `--harness codex`)
 - [ ] Write failing test: custom agents define `model` per agent_type matching `tierModel.codex`
-- [ ] Write failing test (per Q2 outcome): `subagent-start-gate.sh` blocks via exit-code when supported, else emits `systemMessage` advisory
-- [ ] Implement hooks + custom agents; register `UserPromptSubmit`/`SubagentStart`/`SubagentStop` in `hooks.json`
+- [ ] Write failing test: `hooks.json` registers only events that exist in v0.130.0 (`UserPromptSubmit`, `Stop`); no `SubagentStart`/`SubagentStop`
+- [ ] Implement hook + custom agents; register `UserPromptSubmit`/`Stop` in `hooks.json`
 - [ ] Document `spawn_agent(... fork_turns:"none")` requirement in `codex-tools.md`
+- [ ] (Optional) Behavioral confirmation of Q1 via a guarded live `codex exec` spawn (isolated CODEX_HOME) before shipping
 - [ ] Commit
 
 ---
