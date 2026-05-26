@@ -1,10 +1,25 @@
 # Init Workflow
 
-`/morkit:init [path] [--scope project|module] [--yes]`
+`/morkit:init [path] [--scope project|module] [--yes] [--agents]`
 
 Create the initial doc taxonomy for a codebase. Core principle: **Scout → Content → MAP** (never write a MAP before its content exists), and create a folder only when scout finds the matching component.
 
 Load `taxonomy.md` + `anchor-conventions.md` before generating. Templates: `references/doc-templates/`.
+
+## Examples
+
+```bash
+# First-time bootstrap of docs/ for the current project (asks project vs per-module scale)
+/morkit:init
+
+# Bootstrap docs for a project in another directory, skip the post-scout gate
+/morkit:init ../new-service --yes
+
+# Monorepo: per-module taxonomy, also write the AGENTS.md pointer
+/morkit:init --scope module --agents
+```
+
+After init, maintain the set with `/morkit:docs update` (refresh against code changes) or `/morkit:docs summarize` (quick MAP refresh).
 
 ## Stage 0 — Preflight & Scope
 

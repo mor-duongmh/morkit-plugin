@@ -4,6 +4,24 @@
 
 Refresh an existing doc taxonomy against code changes. Manual/on-demand (no auto-sync). Uses front-matter `source_files` to find what drifted.
 
+## Examples
+
+```bash
+# Refresh every doc that drifted since its `updated` date (shows drift list, asks scope)
+/morkit:docs update
+
+# Skip the scope-confirm gate — update all stale docs in one pass
+/morkit:docs update --yes
+
+# Maintain docs for a project in another directory
+/morkit:docs update ../api-service
+
+# Monorepo: refresh per-module docs, also write AGENTS.md, no gate
+/morkit:docs update --scope module --agents --yes
+```
+
+Flow: drift list shown → confirm scope → re-scout only changed areas → content docs updated → MAP/anchors re-derived → root `CLAUDE.md` (and `AGENTS.md` when Codex detected) pointer refreshed through an approve gate → report.
+
 ## Preconditions
 - `docs/` already holds a new-style taxonomy (`00-overview/` exists). If not → tell user to run `/morkit:init`.
 
