@@ -110,14 +110,29 @@ PreToolUse(Agent) gate decision: `allow` | `deny(reason)` (Claude). Codex has no
 - **Q4:** Scope guard mechanism — self-contained config under `claude-plugins/.claude/` vs. cwd-gating in the `work`-root hook. Lean: self-contained.
 - **Residual:** ~2-min manual confirmation of Q1 behavior (live `codex exec` spawn) before Task 7 ships — skipped in spike to avoid using the user's ChatGPT quota.
 
-## V2-deferred: Complexity live-wiring <!-- V2-deferred -->
+## Complexity live-wiring — SHIPPED (was V2-deferred)
 
-The embedding-based complexity scorer (`complexity-scorer.cjs`) shells out to the claude-flow CLI per call (~1.4s/embedding × 30 reference prompts on first call). This budget is incompatible with the 5-second hook safety timer in `hook-handler.cjs`.
+Complexity scoring is now **live by default** (`policy.complexity.liveInHook: true`). The original perf blocker (embedding 30 reference prompts per call, ~66 s cold, incompatible with the 5 s hook timer) was resolved by:
 
-**Status:** complexity live-wiring in the hook path is controlled by `policy.complexity.liveInHook` (boolean, **default false**). When false (the default), the hook uses keyword-only tier computation (current behavior, no shelling out). When true, `score(prompt)` is called and the resulting bucket (`"simple"` → −1, `"complex"` → +1, `"medium"`/null → 0) nudges the tier before the confidence gate and adaptive adjustment.
+1. **Precomputed reference vectors** (`embeddings/complexity-refset-vectors.json`, built by `buildRefVectors()`): `loadRefCache` reads them from disk, so a live call embeds only the **single** incoming prompt. End-to-end `score()` ≈ 1.3 s. npx runs `--prefer-offline` (no registry round-trip).
+2. **Uncertain-only gating**: the hook routes by keywords first and invokes the embedding scorer **only when routing confidence < 0.8** (the "no keyword match" case). Confident keyword routes never embed, bounding the latency cost to ambiguous prompts. On uncertain prompts the confidence gate forbids downgrades, so the complexity nudge can only escalate (the safe direction).
 
-**Follow-up:** tracked as Task 9 (perf follow-up). Before enabling `liveInHook`, the embedding pipeline must either (a) be pre-warmed so reference-set embeddings are cached in-process across calls, or (b) be replaced with a lighter scoring backend. The `complexityScore` seam in `computeTierWithPolicy` is fully wired — enabling it is a one-flag change once perf is acceptable.
+The bucket (`"simple"` → −1, `"complex"` → +1, `"medium"`/null → 0) nudges the tier before the confidence gate and adaptive adjustment, on **both** harnesses (Claude enforces; Codex advisory).
+
+**Fresh-machine note:** ONNX weights are not bundled; the scorer uses the locally-cached `@claude-flow/cli`. Without it, scoring fails open to keyword-only routing. Bundling weights is a future hardening item.
+
+## Known limitation — adaptive loop is signal-starved <!-- V2-deferred -->
+
+The adaptive store (`adaptive-store.cjs`) and its decision-cache bridge are fully wired on **both** harnesses (Claude `PostToolUse(Agent)` → `record-outcome`; Codex `Stop` → `record-outcome`, both falling back to the `.last-routing.json` decision cache for agent/bucket/tier — proven by adaptive-store tests 10 + 12).
+
+**However, neither harness's hook payload carries a real success/failure/retry label**, so `record-outcome` defaults `outcome` to `"success"`. Because `adaptiveAdjust` bumps tier UP only after accumulating `retry`/`escalate` outcomes, the loop currently **records but never escalates** — it is structurally complete but signal-starved. This is a cross-harness limitation, not Codex-specific. Resolving it needs a genuine outcome signal (e.g. treating repeated spawns of the same agent+bucket as a retry proxy), which risks false positives and is deferred to V2. The store stays harmless (counters only) meanwhile.
+
+**Codex attribution is also coarser than Claude:** `Stop` fires once per turn (last-write-wins cache), so when multiple subagents spawn in one turn only the last is attributed. Claude's `PostToolUse(Agent)` attributes per-spawn.
+
+## B1 — strict Codex pre-spawn gate (platform-blocked, deferred)
+
+Codex v0.130.0 has no `SubagentStart`/`SubagentStop` hook, so there is no spawn-time block point equivalent to Claude's `PreToolUse(Agent)` deny. Codex enforcement stays **advisory** (UserPromptSubmit `[ROUTING]` inject) + **correct-by-construction** (model baked per `agent_type` in `.codex/agents/*.toml`, verified to match policy base tiers) + `spawn_agent(fork_turns:"none")`. A candidate strict gate via `PreToolUse(spawn_agent)` (Codex *does* dispatch `PreToolUse`) is unverified and deferred behind a future-build feature check.
 
 ---
 
-*Generated: 2026-05-26T04:03:06Z*
+*Generated: 2026-05-26T04:03:06Z; updated 2026-05-26 (complexity shipped; limitations documented).*

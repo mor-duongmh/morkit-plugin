@@ -187,18 +187,19 @@
 
 ---
 
-## Task 9: Complexity live-wiring perf follow-up (DEFERRED — default OFF)
+## Task 9: Complexity live-wiring perf follow-up (DONE — liveInHook ON)
 
-> **Status:** Complexity scoring in the hook path is gated behind `policy.complexity.liveInHook` (boolean, **default false**). When false (current default), the hook uses keyword-only tier computation with no subprocess shelling. The `computeTierWithPolicy` seam is fully wired; enabling it is a one-flag change in `model-policy.json`.
+> **Status: RESOLVED.** Complexity scoring is now live: `policy.complexity.liveInHook` is **true** by default and the perf blocker is fixed.
 
-> **Reason for deferral:** the embedding CLI backend shells out ~1.4 s/call (30 reference prompts × per-call latency on first run), exceeding the 5 s hook safety budget. This will be resolved by either (a) pre-warming the reference-set embeddings in-process or (b) replacing the CLI backend with a lighter scorer.
+**What was done (A2 + A1):**
 
-**Files:** (when undeferred)
+- [x] **A2 — precompute ref vectors:** `buildRefVectors()` embeds the 30 reference prompts once into `embeddings/complexity-refset-vectors.json`; `loadRefCache` reads them from disk (~66 s cold → instant). npx invocation uses `--prefer-offline` (no registry round-trip). End-to-end `score()` is now ~1.3 s.
+- [x] **A1 — uncertain-only gating:** the hook routes by keywords first and embeds (~1.3 s) **only when routing confidence < 0.8** (the "no keyword match" case). Confident keyword matches never pay the embedding cost, so the per-prompt latency hits only ambiguous prompts. On uncertain prompts the confidence gate forbids downgrades, so embedding can only escalate.
+- [x] Enabled `complexity.liveInHook: true`. Works on **both harnesses** (Claude enforces the nudged tier; Codex receives it as advisory) via the shared `hook-handler.cjs route` path.
+- [x] Tests: `readPrecomputedVectors` shape test + 3 gate tests (off / uncertain-on / confident-on); embedding tests now run in ~6 s with precomputed refs. Verified live: uncertain-complex prompt escalates coder 2→3 (opus / gpt-5.5) on both harnesses.
 
-- `claude-plugins/.claude/helpers/model-policy.json` — set `complexity.liveInHook: true`
-- `claude-plugins/.claude/helpers/complexity-scorer.cjs` — optimize backend (pre-warm / lighter)
-- `claude-plugins/morkit/output/spec/model-routing-harness/design.md` — update V2-deferred note
+**Not vendored:** the ONNX weights are NOT bundled — the scorer relies on the locally-cached `@claude-flow/cli` (offline, no download here). Fresh machines without the cache fall back gracefully to keyword-only routing (fail-open). Bundling weights remains a future hardening item.
 
 ---
 
-*Generated: 2026-05-26T04:03:06Z*
+*Generated: 2026-05-26T04:03:06Z; updated 2026-05-26 (A1+A2 shipped).*
