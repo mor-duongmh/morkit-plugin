@@ -10,6 +10,7 @@ __pycache__/
 .claude/*
 !.claude/helpers
 !.claude/hooks
+!.claude/settings.json
 .claude/helpers/.adaptive-state.json
 plans/templates
 CLAUDE.md
