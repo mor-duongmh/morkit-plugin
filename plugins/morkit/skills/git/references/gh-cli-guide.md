@@ -98,12 +98,14 @@ gh issue list --json number,title --jq '.[].title'
 
 ## Common Patterns
 
-### Create PR with auto-merge
+### Create draft PR for review
 ```bash
-gh pr create --fill && gh pr merge --auto --squash
+gh pr create --draft --title "feat(scope): description" --body "..."
 ```
 
-### Close stale PRs
+### Close a specific PR
 ```bash
-gh pr list --state open --json number -q '.[].number' | xargs -I {} gh pr close {}
+gh pr close 123
 ```
+
+> **⚠️ Warning:** Never run bulk-close commands without scoping by author/age and confirming each PR. Closing all open PRs in a repo is irreversible.

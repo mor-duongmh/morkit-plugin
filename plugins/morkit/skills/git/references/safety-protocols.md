@@ -2,9 +2,9 @@
 
 ## Secret Detection Patterns
 
-### Scan Command
+### Scan Command (canonical — use this regex everywhere)
 ```bash
-git diff --cached | grep -iE "(AKIA|api[_-]?key|token|password|secret|credential|private[_-]?key|mongodb://|postgres://|mysql://|redis://|-----BEGIN)"
+git diff --cached | grep -iE "(AKIA[0-9A-Z]{16}|api[_-]?key|token|password|secret|credential|private[_-]?key|mongodb://|postgres://|mysql://|redis://|-----BEGIN|client_secret|oauth_token)"
 ```
 
 ### Patterns to Detect
@@ -61,9 +61,15 @@ git merge --abort
 ```
 
 ### Discard Local Changes
+
+**MANDATORY: Use `AskUserQuestion` to confirm before running any of the commands below.**
+
 ```bash
-git checkout -- <file>   # Single file
-git reset --hard HEAD    # All files (DANGER)
+git checkout -- <file>   # Single file — CONFIRM FIRST
+git reset --hard HEAD    # All files (DANGER) — CONFIRM FIRST
 ```
 
-**Always confirm with user before destructive operations.**
+Also require confirmation before:
+- `git push --force` / `git push -f` on any branch
+- `git branch -D <branch>` (force-delete local branch)
+- `git push origin --delete <branch>` (delete remote branch)

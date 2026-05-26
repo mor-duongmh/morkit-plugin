@@ -35,14 +35,15 @@ git push origin HEAD
 
 ## Force Push (DANGER)
 
-**NEVER force push to main/master/production branches.**
+**NEVER force push to main/master/production/prod/release/* branches.**
 
-If user explicitly requests force push on feature branch:
+If user explicitly requests force push on a feature branch, use `AskUserQuestion` to confirm:
+> "Force push rewrites remote history. Collaborators on this branch may lose work. Proceed?"
+
+Only after confirmation:
 ```bash
 git push -f origin HEAD
 ```
-
-**Warn user:** "Force push rewrites history. Collaborators may lose work."
 
 ## Output Format
 ```

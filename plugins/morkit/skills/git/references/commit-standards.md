@@ -23,7 +23,7 @@ type(scope): description
 - **No period at end**
 - **Scope optional but recommended**
 - **Focus on WHAT, not HOW**
-- Only use `feat`, `fix`, or `perf` prefixes for files in `.claude` directory (do not use `docs`).
+- For agent config files (paths under `.claude/` or `plugins/`): prefer `feat`, `fix`, or `perf` over `docs` — these directories contain agent behavior, not documentation.
 
 ## NEVER Include AI Attribution
 - ❌ "Generated with Claude"
@@ -41,6 +41,7 @@ type(scope): description
 - ❌ `feat(auth): added login using bcrypt with salt` (too long, describes HOW)
 - ❌ `Fix bug` (not specific)
 
-## Special Cases
-- `.claude/` skill updates: `perf(skill): improve token efficiency`
-- `.claude/` new skills: `feat(skill): add database-optimizer`
+## Special Cases (agent config files)
+- `.claude/` or `plugins/` skill updates: `perf(skill): improve token efficiency`
+- `.claude/` or `plugins/` new skills: `feat(skill): add database-optimizer`
+- `docs(readme): ...` is still valid for top-level README/changelog

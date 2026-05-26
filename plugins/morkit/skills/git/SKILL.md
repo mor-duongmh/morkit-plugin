@@ -1,14 +1,9 @@
 ---
 name: git
-description: "Git operations with conventional commits. Use for staging, committing, pushing, PRs, merges. Auto-splits commits by type/scope. Security scans for secrets."
-user-invocable: true
-when_to_use: "Invoke for commits, PRs, branch hygiene, or release git steps."
+description: "Use when the user asks to commit, push, create a PR, or merge branches. Handles conventional commits, secret scanning, and auto-splits commits by type/scope."
 category: dev-tools
 keywords: [git, commits, staging, PR, merge]
 argument-hint: "cm|cp|pr|merge [args]"
-metadata:
-  author: morkit
-  version: "1.0.0"
 ---
 
 # Git Operations
@@ -27,12 +22,11 @@ If invoked without arguments, use `AskUserQuestion` to present available git ope
 Present as options via `AskUserQuestion` with header "Git Operation", question "What would you like to do?".
 
 Execute git workflows via `git-manager` subagent to isolate verbose output.
-Activate `context-engineering` skill.
 
 **IMPORTANT:**
 - Sacrifice grammar for the sake of concision.
-- Ensure token efficiency while maintaining high quality.
-- Pass these rules to subagents.
+- Ensure token efficiency — pass minimal context to subagent.
+- Never chain subagent calls back to this skill (delegation loop).
 
 ## Arguments
 - `cm`: Stage files & create commits
@@ -41,7 +35,7 @@ Activate `context-engineering` skill.
   - `to-branch`: Target branch (default: main)
   - `from-branch`: Source branch (default: current branch)
 - `merge`: Merge [to-branch] [from-branch]
-  - `to-branch`: Target branch (default: main)
+  - `to-branch`: Target branch — **required, no default**
   - `from-branch`: Source branch (default: current branch)
 
 ## Quick Reference
@@ -59,32 +53,34 @@ Activate `context-engineering` skill.
 
 ## Core Workflow
 
-### Step 1: Stage + Analyze
+### Step 1: Pre-stage Security Check
+
+Run before staging anything — see `references/workflow-commit.md` for the full check.
+
+Check file names for secrets:
 ```bash
-git add -A && git diff --cached --stat && git diff --cached --name-only
+git status --short | awk '/^\?\? /{print $2}' | grep -iE '(\.env($|\.[^.]+$)|\.pem$|\.key$|\.p12$|credentials\.json|secrets\.json)'
 ```
 
-### Step 2: Security Check
-Scan for secrets before commit:
+Check content for secret patterns (strong regex from `references/safety-protocols.md`):
 ```bash
-git diff --cached | grep -iE "(api[_-]?key|token|password|secret|credential)"
+git diff | grep -iE "(AKIA[0-9A-Z]{16}|api[_-]?key|token|password|secret|credential|private[_-]?key|mongodb://|postgres://|mysql://|redis://|-----BEGIN|client_secret|oauth_token)"
 ```
-**If secrets found:** STOP, warn user, suggest `.gitignore`.
+
+**If either check matches:** STOP, warn user, suggest `.gitignore`. Do not proceed.
+
+### Step 2: Stage + Analyze
+
+Use specific files when possible; avoid `git add -A`:
+```bash
+git diff --cached --stat && git diff --cached --name-only
+```
 
 ### Step 3: Split Decision
 
-**NOTE:**
-- Search for related issues on GitHub and add to body.
-- Only use `feat`, `fix`, or `perf` prefixes for files in `.claude` directory (do not use `docs`).
-
-**Split commits if:**
-- Different types mixed (feat + fix, code + docs)
-- Multiple scopes (auth + payments)
-- Config/deps + code mixed
-- FILES > 10 unrelated
-
-**Single commit if:**
-- Same type/scope, FILES ≤ 3, LINES ≤ 50
+See `references/workflow-commit.md` for full logic. Summary:
+- Single commit: same type/scope, ≤ 3 files, ≤ 50 lines
+- Multi commit: mixed types/scopes — group by config/deps/test/code/docs
 
 ### Step 4: Commit
 ```bash
@@ -115,6 +111,6 @@ git commit -m "type(scope): description"
 - `references/workflow-pr.md` - PR creation with remote diff analysis
 - `references/workflow-merge.md` - Branch merge workflow
 - `references/commit-standards.md` - Conventional commit format rules
-- `references/safety-protocols.md` - Secret detection, branch protection
+- `references/safety-protocols.md` - Secret detection (canonical regex), branch protection
 - `references/branch-management.md` - Naming, lifecycle, strategies
 - `references/gh-cli-guide.md` - GitHub CLI commands reference

@@ -1,7 +1,7 @@
 ---
 name: "morkit:git"
 description: Git operations with conventional commits — stage, commit, push, PR, merge. Delegates to git-manager subagent.
-category: Dev Tools
+category: dev-tools
 tags: [git, commits, PR, merge]
 ---
 

@@ -2,29 +2,41 @@
 
 Execute via `git-manager` subagent.
 
-## Tool 1: Stage + Analyze
+## Tool 1: Pre-stage Security Check
+
+**BEFORE staging anything**, check for sensitive file names:
 ```bash
-git add -A && \
+git status --short | awk '/^\?\? /{print $2}' | grep -iE '(\.env($|\.[^.]+$)|\.pem$|\.key$|\.p12$|credentials\.json|secrets\.json|private.*\.json)'
+```
+
+**If any sensitive files found:** STOP immediately. Warn user, suggest adding to `.gitignore`. Do NOT proceed with staging.
+
+Then check tracked modified files for secret patterns:
+```bash
+git diff | grep -iE "(AKIA[0-9A-Z]{16}|api[_-]?key|token|password|secret|credential|private[_-]?key|mongodb://|postgres://|mysql://|redis://|-----BEGIN|client_secret|oauth_token)"
+```
+
+**If matches found:** STOP, show matching lines, block staging.
+
+## Tool 2: Stage + Analyze
+
+Stage only after security check passes. Use specific files when possible; avoid `git add -A`:
+```bash
+git add <files> && \
 echo "=== STAGED ===" && git diff --cached --stat && \
-echo "=== SECURITY ===" && \
-git diff --cached | grep -c -iE "(api[_-]?key|token|password|secret|credential)" | awk '{print "SECRETS:"$1}' && \
 echo "=== GROUPS ===" && \
 git diff --cached --name-only | awk -F'/' '{
   if ($0 ~ /\.(md|txt)$/) print "docs:"$0
   else if ($0 ~ /test|spec/) print "test:"$0
-  else if ($0 ~ /\.claude/) print "config:"$0
+  else if ($0 ~ /\.claude|plugins\//) print "config:"$0
   else if ($0 ~ /package\.json|lock/) print "deps:"$0
   else print "code:"$0
 }'
 ```
 
-**If SECRETS > 0:** STOP, show matches, block commit.
+If `git add -A` is unavoidable, run the full security scan again on staged diff before continuing.
 
-## Tool 2: Split Decision
-
-NOTE:
-- Search for related issues on GitHub and add to body.
-- Only use `feat`, `fix`, or `perf` prefixes for files in `.claude` directory (do not use `docs`).
+## Tool 3: Split Decision
 
 **From groups, decide:**
 
@@ -37,7 +49,9 @@ NOTE:
 - Group 4: `code:` → `feat|fix: ...`
 - Group 5: `docs:` → `docs: ...`
 
-## Tool 3: Commit
+See `commit-standards.md` for type rules.
+
+## Tool 4: Commit
 
 **Single:**
 ```bash
@@ -50,9 +64,9 @@ git reset && git add file1 file2 && git commit -m "type(scope): desc"
 ```
 Repeat for each group.
 
-## Tool 4: Push (if requested)
+## Tool 5: Push (if requested)
+
+**Only push if user explicitly requested** ("push", "commit and push"):
 ```bash
 git push && echo "✓ pushed: yes" || echo "✓ pushed: no"
 ```
-
-**Only push if user explicitly requested** ("push", "commit and push").
