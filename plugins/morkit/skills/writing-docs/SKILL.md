@@ -31,11 +31,13 @@ Header "Docs Operation", question "What would you like to do?". Do NOT auto-run 
 
 Parse the first word of the arguments:
 - `init` → load `references/init-workflow.md` (entered via `/morkit:init`)
-- `update` → load `references/update-workflow.md`
+- `update` → load `references/update-workflow.md` (refresh from code + bridge active change-specs)
 - `summarize` → load `references/summarize-workflow.md`
 - empty / unclear → AskUserQuestion (above)
 
 Flags: `[path]` target dir (default: cwd) · `--scope project|module` · `--yes` (skip the post-scout gate) · `--agents` (also write `AGENTS.md`).
+
+`init` has **two paths**, auto-detected at its Stage 0: **brownfield** (scout existing code → derive docs) and **greenfield** (empty repo → seed a format-correct spine only, no fiction). See `references/init-workflow.md`.
 
 `init` and `update` finish by generating/refreshing the root agent-instruction file your harness auto-loads (`CLAUDE.md` for Claude Code, `AGENTS.md` for Codex; + the other when detected) per `references/agent-instructions.md`.
 
@@ -64,6 +66,7 @@ Conventions (full detail: `references/taxonomy.md` + `references/anchor-conventi
 
 ## Constraints
 - LLM-driven only — no Python, no external CLI dependency. Keep morkit self-contained.
-- Generation order is ALWAYS **Scout → Content → MAP → agent-instructions** (never write a MAP before its content exists; agent-instructions last because the pointer links to the MAP/guide it just produced).
+- Generation order is ALWAYS **Scout → Content → MAP → agent-instructions** (never write a MAP before its content exists; agent-instructions last because the pointer links to the MAP/guide it just produced). *Greenfield seed:* no Scout — seed Content → MAP → agent-instructions in the same order.
 - Create a folder/file only when the project actually has the matching component (no empty folders).
+- **Greenfield (empty repo):** init detects no-code at Stage 0 and seeds ONLY the spine (SCOPE, DOCUMENT-MAP, empty FEATURE-LIST, root CLAUDE.md pointer — plus opt-in STACK/ARCHITECTURE). NEVER invent features/architecture/sources. Code-derived docs are skipped; `update` backfills them as code appears.
 - All output stays in `docs/` EXCEPT `CLAUDE.md` / `AGENTS.md` at the root — those are written only through the marker-block + approve gate in `references/agent-instructions.md` (never touch content outside the marker block).

@@ -12,7 +12,9 @@ This is the first-time documentation bootstrap — run it once per project (brow
 - Generate anchors (MAP files + cross-links + minimal front-matter) so agents load minimal context per task
 - Write a thin pointer block into the root `CLAUDE.md` (and `AGENTS.md` when Codex is detected) through an approve gate
 
-Flags pass through to the skill: `[path]` target dir (default: cwd) · `--scope project|module` · `--yes` (skip the post-scout gate) · `--agents` (also write `AGENTS.md`).
+**Greenfield (empty repo) is auto-detected** at the skill's Stage 0 (no manifest + ~0 source LOC): instead of scouting, init seeds only a minimal correct-format spine (`SCOPE`, `DOCUMENT-MAP`, an empty `FEATURE-LIST`, and the root `CLAUDE.md` pointer) — no invented content. A one-time gate offers to also seed intended `STACK`/`ARCHITECTURE`. `/morkit:docs update` backfills the rest as code appears.
+
+Flags pass through to the skill: `[path]` target dir (default: cwd) · `--scope project|module` · `--yes` (skip the post-scout gate; on greenfield also skips the STACK/ARCHITECTURE seed prompt) · `--agents` (also write `AGENTS.md`).
 
 Output goes to `docs/` at the target project root. No Python — fully LLM-driven.
 

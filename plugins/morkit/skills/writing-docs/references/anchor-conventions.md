@@ -18,11 +18,12 @@ How docs become "anchors" an AI agent can latch onto, decomposed and linked so t
 ```yaml
 ---
 updated: <YYYY-MM-DD>
-status: draft | stable
+status: draft | stable | planned | drift
 source_files: [<path or glob>]   # only where the doc maps to specific code
 ---
 ```
-- `source_files` is the seed for future `update`/sync — include it on docs derived from code (SOURCE-MAP, SYS-SPEC, DATA-MAP, API-MAP, UI-MAP, FEATURE-LIST).
+- `status` values: `draft`/`stable` (normal lifecycle) · `planned` (intent seeded ahead of code, e.g. greenfield ARCHITECTURE) · `drift` (a bridged spec claim with no code evidence yet — flagged by `docs update` for review).
+- `source_files` is the seed for future `update`/sync — include it on docs derived from code (SOURCE-MAP, SYS-SPEC, DATA-MAP, API-MAP, UI-MAP, FEATURE-LIST). Omit it on seeded greenfield docs (no code yet).
 - Omit `source_files` where it has no meaning (GLOSSARY, DOCUMENT-MAP).
 - Do NOT add `owner`/`related` unless the project asks — keep it to these 3 fields.
 

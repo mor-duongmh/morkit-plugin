@@ -69,6 +69,7 @@ status: draft
 <!-- hint: Identify the single source of truth for the most-changed concerns. -->
 <!-- hint: Format: "- <concern>: `path/to/file`" — one line per concern. -->
 <!-- hint: e.g. "- Route truth: `src/router/index.ts`" -->
+<!-- hint: doc-source canonical (how docs stay truthful): HOW from code · WHY from design.md/ADR · WHAT from FEATURE-LIST (+ spec.md when present). On spec⟂code, code wins; the spec claim is flagged as drift. -->
 
 - <placeholder concern>: `<path/to/canonical/file>`
 - <placeholder concern>: `<path/to/canonical/file>`
