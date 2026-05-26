@@ -42,6 +42,12 @@ const { isClaudePluginsRepo } = require('./scope-guard.cjs');
  */
 const LAST_ROUTING_CACHE = path.join(__dirname, '.last-routing.json');
 
+// A1: when complexity.liveInHook is ON, embed ONLY when keyword routing is
+// uncertain (confidence below this). Keyword matches score 0.8; the default
+// "no pattern matched" route scores 0.5. So embedding (~1.3s) runs only on the
+// uncertain 0.5 case, bounding the per-prompt cost instead of taxing every prompt.
+const EMBED_WHEN_CONFIDENCE_BELOW = 0.8;
+
 /** Write {agent, bucket, tier, ts} to the decision cache. Never throws. */
 function writeCachedDecision(agent, bucket, tier) {
   try {
@@ -100,27 +106,47 @@ function buildRouteOutput(prompt, opts) {
     ? opts._adaptiveAdjust
     : storeAdaptiveAdjust;
 
-  // FIX I-2: complexity live-wiring is DEFERRED behind policy.complexity.liveInHook (default false).
-  // Only call score() when liveInHook === true; otherwise keyword-only path (current behavior).
+  // A1: complexity scoring is gated behind policy.complexity.liveInHook. To bound
+  // the embedding cost (~1.3s) to ambiguous prompts, route by keywords FIRST, then
+  // invoke the embedding scorer ONLY when that route is uncertain (confidence below
+  // EMBED_WHEN_CONFIDENCE_BELOW). On uncertain prompts the confidence gate already
+  // forbids downgrades, so embedding can only escalate — the safe direction.
   let complexityScore = null;
-  try {
-    const policy = loadPolicy();
-    if (policy && policy.complexity && policy.complexity.liveInHook === true) {
-      const { score } = require('./complexity-scorer.cjs');
-      const scored = score(prompt);
-      if (scored) complexityScore = scored.bucket;
-    }
-  } catch (_) {
-    // score() failing must never block routing — stay on keyword-only path
-  }
-
-  const routeOpts = { harness, adaptiveAdjust: adaptiveAdjustFn, complexityScore };
+  const baseRouteOpts = { harness, adaptiveAdjust: adaptiveAdjustFn };
 
   let result;
   try {
-    result = routeTask(prompt, routeOpts);
+    result = routeTask(prompt, baseRouteOpts);
   } catch (_) {
     return '[ROUTING] agent=coder (conf 0.50)';
+  }
+
+  if (typeof result.tier === 'number' && result.confidence < EMBED_WHEN_CONFIDENCE_BELOW) {
+    // opts._liveInHook / opts._score are test seams (cf. _adaptiveAdjust, _policyPath).
+    let liveInHook = false;
+    if (opts && typeof opts._liveInHook === 'boolean') {
+      liveInHook = opts._liveInHook;
+    } else {
+      try {
+        const policy = loadPolicy();
+        liveInHook = !!(policy && policy.complexity && policy.complexity.liveInHook === true);
+      } catch (_) {}
+    }
+
+    if (liveInHook) {
+      try {
+        const scoreFn = (opts && typeof opts._score === 'function')
+          ? opts._score
+          : require('./complexity-scorer.cjs').score;
+        const scored = scoreFn(prompt);
+        if (scored) {
+          complexityScore = scored.bucket;
+          result = routeTask(prompt, { ...baseRouteOpts, complexityScore });
+        }
+      } catch (_) {
+        // embedding failure must never block routing — keep the keyword-only result
+      }
+    }
   }
 
   // Enriched shape (policy loaded)

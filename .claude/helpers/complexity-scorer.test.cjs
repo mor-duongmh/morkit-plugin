@@ -14,9 +14,24 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
-const { score, isStrictEligible } = require('./complexity-scorer.cjs');
+const { score, isStrictEligible, readPrecomputedVectors } = require('./complexity-scorer.cjs');
 
 const EMBEDDING_TESTS = process.env.ENABLE_EMBEDDING_TESTS === '1';
+
+// ── Precomputed vectors (A2): fast path, no shell-out ─────────────────────────
+// loadRefCache reads these instead of embedding 30 ref prompts (~66s cold).
+test('readPrecomputedVectors returns three buckets of equal-length 384-dim vectors', () => {
+  const refs = readPrecomputedVectors();
+  assert.ok(refs !== null, 'precomputed vectors file must exist and parse');
+  for (const bucket of ['simple', 'medium', 'complex']) {
+    assert.ok(Array.isArray(refs[bucket]) && refs[bucket].length === 10,
+      `${bucket} must have 10 precomputed vectors, got ${refs[bucket] && refs[bucket].length}`);
+    for (const v of refs[bucket]) {
+      assert.equal(v.length, 384, `each ${bucket} vector must be 384-dim`);
+      assert.ok(v.every((n) => typeof n === 'number'), `${bucket} vectors must be numeric`);
+    }
+  }
+});
 
 // ── Test 1: null-path when complexity.enabled=false ───────────────────────────
 test('score() returns null when complexityEnabled opt is false', () => {

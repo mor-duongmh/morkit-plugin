@@ -46,6 +46,40 @@ test('buildRouteOutput minimal line when policy is null (bare routeTask result)'
   assert.ok(!output.includes('model='), `must NOT include model= when policy null; got: ${output}`);
 });
 
+// ── A1: complexity scoring gated to uncertain prompts only ────────────────────
+
+test('buildRouteOutput does NOT score when liveInHook is OFF, even for an uncertain prompt', () => {
+  let calls = 0;
+  const spy = () => { calls += 1; return { bucket: 'complex', confidence: 0.9 }; };
+  // "ponder the meaning of existence" matches no task pattern → confidence 0.5 (uncertain)
+  const output = buildRouteOutput('ponder the meaning of existence', {
+    harness: 'claude', _liveInHook: false, _score: spy,
+  });
+  assert.equal(calls, 0, 'scorer must NOT be called when liveInHook is OFF');
+  assert.ok(!output.includes('complexity'), `no complexity escalator expected; got: ${output}`);
+});
+
+test('buildRouteOutput scores an UNCERTAIN prompt when liveInHook is ON (escalate-only)', () => {
+  let calls = 0;
+  const spy = (p) => { calls += 1; assert.equal(typeof p, 'string'); return { bucket: 'complex', confidence: 0.9 }; };
+  const output = buildRouteOutput('ponder the meaning of existence', {
+    harness: 'claude', _liveInHook: true, _score: spy,
+  });
+  assert.equal(calls, 1, 'scorer must be called exactly once on an uncertain prompt');
+  assert.ok(output.includes('+complexity'), `complex bucket must add +complexity escalator; got: ${output}`);
+});
+
+test('buildRouteOutput does NOT score a CONFIDENT (keyword-matched) prompt even when liveInHook is ON', () => {
+  let calls = 0;
+  const spy = () => { calls += 1; return { bucket: 'complex', confidence: 0.9 }; };
+  // "implement a new feature" matches the coder pattern → confidence 0.8 (≥ threshold)
+  const output = buildRouteOutput('implement a new feature', {
+    harness: 'claude', _liveInHook: true, _score: spy,
+  });
+  assert.equal(calls, 0, 'scorer must NOT be called when keyword routing is confident');
+  assert.ok(!output.includes('complexity'), `no complexity escalator on confident route; got: ${output}`);
+});
+
 // ── pretooluse-agent-gate ─────────────────────────────────────────────────────
 
 const { buildGateDecision: gateDecision } = require('../hooks/pretooluse-agent-gate.cjs');

@@ -125,41 +125,20 @@ test('S.6 isClaudePluginsRepo returns false (does not throw) on invalid marker J
 // ── S.7: backward-compat — routeTask without policy returns bare shape ─────────
 
 test('S.7 routeTask with absent policy returns bare { agent, confidence, reason }', () => {
-  // We call routeTask with a _policyPath pointing to a nonexistent file
-  // to simulate the policy-absent path.  Since routeTask doesn't accept
-  // _policyPath directly, we temporarily rename the default policy.
-  const policyPath = path.join(__dirname, 'model-policy.json');
-  const backupPath = path.join(__dirname, '.model-policy.json.bak-test');
+  // Force the policy-absent path via the _policyPath test seam (a nonexistent
+  // file makes loadPolicy return null). This does NOT mutate the shared default
+  // model-policy.json, so it is safe to run concurrently with sibling test files.
+  const result = routeTask('implement a new feature', {
+    harness: 'claude',
+    _policyPath: path.join(__dirname, '.does-not-exist-policy.json'),
+  });
 
-  // If default policy exists, rename it out of the way
-  const hadPolicy = fs.existsSync(policyPath);
-  if (hadPolicy) {
-    fs.renameSync(policyPath, backupPath);
-  }
-
-  try {
-    // Clear the require cache so router.js re-reads the policy
-    delete require.cache[require.resolve('./router.js')];
-    delete require.cache[require.resolve('./model-router.js')];
-    const { routeTask: freshRoute } = require('./router.js');
-
-    const result = freshRoute('implement a new feature', { harness: 'claude' });
-
-    // Must be bare shape: has agent/confidence/reason, must NOT have tier/model
-    assert.ok(typeof result.agent === 'string', 'result must have agent');
-    assert.ok(typeof result.confidence === 'number', 'result must have confidence');
-    assert.ok(typeof result.reason === 'string', 'result must have reason');
-    assert.equal(result.tier, undefined, 'bare shape must NOT have tier');
-    assert.equal(result.model, undefined, 'bare shape must NOT have model');
-  } finally {
-    // Always restore
-    if (hadPolicy) {
-      fs.renameSync(backupPath, policyPath);
-    }
-    // Restore the cached modules
-    delete require.cache[require.resolve('./router.js')];
-    delete require.cache[require.resolve('./model-router.js')];
-  }
+  // Must be bare shape: has agent/confidence/reason, must NOT have tier/model
+  assert.ok(typeof result.agent === 'string', 'result must have agent');
+  assert.ok(typeof result.confidence === 'number', 'result must have confidence');
+  assert.ok(typeof result.reason === 'string', 'result must have reason');
+  assert.equal(result.tier, undefined, 'bare shape must NOT have tier');
+  assert.equal(result.model, undefined, 'bare shape must NOT have model');
 });
 
 // ── S.8: E2E smoke — claude harness, security prompt → tier 3 → opus ─────────

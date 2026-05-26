@@ -149,26 +149,27 @@ test('FIX N-1: codex tier-0 clamp returns consistent {tier, model} (both at tier
   );
 });
 
-// ── Test 6 (FIX I-2): complexity.liveInHook=false (default) — no scoring called ──
-// When liveInHook is false (default), buildRouteOutput must NOT call score().
-// We verify this by confirming the output is identical with/without a mock scorer.
-test('FIX I-2: complexity.liveInHook defaults to false — scorer is NOT invoked in default path', () => {
+// ── Test 6 (A1): liveInHook ON by default; confident prompts are NOT scored ─────
+// liveInHook is now ON, but the hook gates scoring to uncertain prompts. A prompt
+// that matches a keyword pattern (confidence 0.8) must NOT trigger an embedding,
+// so no complexity escalator appears on the keyword-only path.
+test('A1: confident keyword-matched prompt is not scored even with liveInHook ON', () => {
   const policy = JSON.parse(require('node:fs').readFileSync(VALID_POLICY_PATH, 'utf8'));
-  // Confirm the policy has liveInHook false (or absent)
-  const liveInHook = policy.complexity && policy.complexity.liveInHook;
-  assert.ok(
-    !liveInHook,
-    `complexity.liveInHook must be false (default off); got: ${liveInHook}`,
+  // liveInHook is now ON by default (A1 decision).
+  assert.equal(
+    policy.complexity && policy.complexity.liveInHook, true,
+    `complexity.liveInHook must be true (A1 default on); got: ${policy.complexity && policy.complexity.liveInHook}`,
   );
 
-  // buildRouteOutput with default policy must produce tier+model line (keyword-only path)
+  // "implement a feature" matches the coder pattern → confidence 0.8 (≥ embed threshold),
+  // so the hook stays on the keyword-only path and never embeds.
   const { buildRouteOutput } = require('./hook-handler.cjs');
   const output = buildRouteOutput('implement a feature', { harness: 'claude' });
   assert.ok(output.includes('[ROUTING]'), 'must produce [ROUTING] line on keyword-only path');
-  assert.ok(output.includes('tier='), 'must include tier= even when complexity is default-off');
-  // No +complexity or -complexity escalator should appear (scoring was not called)
-  assert.ok(!output.includes('+complexity'), 'must NOT include +complexity escalator when liveInHook=false');
-  assert.ok(!output.includes('-complexity'), 'must NOT include -complexity escalator when liveInHook=false');
+  assert.ok(output.includes('tier='), 'must include tier= on the keyword-only path');
+  // No +complexity / -complexity escalator: a confident prompt is never scored.
+  assert.ok(!output.includes('+complexity'), 'must NOT include +complexity escalator on a confident prompt');
+  assert.ok(!output.includes('-complexity'), 'must NOT include -complexity escalator on a confident prompt');
 });
 
 // ── Test 7 (FIX I-2): complexityScore nudges tier — complex +1, simple -1 ────

@@ -110,8 +110,10 @@ function routeTask(task, opts) {
     }
   }
 
-  // Attempt to load policy for enriched routing
-  const policy = loadPolicy();
+  // Attempt to load policy for enriched routing.
+  // opts._policyPath is a test seam: pass a nonexistent path to force the
+  // policy-absent (bare-shape) path WITHOUT mutating the shared default file.
+  const policy = (opts && opts._policyPath) ? loadPolicy(opts._policyPath) : loadPolicy();
   if (!policy) {
     // Backward-compatible fallback: return base shape only
     return { agent, confidence, reason };

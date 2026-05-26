@@ -32,8 +32,14 @@ const { spawnSync } = require('node:child_process');
 const { loadPolicy } = require('./router.js');
 
 const REFSET_PATH = path.join(__dirname, 'embeddings', 'complexity-refset.json');
+// Precomputed reference-set vectors. When present, loadRefCache reads these from
+// disk instead of shelling out 30x (~66s cold). Regenerate with buildRefVectors().
+const REFVEC_PATH = path.join(__dirname, 'embeddings', 'complexity-refset-vectors.json');
 const DEFAULT_CLI = process.env.COMPLEXITY_CLI_PATH || 'npx';
-const DEFAULT_CLI_ARGS = ['@claude-flow/cli@latest', 'embeddings', 'generate', '-o', 'array', '-t'];
+// `--prefer-offline` keeps npx on the local cache (no registry round-trip) so a
+// single embed stays within the hook budget; it only hits the network if the
+// package is genuinely missing.
+const DEFAULT_CLI_ARGS = ['--prefer-offline', '@claude-flow/cli@latest', 'embeddings', 'generate', '-o', 'array', '-t'];
 
 // Cached reference set embeddings (computed once per process lifetime)
 let refCache = null;
@@ -108,6 +114,15 @@ function generateEmbedding(text, cliPath) {
 function loadRefCache(cliPath) {
   if (refCache) return refCache;
 
+  // Fast path: precomputed vectors on disk (no shelling out).
+  const precomputed = readPrecomputedVectors();
+  if (precomputed) {
+    refCache = precomputed;
+    return refCache;
+  }
+
+  // Slow fallback: embed every reference prompt (cold ~66s). Kept for
+  // resilience when the vectors file is absent or stale.
   let refset;
   try {
     refset = JSON.parse(fs.readFileSync(REFSET_PATH, 'utf8'));
@@ -130,6 +145,60 @@ function loadRefCache(cliPath) {
 
   refCache = buckets;
   return refCache;
+}
+
+/**
+ * Read precomputed reference vectors from REFVEC_PATH.
+ *
+ * @returns {{ simple: number[][], medium: number[][], complex: number[][] }|null}
+ *   null when the file is absent, malformed, or any bucket is empty.
+ */
+function readPrecomputedVectors() {
+  let data;
+  try {
+    data = JSON.parse(fs.readFileSync(REFVEC_PATH, 'utf8'));
+  } catch (_e) {
+    return null;
+  }
+  const buckets = {};
+  for (const bucket of ['simple', 'medium', 'complex']) {
+    const vecs = data && data[bucket];
+    if (!Array.isArray(vecs) || vecs.length === 0) return null;
+    for (const v of vecs) {
+      if (!Array.isArray(v) || v.length < 1) return null;
+    }
+    buckets[bucket] = vecs;
+  }
+  return buckets;
+}
+
+/**
+ * Build the precomputed reference-vectors file by embedding every prompt in the
+ * reference set. Run once at build time (or after editing the ref set):
+ *   node -e "require('./.claude/helpers/complexity-scorer.cjs').buildRefVectors()"
+ *
+ * @param {string} [cliPath] - Override CLI executable (for testing).
+ * @returns {{ written: string, counts: object }} path written and per-bucket counts.
+ * @throws if the ref set is unreadable or any embedding fails.
+ */
+function buildRefVectors(cliPath) {
+  const refset = JSON.parse(fs.readFileSync(REFSET_PATH, 'utf8'));
+  const out = {};
+  const counts = {};
+  for (const bucket of ['simple', 'medium', 'complex']) {
+    const prompts = refset[bucket];
+    if (!Array.isArray(prompts) || prompts.length === 0) {
+      throw new Error(`ref set bucket "${bucket}" is empty or missing`);
+    }
+    out[bucket] = prompts.map((p) => {
+      const v = generateEmbedding(p, cliPath);
+      if (!v) throw new Error(`embedding failed for prompt: ${p}`);
+      return v;
+    });
+    counts[bucket] = out[bucket].length;
+  }
+  fs.writeFileSync(REFVEC_PATH, JSON.stringify(out));
+  return { written: REFVEC_PATH, counts };
 }
 
 /**
@@ -209,4 +278,4 @@ function isStrictEligible(confidence, confidenceMin) {
   return confidence >= confidenceMin;
 }
 
-module.exports = { score, isStrictEligible, cosine, generateEmbedding };
+module.exports = { score, isStrictEligible, cosine, generateEmbedding, buildRefVectors, readPrecomputedVectors };

@@ -20,7 +20,7 @@
     "refSet": "embeddings/complexity-refset.json",
     "confidenceMin": 0.65,
     "strictBelowMinFallback": "warn",
-    "liveInHook": false
+    "liveInHook": true
   },
   "tierModel": {
     "claude": { "0": "__direct__", "1": "haiku", "2": "sonnet", "3": "opus" },
