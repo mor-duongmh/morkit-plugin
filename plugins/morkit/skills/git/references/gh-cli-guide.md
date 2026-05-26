@@ -51,9 +51,10 @@ gh pr status                  # Your PRs + reviews
 gh pr merge 123               # Default merge commit
 gh pr merge 123 --squash      # Squash commits
 gh pr merge 123 --rebase      # Rebase merge
-gh pr merge 123 --auto        # Auto-merge when checks pass
 gh pr merge 123 --delete-branch  # Delete branch after
 ```
+
+> **⚠️ Never auto-merge** (`--auto`) from an agent — it merges to the base branch with no human review. Merges must be user-initiated.
 
 ### PR Comments
 ```bash

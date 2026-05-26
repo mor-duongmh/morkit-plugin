@@ -14,6 +14,9 @@ If TO_BRANCH is a protected branch (`main`, `master`, `production`, `prod`, `rel
 - Use `AskUserQuestion` to confirm: "You are about to merge into a protected branch. Proceed with direct merge, or create a PR instead?"
 - Default to creating a PR via `workflow-pr.md`.
 
+## Step 0.5: Environment check
+Run the environment detection in `safety-protocols.md` → "Environment Detection". If HEAD is detached / the sandbox blocks push (e.g. Codex App), do not push the merge — hand off to the host App.
+
 ## Step 1: Validate branches
 
 Reject TO_BRANCH if it contains unsafe characters (`;`, `|`, `$`, backtick, space):

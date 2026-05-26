@@ -8,9 +8,17 @@ argument-hint: "cm|cp|pr|merge [args]"
 
 # Git Operations
 
+## Safety Rules (always apply)
+
+These rules apply on **every** platform, whether or not the `git-manager` subagent is loaded:
+
+- **Confirm before any destructive op** — push, force-push, `reset --hard`, `checkout -- <file>`, branch delete, or merge into a protected branch (`main`, `master`, `production`, `prod`, `release/*`). Confirm via `AskUserQuestion` on Claude Code; on platforms without it (e.g. Codex — see `using-morkit/references/codex-tools.md`), ask the user inline in plain text and **wait for a reply**. Never skip the confirmation.
+- **No unsolicited pushes or force operations** — only perform git actions the user explicitly requested.
+- **Always run the secret scan before staging** (Step 1). Block on any match.
+
 ## Default (No Arguments)
 
-If invoked without arguments, use `AskUserQuestion` to present available git operations:
+If invoked without arguments, use `AskUserQuestion` (or, on platforms without it, a plain-text prompt) to present available git operations:
 
 | Operation | Description |
 |-----------|-------------|
@@ -21,7 +29,9 @@ If invoked without arguments, use `AskUserQuestion` to present available git ope
 
 Present as options via `AskUserQuestion` with header "Git Operation", question "What would you like to do?".
 
-Execute git workflows via `git-manager` subagent to isolate verbose output.
+Execute git workflows via the `git-manager` subagent to isolate verbose output.
+
+**Platform note (delegation):** if your platform has no named-agent registry (e.g. Codex — its plugin system does not yet load the `agents/` directory), do **not** try to spawn `git-manager`. Instead read `agents/git-manager.md`, apply its safety rules (also listed above), and run the workflow inline. See `using-morkit/references/codex-tools.md` → "Named agent dispatch".
 
 **IMPORTANT:**
 - Sacrifice grammar for the sake of concision.

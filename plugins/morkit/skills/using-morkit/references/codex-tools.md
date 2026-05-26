@@ -10,6 +10,7 @@ Skills use Claude Code tool names. When you encounter these in a skill, use your
 | Task completes automatically | `close_agent` to free slot |
 | `TodoWrite` (task tracking) | `update_plan` |
 | `Skill` tool (invoke a skill) | Skills load natively — just follow the instructions |
+| `AskUserQuestion` (confirm / choose) | No native tool — ask the user inline in plain text and **wait for their reply** before proceeding. Never skip the confirmation. |
 | `Read`, `Write`, `Edit` (files) | Use your native file tools |
 | `Bash` (run commands) | Use your native shell tools |
 | `${CLAUDE_PLUGIN_ROOT}` (plugin path) | `${MORKIT_PLUGIN_ROOT}` (see [Plugin root resolution](#plugin-root-resolution)) |

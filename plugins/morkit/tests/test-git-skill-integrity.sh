@@ -88,8 +88,9 @@ case_4_skill_activations() {
     local i=1
     while IFS= read -r line; do
         # Extract skill name from: Activate `<name>` skill
+        # Portable (BSD + GNU): use sed BRE capture instead of grep -oP (Perl-only).
         local skill_name
-        skill_name=$(echo "$line" | grep -oP 'Activate `\K[^`]+')
+        skill_name=$(printf '%s' "$line" | sed -n 's/.*Activate `\([^`]*\)`.*/\1/p')
         [[ -z "$skill_name" ]] && continue
         local skill_path="$TEST_PLUGIN_ROOT/skills/$skill_name/SKILL.md"
         if [[ -f "$skill_path" ]]; then
@@ -117,10 +118,11 @@ case_5_no_git_add_dash_A_in_commit() {
 
 case_5_no_auto_merge_pattern() {
     local file="$GIT_SKILL_DIR/references/gh-cli-guide.md"
-    if grep -q 'gh pr merge --auto' "$file"; then
-        _fail "5.2 gh-cli-guide.md still contains auto-merge pattern"
+    # Robust: catch `gh pr merge --auto` AND `gh pr merge 123 --auto` (any args between).
+    if grep -qE 'gh pr merge.*--auto' "$file"; then
+        _fail "5.2 gh-cli-guide.md still contains a runnable auto-merge command"
     else
-        _pass "5.2 gh-cli-guide.md has no auto-merge pattern"
+        _pass "5.2 gh-cli-guide.md has no runnable auto-merge command"
     fi
 }
 
@@ -143,6 +145,48 @@ case_5_merge_no_default_to_main() {
 }
 
 # ---------------------------------------------------------------------------
+# 6. Cross-platform (Codex) safety — guardrails must not depend on tools the
+#    git-manager agent file or AskUserQuestion alone provide.
+# ---------------------------------------------------------------------------
+case_6_safety_rules_in_skill() {
+    # Safety rules must live in SKILL.md (Codex does not load agents/), not only
+    # in the agent file.
+    if grep -qi 'Safety Rules (always apply)' "$GIT_SKILL_DIR/SKILL.md"; then
+        _pass "6.1 SKILL.md carries the always-apply safety rules"
+    else
+        _fail "6.1 SKILL.md missing safety rules (Codex won't load agents/git-manager.md)"
+    fi
+}
+
+case_6_delegation_fallback() {
+    # SKILL.md must document the no-named-agent fallback for Codex.
+    if grep -qi 'no named-agent registry\|Platform note (delegation)' "$GIT_SKILL_DIR/SKILL.md"; then
+        _pass "6.2 SKILL.md documents the Codex delegation fallback"
+    else
+        _fail "6.2 SKILL.md missing delegation fallback for platforms without named agents"
+    fi
+}
+
+case_6_env_detection() {
+    if grep -qi 'Environment Detection' "$GIT_SKILL_DIR/references/safety-protocols.md"; then
+        _pass "6.3 safety-protocols.md documents sandbox/worktree environment detection"
+    else
+        _fail "6.3 safety-protocols.md missing environment detection (sandbox push handling)"
+    fi
+}
+
+case_6_askuserquestion_mapped() {
+    # The plugin's Codex tool map must define an AskUserQuestion equivalent, or
+    # every confirmation gate silently breaks on Codex.
+    local map="$TEST_PLUGIN_ROOT/skills/using-morkit/references/codex-tools.md"
+    if [[ -f "$map" ]] && grep -q 'AskUserQuestion' "$map"; then
+        _pass "6.4 codex-tools.md maps AskUserQuestion to a Codex equivalent"
+    else
+        _fail "6.4 codex-tools.md has no AskUserQuestion mapping (confirm gates break on Codex)"
+    fi
+}
+
+# ---------------------------------------------------------------------------
 # Run all cases
 # ---------------------------------------------------------------------------
 case_1_skill_md_exists
@@ -157,5 +201,9 @@ case_5_no_git_add_dash_A_in_commit
 case_5_no_auto_merge_pattern
 case_5_no_bulk_pr_close
 case_5_merge_no_default_to_main
+case_6_safety_rules_in_skill
+case_6_delegation_fallback
+case_6_env_detection
+case_6_askuserquestion_mapped
 
 exit_with_status

@@ -9,6 +9,9 @@ Execute via `git-manager` subagent.
 ## CRITICAL: Use REMOTE diff
 PRs based on remote branches. Local diff includes unpushed changes.
 
+## Step 0: Environment check
+Run the environment detection in `safety-protocols.md` → "Environment Detection". If HEAD is detached / the sandbox blocks push (e.g. Codex App), commit locally and hand off to the host App (output a suggested PR body) instead of creating the PR via CLI.
+
 ## Tool 1: Sync + Analyze
 
 **IMPORTANT: Always merge `main` (or any default branch) to current branch first.**

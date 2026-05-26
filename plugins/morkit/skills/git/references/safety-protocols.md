@@ -47,6 +47,21 @@ Always use `origin/{branch}` for comparisons:
 - ✅ `git diff origin/main...origin/feature`
 - ❌ `git diff main...HEAD` (includes local uncommitted)
 
+## Environment Detection (sandbox / worktree)
+
+Before any `push`, `pr`, or `merge`, detect the environment with read-only git commands:
+
+```bash
+GIT_DIR=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
+GIT_COMMON=$(cd "$(git rev-parse --git-common-dir)" 2>/dev/null && pwd -P)
+BRANCH=$(git branch --show-current)
+```
+
+- `GIT_DIR != GIT_COMMON` → already inside a linked worktree.
+- `BRANCH` empty → **detached HEAD** (common in a Codex App sandbox) → cannot branch/push/PR.
+
+**If the sandbox blocks push/branch** (detached HEAD in an externally managed worktree): commit the work locally, then tell the user to use the host App's native controls ("Create branch" / "Hand off to local"). Still output suggested branch name, commit message, and PR body for the user to copy. See `using-morkit/references/codex-tools.md` → "Codex App Finishing".
+
 ## Error Recovery
 
 ### Undo Last Commit (unpushed)
@@ -62,7 +77,7 @@ git merge --abort
 
 ### Discard Local Changes
 
-**MANDATORY: Use `AskUserQuestion` to confirm before running any of the commands below.**
+**MANDATORY: Confirm before running any of the commands below.** Use `AskUserQuestion` on Claude Code; on platforms without it (e.g. Codex — see `using-morkit/references/codex-tools.md`), ask the user inline and wait for a reply.
 
 ```bash
 git checkout -- <file>   # Single file — CONFIRM FIRST

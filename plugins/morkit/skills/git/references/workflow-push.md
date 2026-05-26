@@ -2,6 +2,9 @@
 
 Execute via `git-manager` subagent.
 
+## Step 0: Environment check
+Run the environment detection in `safety-protocols.md` → "Environment Detection". If HEAD is detached / the sandbox blocks push (e.g. Codex App), commit locally and hand off to the host App instead of pushing.
+
 ## Pre-Push Checklist
 1. All changes committed
 2. Secrets scanned (see `safety-protocols.md`)
