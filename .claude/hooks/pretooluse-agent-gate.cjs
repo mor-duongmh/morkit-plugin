@@ -8,17 +8,29 @@
  *   PreToolUse (matcher: Agent) → node pretooluse-agent-gate.cjs
  *
  * Reads Claude Code's PreToolUse stdin JSON, inspects the Agent tool_input
- * for a `model` field, and compares it against the policy-expected model for
- * the given `subagent_type`.
+ * for a `model` field, and enforces a MINIMUM-capability floor: the spawned
+ * model must be at least as capable as the tier the router computes for the
+ * agent call's actual task text (escalators + confidence gate included).
+ *
+ * Enforcing a floor (not an exact base match) avoids false positives on
+ * legitimately-escalated spawns — e.g. a "security" coder task that the
+ * router escalates from tier 2 (sonnet) to tier 3 (opus); spawning opus must
+ * be ALLOWED even though the coder *base* tier is sonnet. Equal or more
+ * capable is always fine (the operator may choose to spend more).
  *
  * Decision rules:
- *   1. model absent or matches expected → ALLOW (no output needed).
- *   2. model MISMATCHES expected AND confidence >= confidenceMin → DENY
- *      with corrective message naming the expected model.
- *   3. model MISMATCHES expected AND confidence < confidenceMin → ALLOW
- *      with optional systemMessage warning (per strictBelowMinFallback: "warn").
- *   4. Any internal error → ALLOW (fail-open; a buggy gate must never
- *      block legitimate work).
+ *   1. model absent → ALLOW (nothing to enforce).
+ *   2. spawnedTier >= expectedTier → ALLOW (equal or more capable is fine).
+ *   3. spawnedTier < expectedTier AND confidence >= confidenceMin → DENY
+ *      with a corrective message naming the expected model/tier.
+ *   4. spawnedTier < expectedTier AND confidence < confidenceMin → ALLOW
+ *      with a systemMessage warning (per strictBelowMinFallback: "warn").
+ *   5. Any internal error / undeterminable tier → ALLOW (fail-open; a buggy
+ *      gate must never block legitimate work).
+ *
+ * Expected tier is computed by running `routeTask` on the agent call's task
+ * text (`tool_input.prompt`), which carries the escalator keywords. When that
+ * text is unavailable, we fall back to the agent's base tier from the policy.
  *
  * PreToolUse deny contract (verified from Claude Code hooks docs,
  * https://code.claude.com/docs/en/hooks, 2026-05-26):
@@ -34,58 +46,88 @@ const path = require('node:path');
 const { routeTask, loadPolicy } = require(path.join(__dirname, '../helpers/router.js'));
 
 /**
- * Compute the expected policy model for a given subagent_type.
+ * Build a reverse map of model-string → tier-int from the claude harness map.
+ * E.g. { "__direct__":0, "haiku":1, "sonnet":2, "opus":3 } → reverse lookup.
  *
- * Uses routeTask to mirror the same agent-detection + tier-computation logic
- * that the route handler uses. The subagent_type is used as the prompt prefix
- * so the pattern matcher can identify the correct agent.
+ * @param {object} policy
+ * @returns {Map<string, number>}
+ */
+function modelToTierMap(policy) {
+  const map = new Map();
+  const harnessMap = (policy && policy.tierModel && policy.tierModel.claude) || {};
+  for (const [tierStr, model] of Object.entries(harnessMap)) {
+    const tier = Number(tierStr);
+    if (Number.isInteger(tier) && typeof model === 'string') {
+      map.set(model, tier);
+    }
+  }
+  return map;
+}
+
+/**
+ * Compute the expected (minimum) tier the router would assign for an agent's
+ * task. Runs the SAME routing computation the router/route-handler uses on the
+ * agent call's task text so escalators + the confidence gate are included.
  *
- * Returns null when policy is unavailable (gate should fail-open).
+ * Falls back to the agent's base tier from policy.agentBase when the task text
+ * is empty (so we still enforce a floor without escalator context).
  *
  * @param {string} subagentType - e.g. "coder", "tester", "architect"
- * @param {string} prompt       - original task prompt (may be empty)
+ * @param {string} agentPrompt  - the subagent's task description (may be empty)
  * @param {object} policy       - loaded policy object
- * @returns {string|null}       - expected model string or null
+ * @returns {{ tier: number, confidence: number, model: string|null } | null}
+ *   null when policy is unavailable (gate should fail-open).
  */
-function expectedModelForSubagent(subagentType, prompt, policy) {
+function expectedTierForAgent(subagentType, agentPrompt, policy) {
   if (!policy) return null;
 
-  // Build a synthetic prompt that will route to the correct agent.
-  // Prefer the original prompt if it already routes to the right agent;
-  // otherwise prepend the subagent_type keyword so the pattern fires.
-  const syntheticPrompt = `${subagentType} task: ${prompt || 'task'}`;
-  const result = routeTask(syntheticPrompt, { harness: 'claude' });
+  const harnessMap = (policy.tierModel && policy.tierModel.claude) || {};
 
-  // If the routed agent does not match, force via agentBase directly.
-  // We compute tier using the policy's agentBase for this subagentType.
-  const agentForType = result.agent === subagentType ? result.agent : subagentType;
+  // Preferred path: route on the agent call's actual task text. routeTask
+  // applies the agent's base tier + escalators + the confidence gate, exactly
+  // as the route handler does. We prefix the subagent_type so the pattern
+  // matcher resolves to the intended agent even if the task text is terse.
+  if (agentPrompt && agentPrompt.trim()) {
+    const syntheticPrompt = `${subagentType} task: ${agentPrompt}`;
+    const result = routeTask(syntheticPrompt, { harness: 'claude' });
+    if (typeof result.tier === 'number') {
+      return {
+        tier: result.tier,
+        confidence: typeof result.confidence === 'number' ? result.confidence : 1.0,
+        model: result.model || harnessMap[String(result.tier)] || null,
+      };
+    }
+  }
 
-  // Compute the base tier for this agent from policy
-  const baseTier = Object.prototype.hasOwnProperty.call(policy.agentBase, agentForType)
-    ? policy.agentBase[agentForType]
+  // Fallback: base tier for this agent (no escalator context available).
+  const baseTier = Object.prototype.hasOwnProperty.call(policy.agentBase, subagentType)
+    ? policy.agentBase[subagentType]
     : 2;
-
-  const harnessMap = policy.tierModel['claude'] || {};
-  const model = harnessMap[String(baseTier)];
-  return model || null;
+  return {
+    tier: baseTier,
+    confidence: 1.0,
+    model: harnessMap[String(baseTier)] || null,
+  };
 }
 
 /**
  * Compute the gate decision for an Agent tool_input.
  *
- * Pure function — no side effects except routeTask (which reads the policy file).
+ * Enforces a minimum-capability floor: the spawned model must map to a tier
+ * >= the tier the router computes for the agent's task. Equal or more capable
+ * is allowed. Pure function — side effects limited to routeTask (reads policy).
  * Exported for unit testing.
  *
  * @param {object} toolInput        - The Agent call's tool_input (subagent_type, model, prompt, …)
  * @param {object} opts
- * @param {number}  opts.confidence - Routing confidence (0–1). If unknown, pass 1.0 to be strict.
+ * @param {number} [opts.confidence] - Optional confidence override. When omitted,
+ *   the confidence from routing the agent's task text is used.
  * @param {object}  opts.policy     - Loaded policy (may be null → fail-open).
  * @returns {{ action: "allow"|"deny", output: object|null }}
  */
 function buildGateDecision(toolInput, opts) {
   try {
     const policy = opts && opts.policy != null ? opts.policy : null;
-    const confidence = (opts && typeof opts.confidence === 'number') ? opts.confidence : 1.0;
 
     // Fail-open: no policy → allow
     if (!policy) {
@@ -94,46 +136,62 @@ function buildGateDecision(toolInput, opts) {
 
     const subagentType = toolInput.subagent_type || toolInput.subagentType || '';
     const requestedModel = toolInput.model;
-    const prompt = toolInput.prompt || '';
+    const agentPrompt = toolInput.prompt || '';
 
     // Rule 1: no model specified → allow (nothing to enforce)
     if (!requestedModel) {
       return { action: 'allow', output: null };
     }
 
-    const expectedModel = expectedModelForSubagent(subagentType, prompt, policy);
+    // Compute the expected (minimum) tier the router would assign for this task.
+    const expected = expectedTierForAgent(subagentType, agentPrompt, policy);
 
-    // Rule 1b: can't determine expected model → fail-open
-    if (!expectedModel) {
+    // Rule 5a: can't determine expected tier → fail-open
+    if (!expected || typeof expected.tier !== 'number') {
       return { action: 'allow', output: null };
     }
 
-    // Rule 1c: model matches → allow
-    if (requestedModel === expectedModel) {
+    // Reverse-lookup the spawned model → tier.
+    const spawnedTier = modelToTierMap(policy).get(requestedModel);
+
+    // Rule 5b: spawned model not in the policy table → can't compare → fail-open.
+    if (typeof spawnedTier !== 'number') {
       return { action: 'allow', output: null };
     }
 
-    // Model MISMATCHES — check confidence
+    // Rule 2: equal OR more capable than the floor → allow.
+    if (spawnedTier >= expected.tier) {
+      return { action: 'allow', output: null };
+    }
+
+    // Under-powered (spawnedTier < expectedTier). Caller may override confidence
+    // (e.g. from a complexity score); otherwise use the routing confidence.
+    const confidence = (opts && typeof opts.confidence === 'number')
+      ? opts.confidence
+      : expected.confidence;
+
     const confidenceMin = (policy.complexity && typeof policy.complexity.confidenceMin === 'number')
       ? policy.complexity.confidenceMin
       : 0.65;
 
+    const expectedModel = expected.model || `tier ${expected.tier}`;
+
     if (confidence < confidenceMin) {
-      // Rule 3: low confidence → allow with optional warning
+      // Rule 4: low confidence → allow with a warning (strictBelowMinFallback: "warn").
       const warning = `[model-routing] Low-confidence routing (${confidence.toFixed(2)} < ${confidenceMin}): ` +
-        `requested model "${requestedModel}" differs from policy model "${expectedModel}" ` +
-        `for agent "${subagentType}". Allowing due to low confidence.`;
+        `requested model "${requestedModel}" (tier ${spawnedTier}) is below policy floor ` +
+        `"${expectedModel}" (tier ${expected.tier}) for agent "${subagentType}". Allowing due to low confidence.`;
       return {
         action: 'allow',
         output: { systemMessage: warning },
       };
     }
 
-    // Rule 2: high confidence mismatch → DENY
+    // Rule 3: high-confidence under-powered spawn → DENY.
     // Deny contract: https://code.claude.com/docs/en/hooks (verified 2026-05-26)
-    const reason = `[model-routing] Agent "${subagentType}" policy requires model "${expectedModel}" ` +
-      `but "${requestedModel}" was requested. ` +
-      `Please use model="${expectedModel}" to comply with the routing policy.`;
+    const reason = `[model-routing] Agent "${subagentType}" task expects model ≥ "${expectedModel}" ` +
+      `(tier ${expected.tier}) but "${requestedModel}" (tier ${spawnedTier}) was requested. ` +
+      `Please use model="${expectedModel}" or higher to comply with the routing policy.`;
     return {
       action: 'deny',
       output: {
@@ -145,7 +203,7 @@ function buildGateDecision(toolInput, opts) {
       },
     };
   } catch (_) {
-    // Rule 4: any internal error → fail-open
+    // Rule 5: any internal error → fail-open
     return { action: 'allow', output: null };
   }
 }
@@ -190,21 +248,14 @@ async function main() {
   // Normalize snake_case / camelCase
   const toolInput = hookInput.toolInput || hookInput.tool_input || {};
 
-  // Load policy and derive confidence from a quick routeTask call on the prompt
+  // Load policy. buildGateDecision derives the expected tier AND confidence
+  // by routing the agent call's own task text, so we don't pre-compute here.
   let policy = null;
-  let confidence = 1.0;
   try {
     policy = loadPolicy();
-    const prompt = toolInput.prompt || hookInput.prompt || '';
-    if (prompt && policy) {
-      const result = routeTask(prompt, { harness: 'claude' });
-      if (typeof result.confidence === 'number') {
-        confidence = result.confidence;
-      }
-    }
   } catch (_) { /* fail-open */ }
 
-  const { action, output } = buildGateDecision(toolInput, { confidence, policy });
+  const { action, output } = buildGateDecision(toolInput, { policy });
 
   if (action === 'deny' && output) {
     process.stdout.write(JSON.stringify(output) + '\n');

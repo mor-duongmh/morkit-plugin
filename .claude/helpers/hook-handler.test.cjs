@@ -50,18 +50,19 @@ test('buildRouteOutput minimal line when policy is null (bare routeTask result)'
 
 const { buildGateDecision: gateDecision } = require('../hooks/pretooluse-agent-gate.cjs');
 
-test('gate DENIES Agent call when model mismatches policy and confidence >= confidenceMin', () => {
-  // subagent_type "coder" → tier 2 → model "sonnet" on claude harness
-  // Passing "opus" as the requested model → mismatch with high confidence
+test('gate DENIES an UNDER-POWERED spawn (haiku where policy floor is sonnet) at high confidence', () => {
+  // coder + "implement a feature" → tier 2 (sonnet) floor, confidence 0.8 (>= 0.65).
+  // Spawning "haiku" (tier 1) is below the floor → DENY.
   const decision = gateDecision({
     subagent_type: 'coder',
-    model: 'opus',          // WRONG: policy says "sonnet" for coder/tier-2
+    model: 'haiku',         // tier 1 < expected tier 2
     prompt: 'implement a feature',
-  }, { confidence: 0.9, policy });
+  }, { policy });
 
-  assert.equal(decision.action, 'deny', 'action must be "deny"');
-  assert.ok(
-    decision.output.hookSpecificOutput.permissionDecision === 'deny',
+  assert.equal(decision.action, 'deny', 'action must be "deny" for under-powered spawn');
+  assert.equal(
+    decision.output.hookSpecificOutput.permissionDecision,
+    'deny',
     'permissionDecision must be "deny"',
   );
   assert.ok(
@@ -70,19 +71,44 @@ test('gate DENIES Agent call when model mismatches policy and confidence >= conf
   );
   assert.ok(
     decision.output.hookSpecificOutput.permissionDecisionReason.includes('sonnet'),
-    `deny reason must name the expected model "sonnet"; got: ${decision.output.hookSpecificOutput.permissionDecisionReason}`,
+    `deny reason must name the expected floor model "sonnet"; got: ${decision.output.hookSpecificOutput.permissionDecisionReason}`,
   );
 });
 
-test('gate ALLOWS when model matches the policy model', () => {
-  // coder → tier 2 → "sonnet"; passing "sonnet" → allow
+test('gate ALLOWS an ESCALATED spawn (opus for a "security" coder task)', () => {
+  // coder + "security" task → router escalates to tier 3 (opus). Spawning opus
+  // matches the escalated floor → ALLOW. This is the false-positive the floor
+  // semantics fix: the OLD base-match logic would have denied this.
+  const decision = gateDecision({
+    subagent_type: 'coder',
+    model: 'opus',          // tier 3 == escalated floor tier 3
+    prompt: 'add security auth to the login module',
+  }, { policy });
+
+  assert.equal(decision.action, 'allow', 'escalated spawn matching the escalated floor must be ALLOWED');
+});
+
+test('gate ALLOWS an OVER-POWERED spawn (opus for a plain tier-2 coder task)', () => {
+  // coder + plain task → tier 2 floor. Spawning opus (tier 3) is MORE capable
+  // than the floor → ALLOW (operator may choose to spend more).
+  const decision = gateDecision({
+    subagent_type: 'coder',
+    model: 'opus',          // tier 3 > expected tier 2
+    prompt: 'implement a feature',
+  }, { policy });
+
+  assert.equal(decision.action, 'allow', 'over-powered spawn must be ALLOWED (>= floor)');
+});
+
+test('gate ALLOWS when spawned model exactly matches the floor', () => {
+  // coder → tier 2 → "sonnet"; spawning "sonnet" → allow
   const decision = gateDecision({
     subagent_type: 'coder',
     model: 'sonnet',
     prompt: 'implement a feature',
-  }, { confidence: 0.9, policy });
+  }, { policy });
 
-  assert.equal(decision.action, 'allow', 'action must be "allow" when model matches');
+  assert.equal(decision.action, 'allow', 'action must be "allow" when model equals floor');
 });
 
 test('gate ALLOWS when model is missing (not specified)', () => {
@@ -91,33 +117,31 @@ test('gate ALLOWS when model is missing (not specified)', () => {
     subagent_type: 'coder',
     prompt: 'implement a feature',
     // no model field
-  }, { confidence: 0.9, policy });
+  }, { policy });
 
   assert.equal(decision.action, 'allow', 'action must be "allow" when model is absent');
 });
 
-test('gate ALLOWS (warn only) when confidence is below confidenceMin even on mismatch', () => {
-  // confidence 0.4 < confidenceMin 0.65 → do not deny, warn only
+test('gate ALLOWS (warn only) when confidence is below confidenceMin even when under-powered', () => {
+  // confidence override 0.4 < confidenceMin 0.65 → do not deny, warn only.
   const decision = gateDecision({
     subagent_type: 'coder',
-    model: 'opus',         // mismatch, but low confidence
+    model: 'haiku',         // under-powered, but low confidence
     prompt: 'implement a feature',
   }, { confidence: 0.4, policy });
 
   assert.equal(decision.action, 'allow', 'must be "allow" (not deny) when confidence below minimum');
-  // Optionally includes a systemMessage warning
-  if (decision.output && decision.output.systemMessage) {
-    assert.equal(typeof decision.output.systemMessage, 'string', 'systemMessage must be string if present');
-  }
+  assert.ok(decision.output && typeof decision.output.systemMessage === 'string',
+    'must include a systemMessage warning per strictBelowMinFallback "warn"');
 });
 
 test('gate ALLOWS (fail-open) when an internal error occurs', () => {
-  // Pass null policy to trigger an internal error path
+  // Pass null policy to trigger the fail-open path
   const decision = gateDecision({
     subagent_type: 'coder',
-    model: 'opus',
+    model: 'haiku',
     prompt: 'implement a feature',
-  }, { confidence: 0.9, policy: null });
+  }, { policy: null });
 
   assert.equal(decision.action, 'allow', 'gate must fail open on internal error');
 });
