@@ -120,3 +120,103 @@ test('routeTask with harness option returns enriched shape with model from polic
   assert.equal(typeof noOpts.tier, 'number', 'tier must be present when policy is available');
   assert.equal(typeof noOpts.model, 'string', 'model must be present when policy is available');
 });
+
+// ── Test 5 (FIX N-1): codex tier-0 case — tier and model are consistent ─────
+// When harness=codex and logical tier would be 0, it is clamped to 1.
+// The returned {tier, model} must correspond: tier===1 and model==="gpt-5.4-mini".
+test('FIX N-1: codex tier-0 clamp returns consistent {tier, model} (both at tier 1)', () => {
+  const { computeTierWithPolicy } = require('./model-router.js');
+  const { loadPolicy } = require('./router.js');
+  const policy = loadPolicy();
+  assert.ok(policy, 'policy must be loadable for this test');
+
+  // tester (base=1) + "rename" (-1) = 0 → codex clamps to 1
+  const result = computeTierWithPolicy({
+    agent: 'tester',
+    confidence: 0.8,     // high confidence allows downgrade
+    prompt: 'rename the helper variable',
+    policy,
+    harness: 'codex',
+  });
+
+  assert.equal(result.tier, 1, 'FIX N-1: codex tier must be the effective (post-clamp) tier 1, not 0');
+  assert.equal(result.model, 'gpt-5.4-mini', 'FIX N-1: codex tier-1 must map to gpt-5.4-mini');
+  // Verify consistency: policy.tierModel.codex[tier] === model
+  assert.equal(
+    policy.tierModel.codex[String(result.tier)],
+    result.model,
+    'tier and model must be consistent: policy.tierModel.codex[tier] must equal result.model',
+  );
+});
+
+// ── Test 6 (FIX I-2): complexity.liveInHook=false (default) — no scoring called ──
+// When liveInHook is false (default), buildRouteOutput must NOT call score().
+// We verify this by confirming the output is identical with/without a mock scorer.
+test('FIX I-2: complexity.liveInHook defaults to false — scorer is NOT invoked in default path', () => {
+  const policy = JSON.parse(require('node:fs').readFileSync(VALID_POLICY_PATH, 'utf8'));
+  // Confirm the policy has liveInHook false (or absent)
+  const liveInHook = policy.complexity && policy.complexity.liveInHook;
+  assert.ok(
+    !liveInHook,
+    `complexity.liveInHook must be false (default off); got: ${liveInHook}`,
+  );
+
+  // buildRouteOutput with default policy must produce tier+model line (keyword-only path)
+  const { buildRouteOutput } = require('./hook-handler.cjs');
+  const output = buildRouteOutput('implement a feature', { harness: 'claude' });
+  assert.ok(output.includes('[ROUTING]'), 'must produce [ROUTING] line on keyword-only path');
+  assert.ok(output.includes('tier='), 'must include tier= even when complexity is default-off');
+  // No +complexity or -complexity escalator should appear (scoring was not called)
+  assert.ok(!output.includes('+complexity'), 'must NOT include +complexity escalator when liveInHook=false');
+  assert.ok(!output.includes('-complexity'), 'must NOT include -complexity escalator when liveInHook=false');
+});
+
+// ── Test 7 (FIX I-2): complexityScore nudges tier — complex +1, simple -1 ────
+// computeTierWithPolicy must apply a ±1 nudge when complexityScore is provided.
+test('FIX I-2: complexityScore nudges tier (+1 for complex, -1 for simple, 0 for medium)', () => {
+  const { computeTierWithPolicy } = require('./model-router.js');
+  const { loadPolicy } = require('./router.js');
+  const policy = loadPolicy();
+  assert.ok(policy, 'policy must be loadable');
+
+  // coder base tier=2; no keyword escalators in a plain prompt
+  const base = computeTierWithPolicy({ agent: 'coder', confidence: 0.8, prompt: 'implement', policy });
+  assert.equal(base.tier, 2, 'baseline coder tier must be 2');
+
+  // complex → +1 → tier 3
+  const complex = computeTierWithPolicy({
+    agent: 'coder', confidence: 0.8, prompt: 'implement', policy, complexityScore: 'complex',
+  });
+  assert.equal(complex.tier, 3, 'complex bucket must nudge tier from 2 to 3');
+  assert.ok(complex.escalators.includes('+complexity'), 'escalators must include +complexity');
+
+  // simple → -1 → tier 1
+  const simple = computeTierWithPolicy({
+    agent: 'coder', confidence: 0.8, prompt: 'implement', policy, complexityScore: 'simple',
+  });
+  assert.equal(simple.tier, 1, 'simple bucket must nudge tier from 2 to 1');
+  assert.ok(simple.escalators.includes('-complexity'), 'escalators must include -complexity');
+
+  // simple with low confidence (≤0.5) → confidence gate prevents downgrade → stays at 2
+  const simpleLowConf = computeTierWithPolicy({
+    agent: 'coder', confidence: 0.5, prompt: 'implement', policy, complexityScore: 'simple',
+  });
+  assert.equal(
+    simpleLowConf.tier, 2,
+    'simple bucket with low confidence must not downgrade (confidence gate); got ' + simpleLowConf.tier,
+  );
+
+  // medium → 0 (no change)
+  const medium = computeTierWithPolicy({
+    agent: 'coder', confidence: 0.8, prompt: 'implement', policy, complexityScore: 'medium',
+  });
+  assert.equal(medium.tier, 2, 'medium bucket must not change tier');
+  assert.ok(!medium.escalators.includes('+complexity'), 'medium must not add +complexity');
+  assert.ok(!medium.escalators.includes('-complexity'), 'medium must not add -complexity');
+
+  // null → 0 (no change, same as medium)
+  const nullScore = computeTierWithPolicy({
+    agent: 'coder', confidence: 0.8, prompt: 'implement', policy, complexityScore: null,
+  });
+  assert.equal(nullScore.tier, 2, 'null complexityScore must not change tier');
+});

@@ -52,7 +52,11 @@ if command -v jq >/dev/null 2>&1; then
     enabled=$(jq -r '.enabled // false' "$SCOPE_MARKER" 2>/dev/null || echo "false")
     [[ "$enabled" == "true" ]] || exit 0
 elif command -v node >/dev/null 2>&1; then
-    enabled=$(node -e "try{var m=JSON.parse(require('fs').readFileSync('$SCOPE_MARKER','utf8'));console.log(m.enabled===true?'true':'false')}catch(_){console.log('false')}" 2>/dev/null || echo "false")
+    # FIX N-2: export SCOPE_MARKER as an env var so the path is read via process.env
+    # rather than embedded as an inline JS string literal. This handles paths with spaces.
+    SCOPE_MARKER_PATH="$SCOPE_MARKER"
+    export SCOPE_MARKER_PATH
+    enabled=$(node -e "try{var m=JSON.parse(require('fs').readFileSync(process.env.SCOPE_MARKER_PATH,'utf8'));console.log(m.enabled===true?'true':'false')}catch(_){console.log('false')}" 2>/dev/null || echo "false")
     [[ "$enabled" == "true" ]] || exit 0
 else
     # Neither jq nor node available → fail-open (exit 0, noop)

@@ -187,4 +187,18 @@
 
 ---
 
+## Task 9: Complexity live-wiring perf follow-up (DEFERRED — default OFF)
+
+> **Status:** Complexity scoring in the hook path is gated behind `policy.complexity.liveInHook` (boolean, **default false**). When false (current default), the hook uses keyword-only tier computation with no subprocess shelling. The `computeTierWithPolicy` seam is fully wired; enabling it is a one-flag change in `model-policy.json`.
+
+> **Reason for deferral:** the embedding CLI backend shells out ~1.4 s/call (30 reference prompts × per-call latency on first run), exceeding the 5 s hook safety budget. This will be resolved by either (a) pre-warming the reference-set embeddings in-process or (b) replacing the CLI backend with a lighter scorer.
+
+**Files:** (when undeferred)
+
+- `claude-plugins/.claude/helpers/model-policy.json` — set `complexity.liveInHook: true`
+- `claude-plugins/.claude/helpers/complexity-scorer.cjs` — optimize backend (pre-warm / lighter)
+- `claude-plugins/morkit/output/spec/model-routing-harness/design.md` — update V2-deferred note
+
+---
+
 *Generated: 2026-05-26T04:03:06Z*

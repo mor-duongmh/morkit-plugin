@@ -44,10 +44,14 @@ function countFileTokens(prompt) {
  * @param {string}   opts.prompt      - Original task prompt.
  * @param {object}   opts.policy      - Loaded policy object (from loadPolicy).
  * @param {string}  [opts.harness]    - Model harness: "claude" (default) or "codex".
- * @param {number|null} [opts.complexityScore] - SEAM for Task 4: embedding bucket score.
- *   Currently unused; reserved for future complexity-based tier nudge.
- * @param {function} [opts.adaptiveAdjust] - SEAM for Task 5: fn(agent, bucket, tier) → tier.
- *   Defaults to identity (no-op).
+ * @param {string|null} [opts.complexityScore] - Complexity bucket from complexity-scorer:
+ *   "simple" | "medium" | "complex" | null.
+ *   When provided (liveInHook is ON, or passed explicitly in tests), nudges the tier:
+ *     "complex" → +1, "simple" → -1, "medium"/null → 0.
+ *   Nudge is recorded in escalators and is subject to the same [0,3] clamp.
+ *   Also passed as the `bucket` argument to adaptiveAdjust.
+ * @param {function} [opts.adaptiveAdjust] - fn(agent, bucket, tier, policyAdaptive) → tier.
+ *   Defaults to identity (no-op). Wired from adaptive-store.cjs in the live hook path.
  * @returns {{ tier: number, model: string, escalators: string[] }}
  */
 function computeTierWithPolicy({
@@ -56,9 +60,8 @@ function computeTierWithPolicy({
   prompt,
   policy,
   harness = 'claude',
-  // eslint-disable-next-line no-unused-vars
-  complexityScore = null,   // SEAM: Task 4 will populate this
-  adaptiveAdjust = null,    // SEAM: Task 5 will populate this
+  complexityScore = null,
+  adaptiveAdjust = null,
 }) {
   const baseTier = Object.prototype.hasOwnProperty.call(policy.agentBase, agent)
     ? policy.agentBase[agent]
@@ -89,6 +92,18 @@ function computeTierWithPolicy({
     delta -= 1;
   }
 
+  // FIX I-2 step 3: Complexity bucket nudge (+1 for complex, -1 for simple, 0 otherwise).
+  // Only applied when a non-null complexityScore is provided (i.e. liveInHook is ON or tests pass it).
+  // Nudge is folded into the escalator delta so the confidence gate and clamp apply to the combined delta.
+  if (complexityScore === 'complex') {
+    escalators.push('+complexity');
+    delta += 1;
+  } else if (complexityScore === 'simple') {
+    escalators.push('-complexity');
+    delta -= 1;
+  }
+  // 'medium' and null are no-ops (no escalator recorded)
+
   let tier = baseTier + delta;
 
   // Confidence gate: low confidence (≤ 0.5) forbids any downgrade
@@ -99,17 +114,18 @@ function computeTierWithPolicy({
   // Clamp to valid range
   tier = Math.max(0, Math.min(3, tier));
 
-  // SEAM: Task 5 adaptive adjustment (identity by default).
+  // Adaptive adjustment (identity by default).
   // Signature: adaptiveAdjust(agent, bucket, tier, policyAdaptive) → tier
-  // `complexityScore` carries the bucket string (or null) when the caller
-  // provides it; the store's adaptiveAdjust uses it as the (agent,bucket) key.
+  // complexityScore carries the bucket string (or null); the store uses it as the (agent,bucket) key.
   if (typeof adaptiveAdjust === 'function') {
     const policyAdaptive = (policy && policy.adaptive) || null;
     tier = Math.max(0, Math.min(3, adaptiveAdjust(agent, complexityScore, tier, policyAdaptive)));
   }
 
   // Harness-aware model mapping
-  // Codex has no tier-0 entry; clamp up to 1 when harness is "codex" and tier is 0
+  // Codex has no tier-0 entry; clamp up to 1 when harness is "codex" and tier is 0.
+  // FIX N-1: return the effective (post-clamp) tier so that tier and model are consistent.
+  // A consumer reverse-looking-up tierModel.codex[tier] must get the same model.
   let effectiveTier = tier;
   if (harness === 'codex' && effectiveTier === 0) {
     effectiveTier = 1;
@@ -118,7 +134,7 @@ function computeTierWithPolicy({
   const harnessMap = policy.tierModel[harness] || policy.tierModel['claude'];
   const model = harnessMap[String(effectiveTier)];
 
-  return { tier, model, escalators };
+  return { tier: effectiveTier, model, escalators };
 }
 
 module.exports = { computeTierWithPolicy, countFileTokens };

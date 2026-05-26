@@ -19,9 +19,44 @@
  *   handleRecordOutcome(inputJson)  → void
  */
 
+const fs = require('node:fs');
+const path = require('node:path');
+
 const { routeTask, loadPolicy } = require('./router.js');
-const { recordOutcome } = require('./adaptive-store.cjs');
+const { recordOutcome, adaptiveAdjust: storeAdaptiveAdjust } = require('./adaptive-store.cjs');
 const { isClaudePluginsRepo } = require('./scope-guard.cjs');
+
+/**
+ * Decision-context cache (FIX I-3).
+ *
+ * The `route` handler knows the full routing decision (agent, bucket, tier) at
+ * the time it fires. The later PostToolUse/Stop outcome event does NOT carry this
+ * context — Claude payloads only have tool_input.subagent_type and similar fields.
+ *
+ * This tiny file-backed cache bridges the gap: `route` writes {agent,bucket,tier,ts}
+ * here; `record-outcome` falls back to reading it when the payload lacks those fields.
+ *
+ * Best-effort only: the cache is last-write-wins (single-agent flow), may be stale
+ * in parallel sessions, and is never read if the payload already supplies agent/tier.
+ * Never throws — any I/O error is silently swallowed.
+ */
+const LAST_ROUTING_CACHE = path.join(__dirname, '.last-routing.json');
+
+/** Write {agent, bucket, tier, ts} to the decision cache. Never throws. */
+function writeCachedDecision(agent, bucket, tier) {
+  try {
+    fs.writeFileSync(LAST_ROUTING_CACHE, JSON.stringify({ agent, bucket, tier, ts: Date.now() }), 'utf8');
+  } catch (_) {}
+}
+
+/** Read last routing decision from cache. Returns null on any error. */
+function readCachedDecision() {
+  try {
+    return JSON.parse(fs.readFileSync(LAST_ROUTING_CACHE, 'utf8'));
+  } catch (_) {
+    return null;
+  }
+}
 
 // ── Pure, testable function for the route handler ─────────────────────────────
 
@@ -37,15 +72,15 @@ const { isClaudePluginsRepo } = require('./scope-guard.cjs');
  *
  * @param {string} prompt - Task prompt.
  * @param {object} [opts]
- * @param {string}  [opts.harness="claude"] - Model harness.
- * @param {string}  [opts._policyPath]      - Override policy path (for testing).
+ * @param {string}   [opts.harness="claude"]      - Model harness.
+ * @param {string}   [opts._policyPath]           - Override policy path (for testing).
+ * @param {function} [opts._adaptiveAdjust]       - Override adaptiveAdjust fn (for testing).
  * @returns {string} Line suitable for stdout / additionalContext.
  */
 function buildRouteOutput(prompt, opts) {
   const harness = (opts && opts.harness) || 'claude';
 
   // Support injecting a broken policy path to exercise the bare-result path in tests.
-  const routeOpts = { harness };
   if (opts && opts._policyPath) {
     // Temporarily monkey-patch loadPolicy by providing a custom policyPath.
     // We re-implement the bare routeTask call here to support override.
@@ -58,6 +93,28 @@ function buildRouteOutput(prompt, opts) {
       return `[ROUTING] agent=${result.agent} (conf ${conf})`;
     }
   }
+
+  // FIX I-1: wire adaptiveAdjust from adaptive-store so accumulated outcomes influence tier.
+  // Injectable via opts._adaptiveAdjust for tests; defaults to the real store function.
+  const adaptiveAdjustFn = (opts && typeof opts._adaptiveAdjust === 'function')
+    ? opts._adaptiveAdjust
+    : storeAdaptiveAdjust;
+
+  // FIX I-2: complexity live-wiring is DEFERRED behind policy.complexity.liveInHook (default false).
+  // Only call score() when liveInHook === true; otherwise keyword-only path (current behavior).
+  let complexityScore = null;
+  try {
+    const policy = loadPolicy();
+    if (policy && policy.complexity && policy.complexity.liveInHook === true) {
+      const { score } = require('./complexity-scorer.cjs');
+      const scored = score(prompt);
+      if (scored) complexityScore = scored.bucket;
+    }
+  } catch (_) {
+    // score() failing must never block routing — stay on keyword-only path
+  }
+
+  const routeOpts = { harness, adaptiveAdjust: adaptiveAdjustFn, complexityScore };
 
   let result;
   try {
@@ -72,6 +129,11 @@ function buildRouteOutput(prompt, opts) {
     const escPart = result.escalators && result.escalators.length > 0
       ? `; ${result.escalators.join(' ')}`
       : '';
+
+    // FIX I-3: cache the routing decision so record-outcome can fall back to it
+    // when the PostToolUse/Stop payload lacks agent/bucket/tier context.
+    writeCachedDecision(result.agent, complexityScore, result.tier);
+
     return `[ROUTING] agent=${result.agent} tier=${result.tier} model=${result.model} (conf ${conf}${escPart})`;
   }
 
@@ -85,6 +147,13 @@ function buildRouteOutput(prompt, opts) {
 /**
  * Handle a "record-outcome" event from stdin JSON.
  *
+ * FIX I-2: Agent is read from data.agent OR data.tool_input.subagent_type
+ * (real Claude PostToolUse payloads carry the agent name in tool_input.subagent_type).
+ *
+ * FIX I-3: When the payload lacks agent/bucket/tier, fall back to the decision cache
+ * written by the most-recent `route` invocation. This is best-effort only — the cache
+ * is last-write-wins and may be stale in concurrent sessions.
+ *
  * @param {string} inputJson - Raw JSON string from the hook invocation.
  * @returns {void}
  */
@@ -92,16 +161,35 @@ function handleRecordOutcome(inputJson) {
   try {
     const data = JSON.parse(inputJson);
 
-    const agent = typeof data.agent === 'string' ? data.agent : null;
-    const bucket = typeof data.bucket === 'string' ? data.bucket : null;
-    const tier = typeof data.tier === 'number' ? data.tier : 2;
+    // FIX I-2: resolve agent from direct field or from Claude PostToolUse tool_input
+    const toolInput = data.tool_input || data.toolInput || {};
+    let agent = typeof data.agent === 'string' ? data.agent : null;
+    if (!agent && typeof toolInput.subagent_type === 'string') {
+      agent = toolInput.subagent_type;
+    }
+
+    let bucket = typeof data.bucket === 'string' ? data.bucket : null;
+    let tier = typeof data.tier === 'number' ? data.tier : null;
+
+    // FIX I-3: fall back to cached decision when payload lacks agent/bucket/tier.
+    // Best-effort: never throw, treat stale/missing cache as if absent.
+    if (!agent || tier === null) {
+      const cached = readCachedDecision();
+      if (cached) {
+        if (!agent && typeof cached.agent === 'string') agent = cached.agent;
+        if (bucket === null && (cached.bucket !== undefined)) bucket = cached.bucket;
+        if (tier === null && typeof cached.tier === 'number') tier = cached.tier;
+      }
+    }
+
     const outcome = typeof data.outcome === 'string' ? data.outcome : 'success';
     const statePath = typeof data.statePath === 'string' ? data.statePath : undefined;
 
-    // Ignore events with no agent (malformed input)
+    // Ignore events with no agent (malformed input, cache also absent)
     if (!agent) return;
 
-    recordOutcome(agent, bucket, tier, outcome, statePath);
+    // Use tier=2 as a safe default if still unknown after cache fallback
+    recordOutcome(agent, bucket, tier !== null ? tier : 2, outcome, statePath);
   } catch (_) {
     // Never throw — hook handlers must always exit cleanly
   }

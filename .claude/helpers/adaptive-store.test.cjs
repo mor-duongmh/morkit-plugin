@@ -212,3 +212,93 @@ test('hook-handler record-outcome handles Codex Stop event shape', () => {
     try { fs.unlinkSync(statePath); } catch (_) {}
   }
 });
+
+// ── Test 11: FIX I-2 — record-outcome resolves agent from tool_input.subagent_type ──
+// Real Claude PostToolUse payloads carry the agent in tool_input.subagent_type.
+test('record-outcome resolves agent from tool_input.subagent_type (real Claude PostToolUse shape)', () => {
+  const handler = require('./hook-handler.cjs');
+  const statePath = tmpPath();
+  try {
+    const input = JSON.stringify({
+      tool_name: 'Agent',
+      tool_input: { subagent_type: 'coder' },
+      bucket: 'medium',
+      tier: 2,
+      outcome: 'success',
+      statePath,
+    });
+    handler['record-outcome'](input);
+
+    const raw = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    assert.ok('coder:medium' in raw, 'agent resolved from tool_input.subagent_type must write coder:medium');
+    assert.equal(raw['coder:medium'].success, 1, 'success count must be 1');
+  } finally {
+    try { fs.unlinkSync(statePath); } catch (_) {}
+  }
+});
+
+// ── Test 12: FIX I-3 — record-outcome falls back to decision cache for agent/tier ──
+// When the payload lacks agent and tier, handleRecordOutcome must read the cache.
+test('record-outcome falls back to decision cache when payload lacks agent and tier', () => {
+  const handler = require('./hook-handler.cjs');
+  const { buildRouteOutput } = handler;
+  const statePath = tmpPath();
+  try {
+    // Step 1: trigger a route to populate the decision cache
+    buildRouteOutput('implement a feature', { harness: 'claude' });
+
+    // Step 2: send a record-outcome payload WITHOUT agent or tier (Stop-like payload)
+    const input = JSON.stringify({
+      event: 'Stop',
+      outcome: 'success',
+      statePath,
+      // no agent, no tier — must fall back to cache
+    });
+    handler['record-outcome'](input);
+
+    const raw = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    // The cache was populated by buildRouteOutput → coder (implement = coder agent)
+    const keys = Object.keys(raw);
+    assert.ok(keys.length > 0, 'decision cache fallback must have written at least one record');
+    // The key must contain "coder" since "implement" routes to coder
+    const coderKey = keys.find(k => k.startsWith('coder:'));
+    assert.ok(coderKey, `must have a coder: key via cache fallback; keys were: ${keys.join(', ')}`);
+  } finally {
+    try { fs.unlinkSync(statePath); } catch (_) {}
+  }
+});
+
+// ── Test 13: FIX I-1 — routeTask with seeded adaptive state returns bumped tier ──
+// With a state where (coder, null) is retry-dominated past minSamples, routeTask
+// with adaptiveAdjust returns a bumped tier vs the same call without the store.
+test('routeTask with adaptiveAdjust wired returns bumped tier when store is retry-dominated', () => {
+  const { routeTask } = require('./router.js');
+  const { adaptiveAdjust: storeAdj } = require('./adaptive-store.cjs');
+  const statePath = tmpPath();
+
+  try {
+    // Seed 8 retry outcomes for coder:null (null bucket → 'default' key)
+    for (let i = 0; i < 8; i++) {
+      recordOutcome('coder', null, 2, 'retry', statePath);
+    }
+
+    // Create an adaptiveAdjust bound to the temp state file
+    const boundAdj = (agent, bucket, tier, policy) => storeAdj(agent, bucket, tier, policy, statePath);
+
+    const withStore = routeTask('implement a feature', { harness: 'claude', adaptiveAdjust: boundAdj });
+    const withoutStore = routeTask('implement a feature', { harness: 'claude' });
+
+    // Both must have tier present
+    assert.equal(typeof withStore.tier, 'number', 'withStore.tier must be a number');
+    assert.equal(typeof withoutStore.tier, 'number', 'withoutStore.tier must be a number');
+
+    // The store-wired call must produce a higher (bumped) tier
+    assert.ok(
+      withStore.tier > withoutStore.tier,
+      `adaptive store must bump tier: got ${withStore.tier} (with store) vs ${withoutStore.tier} (without)`,
+    );
+    assert.equal(withStore.tier, withoutStore.tier + 1, 'bump must be exactly +1');
+  } finally {
+    try { fs.unlinkSync(statePath); } catch (_) {}
+  }
+});

@@ -110,6 +110,14 @@ PreToolUse(Agent) gate decision: `allow` | `deny(reason)` (Claude). Codex has no
 - **Q4:** Scope guard mechanism — self-contained config under `claude-plugins/.claude/` vs. cwd-gating in the `work`-root hook. Lean: self-contained.
 - **Residual:** ~2-min manual confirmation of Q1 behavior (live `codex exec` spawn) before Task 7 ships — skipped in spike to avoid using the user's ChatGPT quota.
 
+## V2-deferred: Complexity live-wiring <!-- V2-deferred -->
+
+The embedding-based complexity scorer (`complexity-scorer.cjs`) shells out to the claude-flow CLI per call (~1.4s/embedding × 30 reference prompts on first call). This budget is incompatible with the 5-second hook safety timer in `hook-handler.cjs`.
+
+**Status:** complexity live-wiring in the hook path is controlled by `policy.complexity.liveInHook` (boolean, **default false**). When false (the default), the hook uses keyword-only tier computation (current behavior, no shelling out). When true, `score(prompt)` is called and the resulting bucket (`"simple"` → −1, `"complex"` → +1, `"medium"`/null → 0) nudges the tier before the confidence gate and adaptive adjustment.
+
+**Follow-up:** tracked as Task 9 (perf follow-up). Before enabling `liveInHook`, the embedding pipeline must either (a) be pre-warmed so reference-set embeddings are cached in-process across calls, or (b) be replaced with a lighter scoring backend. The `complexityScore` seam in `computeTierWithPolicy` is fully wired — enabling it is a one-flag change once perf is acceptable.
+
 ---
 
 *Generated: 2026-05-26T04:03:06Z*

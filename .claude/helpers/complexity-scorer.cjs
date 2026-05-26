@@ -26,9 +26,12 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+// FIX N-5: import canonical loadPolicy from router.js instead of a partial reimplementation.
+// The canonical version validates schema (schemaVersion, required keys); this scorer only
+// needs complexity.enabled so it stays backward compatible — both return null on failure.
+const { loadPolicy } = require('./router.js');
 
 const REFSET_PATH = path.join(__dirname, 'embeddings', 'complexity-refset.json');
-const POLICY_PATH = path.join(__dirname, 'model-policy.json');
 const DEFAULT_CLI = process.env.COMPLEXITY_CLI_PATH || 'npx';
 const DEFAULT_CLI_ARGS = ['@claude-flow/cli@latest', 'embeddings', 'generate', '-o', 'array', '-t'];
 
@@ -127,19 +130,6 @@ function loadRefCache(cliPath) {
 
   refCache = buckets;
   return refCache;
-}
-
-/**
- * Load the routing policy to check complexity.enabled.
- *
- * @returns {object|null}
- */
-function loadPolicy() {
-  try {
-    return JSON.parse(fs.readFileSync(POLICY_PATH, 'utf8'));
-  } catch (_e) {
-    return null;
-  }
 }
 
 /**

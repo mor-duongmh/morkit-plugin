@@ -12,6 +12,7 @@ __pycache__/
 !.claude/hooks
 !.claude/settings.json
 .claude/helpers/.adaptive-state.json
+.claude/helpers/.last-routing.json
 plans/templates
 CLAUDE.md
 release-manifest.json
