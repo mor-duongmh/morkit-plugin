@@ -1,6 +1,6 @@
 {
   "name": "morkit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Mor's all-in-one toolkit for OpenAI Codex CLI — spec workflow (propose/review/archive) + brainstorming/execute/TDD skills + 5-specialist deep code review + AI-agent doc generation (writing-docs). Single-source with the Claude Code variant: the same plugins/morkit/skills/ is symlinked into Codex; skills keep Claude vocab and are translated at runtime via using-morkit/references/codex-tools.md. Hooks gate uses apply_patch|Edit|Write|Skill matcher.",
   "author": {
     "name": "Mor",

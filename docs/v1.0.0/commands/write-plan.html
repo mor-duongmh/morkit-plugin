@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › apply-sync</title>
+<title>morkit › command › write-plan</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,20 +173,21 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">apply-sync</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">write-plan</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>apply-sync</h1>
-  <p class="lede">Áp dụng các nội dung bạn đã tick trong sync-proposal.md vào tài liệu.</p>
+  <div style="margin-bottom: 10px;"><span class="tag deprecated">Đã thay thế</span><span class="tag">Plan & build</span><span class="tag">Command</span></div>
+  <h1>write-plan</h1>
+  <p class="lede">Command cũ — đã được thay bằng skill morkit:writing-plans.</p>
 
   <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:apply-sync [tham số]</code></pre>
+  <pre><code>/morkit:write-plan [tham số]</code></pre>
   <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Ngay sau khi /morkit:sync đã sinh proposal và bạn đã tick chọn</li>
+  <li>Đừng dùng nữa — dùng skill morkit:writing-plans thay thế</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -195,17 +196,16 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:apply-sync</code></pre>
+    <pre><code>$ /morkit:write-plan</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Chuyển các mục được tick thành thay đổi cụ thể rồi chạy update flow chuẩn.</p>
+  <p class="lede" style="font-size:14px;">Sẽ bị gỡ ở bản major tiếp theo.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/brainstorming.html"><div class="ttl">/morkit:brainstorming</div><div class="sub">Plan &amp; build · command</div></a>
+    <a class="related-card" href="../commands/execute-plan.html"><div class="ttl">/morkit:execute-plan</div><div class="sub">Plan &amp; build · command</div></a>
+    <a class="related-card" href="../skills/brainstorming.html"><div class="ttl">brainstorming</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/writing-plans.html"><div class="ttl">writing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
   </div>
 
   <div class="footer">
@@ -232,5 +232,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

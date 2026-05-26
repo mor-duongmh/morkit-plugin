@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-design-guidelines</title>
+<title>morkit › skill › using-git-worktrees</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,26 +173,26 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-design-guidelines</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">using-git-worktrees</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-design-guidelines</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu Design Principles, Patterns và các ADR (MADR format).</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Plan & build</span><span class="tag">Skill</span></div>
+  <h1>using-git-worktrees</h1>
+  <p class="lede">Tạo worktree riêng cho feature mới, không ảnh hưởng đến workspace hiện tại.</p>
 
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
-    <li>Render <code>design-guidelines.md</code> gồm 3 phần:</li>
-    <li><ul><li><strong>Design Principles</strong></li><li><strong>Patterns</strong></li><li><strong>ADRs</strong> theo chuẩn MADR</li></ul></li>
-    <li>Khi <code>init</code>, mỗi ADR có file riêng tại <code>docs/adr/NNN-slug.md</code></li>
-    <li>Phân loại theo scope: <strong>DPR</strong> / <strong>PTN</strong> / <strong>ADR</strong></li>
-    <li><em>Không hỗ trợ</em> chế độ sync — guidelines là quyết định của người, không auto-generate</li>
+    <li>Tạo git worktree ở thư mục riêng dựa trên branch hiện tại hoặc branch mới</li>
+    <li>Có <strong>smart directory selection</strong>: không tạo trong thư mục đã có code</li>
+    <li>Tránh xung đột khi đang dở việc trong workspace chính</li>
+    <li>Hợp khi muốn thử một hướng khác mà không cần <code>git stash</code></li>
   </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi cần một tài liệu thống nhất về nguyên tắc thiết kế</li>
-  <li>Khi muốn ghi lại các quyết định kiến trúc theo MADR format</li>
+  <li>Khi bắt đầu một feature cần làm cách ly khỏi workspace hiện tại</li>
+  <li>Trước khi chạy plan thực thi có thể đụng nhiều file</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -201,18 +201,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-design-guidelines (gọi qua /morkit:init / /morkit:update-doc)</code></pre>
+    <pre><code>$ /morkit:using-git-worktrees (gọi trước khi cut branch)</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Khi init, mỗi ADR sẽ có một file riêng tại docs/adr/NNN-slug.md. Skill này không hỗ trợ chế độ sync — guidelines do người viết.</p>
+  <p class="lede" style="font-size:14px;">Tạo worktree ở thư mục riêng, có kiểm tra an toàn sẵn để không xung đột với branch hiện tại.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/brainstorming.html"><div class="ttl">brainstorming</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/writing-plans.html"><div class="ttl">writing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/executing-plans.html"><div class="ttl">executing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/subagent-driven-development.html"><div class="ttl">subagent-driven-development</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/test-driven-development.html"><div class="ttl">test-driven-development</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/systematic-debugging.html"><div class="ttl">systematic-debugging</div><div class="sub">Plan &amp; build · skill</div></a>
   </div>
 
   <div class="footer">
@@ -239,5 +239,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

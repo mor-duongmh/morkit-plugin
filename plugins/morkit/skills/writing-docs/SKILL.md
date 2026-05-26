@@ -10,22 +10,27 @@ Generate and maintain a project documentation set in `docs/` optimized for AI ag
 
 **IMPORTANT:** This skill writes documentation ONLY. Do NOT implement or modify application code. No Python — fully LLM-driven via morkit-native dispatch (Task tool / `dispatching-parallel-agents`).
 
+## Entry Points
+
+This skill implements three modes, reached via two commands:
+- **`/morkit:init`** → first-time bootstrap (always passes `init`).
+- **`/morkit:docs`** → maintenance of existing docs (`update` / `summarize`).
+
 ## Default (No Arguments)
 
 If invoked without a clear mode, use the **AskUserQuestion tool** to present:
 
 | Operation | Description |
 |-----------|-------------|
-| `init` | Scout the codebase & create the initial doc taxonomy |
 | `update` | Refresh existing docs against code changes |
 | `summarize` | Quick refresh of SOURCE-MAP + DOCUMENT-MAP |
 
-Header "Docs Operation", question "What would you like to do?". Do NOT auto-run `init`.
+Header "Docs Operation", question "What would you like to do?". Do NOT auto-run anything. If there is no `docs/` taxonomy yet (first-time setup), tell the user to run **`/morkit:init`**.
 
 ## Routing
 
 Parse the first word of the arguments:
-- `init` → load `references/init-workflow.md`
+- `init` → load `references/init-workflow.md` (entered via `/morkit:init`)
 - `update` → load `references/update-workflow.md`
 - `summarize` → load `references/summarize-workflow.md`
 - empty / unclear → AskUserQuestion (above)

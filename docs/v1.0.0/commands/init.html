@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-system-architecture</title>
+<title>morkit › command › init</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,25 +173,21 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-system-architecture</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-system-architecture</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu kiến trúc hệ thống theo arc42-lite, kèm sơ đồ thành phần bằng Mermaid.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
+  <h1>init</h1>
+  <p class="lede">Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON.</p>
 
-  <h2>1. Nhiệm vụ</h2>
-  <ul class="duties">
-    <li>Render <code>system-architecture.md</code> theo <strong>arc42-lite 8 section</strong>:</li>
-    <li><ul><li>Introduction</li><li>Constraints</li><li>Context</li><li>Solution Strategy</li><li>Building Blocks</li><li>Runtime</li><li>Deployment</li><li>Crosscutting</li></ul></li>
-    <li>Nhúng sơ đồ component bằng Mermaid</li>
-    <li>Sync quét services, packages, Dockerfile, k8s manifest và import graph để đề xuất Component cần Thêm / Bỏ</li>
-  </ul>
+  <h2>1. Cách gọi</h2>
+  <pre><code>/morkit:init [tham số]</code></pre>
+  <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi cần tài liệu kiến trúc cho dự án</li>
-  <li>Khi muốn nhúng sơ đồ component vẽ bằng Mermaid</li>
+  <li>Khi dự án chưa có tài liệu, muốn sinh lần đầu từ ProjectModel</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -200,18 +196,17 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-system-architecture (gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)</code></pre>
+    <pre><code>$ /morkit:init --lang VN</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Gồm 8 mục theo chuẩn arc42-lite. Sync quét services, packages, Docker, k8s và đồ thị import.</p>
+  <p class="lede" style="font-size:14px;">Có menu chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra nằm ở thư mục docs/ của dự án. Chọn 1 ngôn ngữ: JP, EN hoặc VN.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
   </div>
 
   <div class="footer">
@@ -238,5 +233,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

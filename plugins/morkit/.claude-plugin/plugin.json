@@ -1,6 +1,6 @@
 {
   "name": "morkit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Mor's all-in-one Claude Code toolkit. Single-namespace consolidation of spec workflow + brainstorming/execute/TDD skills + 5-specialist code review + AI-agent doc generation (writing-docs). Every skill, agent, and slash command lives under /morkit:. Single-source with the Codex variant (same plugin runs on both).",
   "author": { "name": "Mor", "email": "duong@mor.company" },
   "homepage": "https://github.com/mor-duongmh/morkit-plugin",

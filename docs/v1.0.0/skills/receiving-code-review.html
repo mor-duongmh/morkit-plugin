@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › setup</title>
+<title>morkit › skill › receiving-code-review</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,21 +173,26 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">setup</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">receiving-code-review</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>setup</h1>
-  <p class="lede">Chạy 1 lần sau khi cài plugin để dựng môi trường Python cho docs-hero.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Plan & build</span><span class="tag">Skill</span></div>
+  <h1>receiving-code-review</h1>
+  <p class="lede">Khi nhận góp ý review, skill này giúp bạn hiểu rõ trước khi sửa — không đồng ý theo phản xạ.</p>
 
-  <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:setup [tham số]</code></pre>
-  <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
+  <h2>1. Nhiệm vụ</h2>
+  <ul class="duties">
+    <li>Phải <strong>hiểu rõ</strong> từng góp ý trước khi action</li>
+    <li><strong>Verify</strong> giả định reviewer đặt — đôi khi reviewer cũng nhầm</li>
+    <li><strong>Push back</strong> có lý nếu góp ý sai, không 'agree + fix' theo phản xạ</li>
+    <li>Hợp khi bạn không chắc một suggestion có đúng không</li>
+  </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Lần đầu sau khi /plugin install morkit</li>
-  <li>Sau khi đổi Python version và muốn dựng lại venv</li>
+  <li>Khi đọc các comment review trên PR</li>
+  <li>Đặc biệt khi feedback chưa rõ hoặc nghe có vẻ chưa hợp lý</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -196,17 +201,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:setup</code></pre>
+    <pre><code>$ /morkit:receiving-code-review (gọi khi đọc PR comments)</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Mất khoảng 30-60 giây. Lệnh idempotent — chạy lại không gây hại.</p>
+  <p class="lede" style="font-size:14px;">Bắt buộc hiểu rõ từng góp ý trước khi thực hiện. Không đồng ý lấy lệ.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../skills/brainstorming.html"><div class="ttl">brainstorming</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/writing-plans.html"><div class="ttl">writing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/executing-plans.html"><div class="ttl">executing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/subagent-driven-development.html"><div class="ttl">subagent-driven-development</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/test-driven-development.html"><div class="ttl">test-driven-development</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/systematic-debugging.html"><div class="ttl">systematic-debugging</div><div class="sub">Plan &amp; build · skill</div></a>
   </div>
 
   <div class="footer">
@@ -233,5 +239,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

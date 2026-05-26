@@ -209,16 +209,20 @@ def page_shell(title, breadcrumb_html, body_html):
 <main class="page">
   <div class="crumbs">
     {breadcrumb_html}
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <span style="display:flex;align-items:center;gap:8px;">
+      <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    </span>
   </div>
   {body_html}
   <div class="footer">
     <a href="../index.html">← Về tổng quan</a>
     <a href="../docs.html">Use cases</a>
-    <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/mor-duongmh/morkit-plugin" target="_blank" rel="noopener">GitHub</a>
   </div>
 </main>
 {THEME_JS}
+<script src="../version-selector.js" data-docs-root=".."></script>
 </body>
 </html>
 """
@@ -334,8 +338,8 @@ def overview_page(*, sections_html):
   {body}
   <div class="footer">
     <a href="docs.html">Use cases →</a>
-    <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
-    <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank" rel="noopener">README</a>
+    <a href="https://github.com/mor-duongmh/morkit-plugin" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/mor-duongmh/morkit-plugin/blob/main/README.md" target="_blank" rel="noopener">README</a>
   </div>
 </main>
 {THEME_JS}

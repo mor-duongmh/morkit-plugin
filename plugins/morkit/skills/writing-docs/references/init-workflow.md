@@ -1,6 +1,6 @@
 # Init Workflow
 
-`/morkit:docs init [path] [--scope project|module] [--yes]`
+`/morkit:init [path] [--scope project|module] [--yes]`
 
 Create the initial doc taxonomy for a codebase. Core principle: **Scout → Content → MAP** (never write a MAP before its content exists), and create a folder only when scout finds the matching component.
 

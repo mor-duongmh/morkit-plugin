@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-codebase-summary</title>
+<title>morkit › command › archive</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,25 +173,21 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-codebase-summary</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">archive</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-codebase-summary</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu tổng quan mã nguồn dạng README: tech stack, cấu trúc, gói, entry point.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Spec workflow</span><span class="tag">Command</span></div>
+  <h1>morkit:archive</h1>
+  <p class="lede">Command đóng change folder sau khi đã merge.</p>
 
-  <h2>1. Nhiệm vụ</h2>
-  <ul class="duties">
-    <li>Render <code>codebase-summary.md</code> dạng README-style overview gồm:</li>
-    <li><ul><li>Tech stack</li><li>Repo layout (file tree gọn)</li><li>Packages chính</li><li>Entry points</li><li>LOC theo ngôn ngữ</li></ul></li>
-    <li>Sync quét file tree + manifest (<code>package.json</code>, <code>pyproject.toml</code>, <code>go.mod</code>...) và đề xuất Thêm / Bỏ</li>
-    <li>Hợp khi <strong>onboard người mới</strong> — nắm dự án trong 5 phút</li>
-  </ul>
+  <h2>1. Cách gọi</h2>
+  <pre><code>/morkit:archive [tham số]</code></pre>
+  <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi cần một bản tổng quan dự án dành cho người mới onboard</li>
-  <li>Khi muốn ai đó hiểu nhanh dự án mà không cần đọc hết code</li>
+  <li>Sau khi PR đã merge và feature đã chạy ổn trên môi trường thật</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -200,18 +196,16 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-codebase-summary (gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)</code></pre>
+    <pre><code>$ /morkit:archive feat-dark-mode</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Liệt kê công nghệ, bố cục thư mục, các package, entry point và số dòng code theo ngôn ngữ.</p>
+  <p class="lede" style="font-size:14px;">Không xoá file — chỉ chuyển sang thư mục archive/ để giữ phần active luôn sạch.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../commands/propose.html"><div class="ttl">/morkit:propose</div><div class="sub">Spec workflow · command</div></a>
+    <a class="related-card" href="../commands/review.html"><div class="ttl">/morkit:review</div><div class="sub">Spec workflow · command</div></a>
+    <a class="related-card" href="../skills/propose.html"><div class="ttl">propose</div><div class="sub">Spec workflow · skill</div></a>
+    <a class="related-card" href="../skills/review.html"><div class="ttl">review</div><div class="sub">Spec workflow · skill</div></a>
   </div>
 
   <div class="footer">
@@ -238,5 +232,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

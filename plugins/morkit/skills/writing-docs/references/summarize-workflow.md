@@ -9,7 +9,7 @@ Quick refresh of the two most important anchors without touching the full taxono
 1. **Light scout** (read-only): directory tree, entry points, key symbols, routes, data stores. Cheaper than init's full scout.
 2. **Refresh `00-overview/SOURCE-MAP`**: concern→file→symbol table + code-search keywords, reflecting current code.
 3. **Refresh `00-overview/DOCUMENT-MAP`**: directory roles + read paths + canonical source rules, with links to whatever docs currently exist.
-4. **If no taxonomy exists yet**: produce a minimal `00-overview/` (SOURCE-MAP + DOCUMENT-MAP + SCOPE) as a starting point and suggest `/morkit:docs init` for the full set.
+4. **If no taxonomy exists yet**: produce a minimal `00-overview/` (SOURCE-MAP + DOCUMENT-MAP + SCOPE) as a starting point and suggest `/morkit:init` for the full set.
 5. Bump `updated`; report what was refreshed.
 
 ## Notes

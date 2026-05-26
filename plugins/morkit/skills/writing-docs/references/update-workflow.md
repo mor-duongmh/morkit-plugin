@@ -5,7 +5,7 @@
 Refresh an existing doc taxonomy against code changes. Manual/on-demand (no auto-sync). Uses front-matter `source_files` to find what drifted.
 
 ## Preconditions
-- `docs/` already holds a new-style taxonomy (`00-overview/` exists). If not → tell user to run `/morkit:docs init`.
+- `docs/` already holds a new-style taxonomy (`00-overview/` exists). If not → tell user to run `/morkit:init`.
 
 ## Steps
 

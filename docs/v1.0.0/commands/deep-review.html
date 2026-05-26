@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › doctor</title>
+<title>morkit › command › deep-review</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,21 +173,22 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">doctor</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">deep-review</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>doctor</h1>
-  <p class="lede">Kiểm tra cài đặt docs-hero xem có ổn không (Python, venv, dependencies...).</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Code review</span><span class="tag">Command</span></div>
+  <h1>morkit:deep-review</h1>
+  <p class="lede">Command chạy review chuyên sâu trên PR hoặc git diff, kết quả là báo cáo Markdown dạng bảng.</p>
 
   <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:doctor [tham số]</code></pre>
+  <pre><code>/morkit:deep-review [tham số]</code></pre>
   <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi /morkit:init hoặc /morkit:update-doc báo lỗi cài đặt</li>
-  <li>Sau khi cài lần đầu, muốn xác nhận môi trường đã sẵn sàng</li>
+  <li>Sau khi push branch, muốn tự review trước khi mời team xem</li>
+  <li>Khi cần kiểm tra rủi ro, bảo mật và độ phủ test trên một PR cụ thể</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -196,17 +197,15 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:doctor</code></pre>
+    <pre><code>$ /morkit:deep-review 123  # hoặc HEAD~3..HEAD</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Chỉ đọc và báo cáo, không sửa gì. Kiểm tra Python version, venv, dependencies, schema và mmdc.</p>
+  <p class="lede" style="font-size:14px;">Báo cáo gồm các phát hiện về rủi ro, bảo mật, pattern, kiểm thử và quy ước code.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/deep-review-doctor.html"><div class="ttl">/morkit:deep-review-doctor</div><div class="sub">Code review · command</div></a>
+    <a class="related-card" href="../commands/deep-review-post.html"><div class="ttl">/morkit:deep-review-post</div><div class="sub">Code review · command</div></a>
+    <a class="related-card" href="../skills/deep-review.html"><div class="ttl">deep-review</div><div class="sub">Code review · skill</div></a>
   </div>
 
   <div class="footer">
@@ -233,5 +232,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

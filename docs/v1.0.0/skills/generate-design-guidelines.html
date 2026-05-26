@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-srs</title>
+<title>morkit › skill › generate-design-guidelines</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,24 +173,27 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-srs</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-design-guidelines</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
   <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-srs</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu yêu cầu phần mềm (SRS) theo chuẩn BrSE cho ITO Japan offshore.</p>
+  <h1>generate-design-guidelines</h1>
+  <p class="lede">Sinh hoặc cập nhật tài liệu Design Principles, Patterns và các ADR (MADR format).</p>
 
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
-    <li>Render template SRS <strong>13 section + 2 phụ lục</strong>:</li>
-    <li><ul><li>Doc Control</li><li>Overview</li><li>Business Flow (kèm UC detail)</li><li>FR detail</li><li>Business Rules</li><li>Roles &amp; Permissions</li><li>NFR theo IPA-6 (kèm Security/PII)</li><li>Data Items với retention</li><li>External Interfaces</li><li>Reports</li><li>Acceptance / UAT</li><li>Traceability</li><li>Open Q&amp;A</li><li>Constraints / Assumptions / Risks (phụ lục)</li><li>Screen Index + Glossary (phụ lục)</li></ul></li>
-    <li>2 chế độ: <code>init</code> sinh từ ProjectModel JSON; <code>update</code> apply Delta và giữ phần bạn sửa tay</li>
+    <li>Render <code>design-guidelines.md</code> gồm 3 phần:</li>
+    <li><ul><li><strong>Design Principles</strong></li><li><strong>Patterns</strong></li><li><strong>ADRs</strong> theo chuẩn MADR</li></ul></li>
+    <li>Khi <code>init</code>, mỗi ADR có file riêng tại <code>docs/adr/NNN-slug.md</code></li>
+    <li>Phân loại theo scope: <strong>DPR</strong> / <strong>PTN</strong> / <strong>ADR</strong></li>
+    <li><em>Không hỗ trợ</em> chế độ sync — guidelines là quyết định của người, không auto-generate</li>
   </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi dự án cần SRS theo chuẩn của khách Nhật</li>
-  <li>Khi yêu cầu thay đổi và cần làm mới SRS</li>
+  <li>Khi cần một tài liệu thống nhất về nguyên tắc thiết kế</li>
+  <li>Khi muốn ghi lại các quyết định kiến trúc theo MADR format</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -199,18 +202,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-srs (gọi qua /morkit:init hoặc /morkit:update-doc)</code></pre>
+    <pre><code>$ /morkit:generate-design-guidelines (gọi qua /morkit:init / /morkit:update-doc)</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Gồm 13 mục lớn và 2 phụ lục: Doc Control, tổng quan, luồng nghiệp vụ, FR/NFR, quyền, dữ liệu, UAT, traceability...</p>
+  <p class="lede" style="font-size:14px;">Khi init, mỗi ADR sẽ có một file riêng tại docs/adr/NNN-slug.md. Skill này không hỗ trợ chế độ sync — guidelines do người viết.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
+    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
     <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
     <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
     <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
     <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
     <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
   </div>
 
   <div class="footer">
@@ -237,5 +240,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

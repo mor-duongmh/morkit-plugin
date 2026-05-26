@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › docs-hero-orchestrator</title>
+<title>morkit › skill › archive</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,25 +173,26 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">docs-hero-orchestrator</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">archive</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>docs-hero</h1>
-  <p class="lede">Điều phối các sub-skill để sinh hoặc cập nhật bộ tài liệu đầy đủ cho một dự án.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Spec workflow</span><span class="tag">Skill</span></div>
+  <h1>archive</h1>
+  <p class="lede">Đóng một change folder sau khi PR đã merge và đã deploy ổn.</p>
 
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
-    <li>Gọi 7 sub-skill theo thứ tự ít xung đột nhất: SRS, API, DB, system architecture, code standards, codebase summary, design guidelines</li>
-    <li>3 chế độ chính:</li>
-    <li><ul><li><code>init</code> — tạo mới từ ProjectModel JSON</li><li><code>update</code> — áp dụng change/plan có sẵn</li><li><code>sync</code> — quét codebase và đề xuất cập nhật</li></ul></li>
-    <li>Theo các chuẩn: <strong>BrSE ITO Japan</strong> (SRS), <strong>arc42-lite</strong> (kiến trúc), <strong>Conventional Commits</strong> + <strong>MADR</strong> (guidelines)</li>
+    <li>Di chuyển thư mục change sang <code>archive/YYYY-MM/</code> theo tháng</li>
+    <li>Cập nhật <code>.meta.json</code> với trạng thái <code>archived</code></li>
+    <li>Không xoá file — bạn vẫn có thể tra lại sau này</li>
+    <li>Giữ thư mục <code>morkit/output/spec/</code> chỉ chứa change đang làm dở</li>
   </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi cần sinh nguyên bộ tài liệu (SRS, API, DB, kiến trúc…) một lần</li>
-  <li>Khi muốn các sub-skill phối hợp với nhau, ít xung đột nhất có thể</li>
+  <li>Sau khi đã merge và verify ở môi trường thật</li>
+  <li>Khi muốn giữ thư mục morkit/output/spec/ gọn gàng</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -200,18 +201,16 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:docs-hero-orchestrator (gọi qua /morkit:init hoặc /morkit:update-doc)</code></pre>
+    <pre><code>$ /morkit:archive feat-pdf-export</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Theo các chuẩn quen thuộc: BrSE ITO Japan cho SRS, arc42-lite cho kiến trúc, MADR cho ADR.</p>
+  <p class="lede" style="font-size:14px;">Folder sẽ được di chuyển sang archive/YYYY-MM/, không bị xoá. Có thể tra lại sau này.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/propose.html"><div class="ttl">propose</div><div class="sub">Spec workflow · skill</div></a>
+    <a class="related-card" href="../skills/review.html"><div class="ttl">review</div><div class="sub">Spec workflow · skill</div></a>
+    <a class="related-card" href="../commands/propose.html"><div class="ttl">/morkit:propose</div><div class="sub">Spec workflow · command</div></a>
+    <a class="related-card" href="../commands/review.html"><div class="ttl">/morkit:review</div><div class="sub">Spec workflow · command</div></a>
   </div>
 
   <div class="footer">
@@ -238,5 +237,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

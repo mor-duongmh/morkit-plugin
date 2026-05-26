@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-api-docs</title>
+<title>morkit › command › doctor</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,25 +173,22 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-api-docs</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">doctor</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-api-docs</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu REST API.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
+  <h1>doctor</h1>
+  <p class="lede">Kiểm tra cài đặt docs-hero xem có ổn không (Python, venv, dependencies...).</p>
 
-  <h2>1. Nhiệm vụ</h2>
-  <ul class="duties">
-    <li>Render <code>api-docs.md</code> mô tả endpoint, request, response, error code</li>
-    <li>3 chế độ:</li>
-    <li><ul><li><code>init</code> — sinh từ ProjectModel</li><li><code>update</code> — áp dụng Delta có sẵn</li><li><code>sync</code> — pipeline 2 bước: <strong>propose → apply</strong>, có checkbox để bạn tick chọn</li></ul></li>
-    <li>Chế độ sync quét REST route trong codebase, xuất file <code>sync-proposal.md</code></li>
-  </ul>
+  <h2>1. Cách gọi</h2>
+  <pre><code>/morkit:doctor [tham số]</code></pre>
+  <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi cần tài liệu mô tả endpoint, request, response</li>
-  <li>Khi route trong mã nguồn đã đổi và muốn đồng bộ lại tài liệu</li>
+  <li>Khi /morkit:init hoặc /morkit:update-doc báo lỗi cài đặt</li>
+  <li>Sau khi cài lần đầu, muốn xác nhận môi trường đã sẵn sàng</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -200,18 +197,17 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-api-docs (gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)</code></pre>
+    <pre><code>$ /morkit:doctor</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Chế độ init sinh từ ProjectModel; update áp dụng thay đổi; sync quét mã và đề xuất nội dung cần cập nhật.</p>
+  <p class="lede" style="font-size:14px;">Chỉ đọc và báo cáo, không sửa gì. Kiểm tra Python version, venv, dependencies, schema và mmdc.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
   </div>
 
   <div class="footer">
@@ -238,5 +234,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

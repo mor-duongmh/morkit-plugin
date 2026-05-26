@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-code-standards</title>
+<title>morkit › skill › systematic-debugging</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,26 +173,26 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-code-standards</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">systematic-debugging</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-code-standards</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu quy ước code (Conventional Commits + cấu hình lint/format).</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Plan & build</span><span class="tag">Skill</span></div>
+  <h1>systematic-debugging</h1>
+  <p class="lede">Khi gặp lỗi, debug có hệ thống thay vì đoán mò. Tái hiện lỗi trước, sửa sau.</p>
 
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
-    <li>Render <code>code-standards.md</code> từ ProjectModel</li>
-    <li>Auto-extract rule từ ESLint, Prettier, Ruff, EditorConfig... đang có trong repo</li>
-    <li>Phân loại theo scope: <strong>LNT</strong> (lint) / <strong>NAM</strong> (naming) / <strong>CMT</strong> (commit) / <strong>FMT</strong> (format)</li>
-    <li>Sync đề xuất Thêm / Bỏ rule khi cấu hình đổi</li>
-    <li>Nếu repo đã có <code>CONTRIBUTING.md</code>, link sang thay vì duplicate</li>
+    <li>Quy trình 5 bước bắt buộc:</li>
+    <li><ol><li>Tái hiện lỗi</li><li>Thu hẹp phạm vi</li><li>Đặt giả thuyết</li><li>Xác minh giả thuyết</li><li>Fix</li></ol></li>
+    <li>Cấm đoán mò — mỗi bước phải có <strong>evidence</strong> cụ thể (output, log, trace)</li>
+    <li>Cấm fix khi chưa biết root cause</li>
   </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi dự án cần một tài liệu thống nhất về quy ước code</li>
-  <li>Khi muốn rút quy ước từ các file cấu hình lint/format đang có</li>
+  <li>Khi gặp bug, test thất bại hoặc hành vi bất thường</li>
+  <li>Trước khi đề xuất bất kỳ bản sửa nào</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -201,18 +201,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-code-standards (gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)</code></pre>
+    <pre><code>$ /morkit:systematic-debugging (gọi khi gặp lỗi)</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Nếu đã có CONTRIBUTING.md, sẽ link sang chứ không nhân đôi nội dung.</p>
+  <p class="lede" style="font-size:14px;">Tái hiện lỗi → thu hẹp phạm vi → đặt giả thuyết → xác minh → sửa. Không đoán mò.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/brainstorming.html"><div class="ttl">brainstorming</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/writing-plans.html"><div class="ttl">writing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/executing-plans.html"><div class="ttl">executing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/subagent-driven-development.html"><div class="ttl">subagent-driven-development</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/test-driven-development.html"><div class="ttl">test-driven-development</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/dispatching-parallel-agents.html"><div class="ttl">dispatching-parallel-agents</div><div class="sub">Plan &amp; build · skill</div></a>
   </div>
 
   <div class="footer">
@@ -239,5 +239,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

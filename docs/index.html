@@ -648,8 +648,9 @@
       <div class="topnav-center"></div>
       <div class="nav-actions">
         <a href="docs.html">Trường hợp sử dụng (Use cases)</a>
-        <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener"
+        <a href="https://github.com/mor-duongmh/morkit-plugin" target="_blank" rel="noopener"
           class="primary">GitHub</a>
+        <span class="version-mount"></span>
         <button id="themeBtn" class="toggle" type="button" title="Đổi sáng/tối">☾ / ☀</button>
       </div>
     </div>
@@ -674,7 +675,7 @@
       </div>
       <div class="sb-group">
         <div class="sb-group-title">Tác nhân (Agent)</div>
-        <a href="#agents" data-sec="agents">9 tác nhân chuyên trách</a>
+        <a href="#agents" data-sec="agents">8 tác nhân chuyên trách</a>
       </div>
       <div class="sb-group">
         <div class="sb-group-title">Công cụ hỗ trợ (Companion)</div>
@@ -683,9 +684,7 @@
       <div class="sb-group">
         <div class="sb-group-title">Tham khảo</div>
         <a href="docs.html">Trường hợp sử dụng (Use cases) →</a>
-        <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub →</a>
-        <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank"
-          rel="noopener">README →</a>
+        <a href="https://github.com/mor-duongmh/morkit-plugin" target="_blank" rel="noopener">GitHub →</a>
       </div>
     </aside>
 
@@ -701,8 +700,7 @@
           Tất cả có thể gọi trực tiếp qua tiền tố lệnh <code>/morkit:*</code>.
         </p>
         <p class="lede-small">
-          Gói gọn <strong>15 lệnh (command) · 9 tác nhân (agent) · 26 kỹ năng (skill)</strong> trong một plugin duy nhất.
-          Chọn lối vào bên dưới hoặc sử dụng thanh điều hướng (sidebar).
+          Gói gọn <strong>10 command · 8 agent · 19 skill</strong> trong một plugin duy nhất.
         </p>
       </section>
 
@@ -734,9 +732,9 @@
         </a>
         <a class="card" href="#docs">
           <div class="card-label">Tự động sinh tài liệu</div>
-          <div class="card-title">SRS · API · DB · Kiến trúc (arch)</div>
-          <p class="card-desc">Tự động sinh trọn bộ tài liệu dự án theo chuẩn BrSE ITO Nhật Bản, cấu trúc kiến trúc tối giản arc42-lite, viết commit theo Conventional Commits và nhật ký kiến trúc MADR.</p>
-          <span class="card-arrow">Xem tác nhân docs-hero →</span>
+          <div class="card-title">Tài liệu tối ưu cho AI agent</div>
+          <p class="card-desc">Skill <code>writing-docs</code> sinh bộ <code>docs/</code> có taxonomy + mỏ neo (MAP) + file nhỏ liên kết chéo, giúp AI agent nạp đúng context tối thiểu mỗi task. LLM-driven, không Python. <code>/morkit:init</code> khởi tạo lần đầu; <code>/morkit:docs</code> bảo trì (update / summarize).</p>
+          <span class="card-arrow">Xem lệnh sinh tài liệu →</span>
         </a>
         <a class="card" href="#companion">
           <div class="card-label">Công cụ bổ trợ (Companion)</div>
@@ -748,7 +746,8 @@
 
       <!-- ─────────────── §1 CÀI ĐẶT ─────────────── -->
       <h2 id="install">1. Cài đặt</h2>
-      <p>Yêu cầu hệ thống: Node.js phiên bản 18 trở lên.</p>
+      <p>Yêu cầu hệ thống: Node.js phiên bản 18 trở lên. morkit dùng <strong>một nguồn</strong> cho cả Claude Code và Codex — cùng bộ skill, dịch vocab lúc chạy.</p>
+      <h3>Cài đặt trên Claude Code</h3>
       <ol class="steps">
         <li>
           Cài đặt <a href="https://docs.anthropic.com/claude/docs/claude-code" target="_blank" rel="noopener">Claude Code</a> nếu hệ thống của bạn chưa cài,
@@ -760,7 +759,7 @@
         </li>
         <li>
           Trong phiên làm việc của Claude, hãy nhập lần lượt 2 lệnh sau để cấu hình nguồn cài đặt:
-          <pre><code>/plugin add marketplace github:mor-duongmh/claude-plugins
+          <pre><code>/plugin add marketplace github:mor-duongmh/morkit-plugin
 /plugin install morkit@mor-duongmh</code></pre>
         </li>
         <li>
@@ -781,6 +780,14 @@
         </li>
       </ol>
       <p class="lede-small">Hoàn tất — gõ <code>/morkit:</code> sẽ thấy danh sách các lệnh (command) sẵn có.</p>
+
+      <h3>Cài đặt trên Codex CLI</h3>
+      <p><strong>Cách 1 — Marketplace native (Codex CLI ≥ 0.131):</strong></p>
+      <pre><code>codex plugin marketplace add mor-duongmh/morkit-plugin</code></pre>
+      <p class="lede-small">Codex sẽ liệt kê plugin <code>morkit</code> — chọn cài. Cùng nguồn với Claude Code.</p>
+      <p><strong>Cách 2 — Script (Codex &lt; 0.131 hoặc fallback):</strong></p>
+      <pre><code>git clone https://github.com/mor-duongmh/morkit-plugin.git ~/.codex/morkit-source
+bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
 
       <!-- ─────────────── §2 CẬP NHẬT ─────────────── -->
       <h2 id="update">2. Cập nhật plugin</h2>
@@ -852,17 +859,12 @@
           </tr>
           <tr>
             <td><strong>Tự động sinh tài liệu (Doc generation)</strong></td>
-            <td><a href="commands/setup.html"><code>/morkit:setup</code></a>, <a
-                href="commands/init.html"><code>/morkit:init</code></a>, <a
-                href="commands/update-doc.html"><code>/morkit:update-doc</code></a>, <a
-                href="commands/sync.html"><code>/morkit:sync</code></a>, <a
-                href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a>, <a
-                href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
-            <td>Tự động hóa hoàn toàn việc sinh tài liệu dự án chuẩn BrSE ITO Nhật Bản: đặc tả yêu cầu (SRS), tài liệu API, schema cơ sở dữ liệu, sơ đồ kiến trúc hệ thống...</td>
+            <td><a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/docs.html"><code>/morkit:docs</code></a></td>
+            <td>Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy + mỏ neo (MAP), file nhỏ liên kết chéo. LLM-driven, không Python. <code>/morkit:init</code> khởi tạo lần đầu; <code>/morkit:docs</code> bảo trì (update / summarize).</td>
           </tr>
         </tbody>
       </table>
-      <p class="lede-small">Tổng cộng bao gồm <strong>26 kỹ năng chuyên biệt (skill) + 9 tác nhân thông minh (agent) + 15 lệnh tắt (slash command)</strong>, tất cả đều được tích hợp tiền tố <code>/morkit:</code>.</p>
+      <p class="lede-small">Tổng cộng bao gồm <strong>19 kỹ năng chuyên biệt (skill) + 8 tác nhân thông minh (agent) + 11 lệnh tắt (slash command)</strong>, tất cả đều được tích hợp tiền tố <code>/morkit:</code>.</p>
 
       <!-- ─────────────── §3 COMMAND TABLES ─────────────── -->
       <h2 id="commands">4. Danh sách các lệnh (command)</h2>
@@ -972,35 +974,19 @@
         </thead>
         <tbody>
           <tr>
-            <td><a href="commands/setup.html"><code>/morkit:setup</code></a></td>
-            <td>Thiết lập và dựng môi trường Python riêng phục vụ cho docs-hero (quá trình chạy 1 lần mất khoảng 30-60 giây).</td>
-          </tr>
-          <tr>
             <td><a href="commands/init.html"><code>/morkit:init</code></a></td>
-            <td>Tự động sinh bộ khung tài liệu mới hoàn chỉnh (SRS, API, cơ sở dữ liệu, sơ đồ kiến trúc hệ thống...) dựa trên định nghĩa từ tệp ProjectModel JSON.</td>
+            <td><strong>Khởi tạo lần đầu</strong> — quét codebase (brownfield hoặc greenfield), dựng bộ tài liệu tối ưu cho AI agent: taxonomy (<code>00-overview…90-operations</code>) + mỏ neo MAP + file nhỏ liên kết chéo + con trỏ <code>CLAUDE.md</code>/<code>AGENTS.md</code> ở root. LLM-driven, không Python.</td>
           </tr>
           <tr>
-            <td><a href="commands/update-doc.html"><code>/morkit:update-doc</code></a></td>
-            <td>Cập nhật trực tiếp các thay đổi (change) hoặc kế hoạch phát triển (plan) đã chốt vào hệ thống tài liệu sẵn có (sử dụng cơ chế phân tích khác biệt thông minh giúp giữ nguyên các phần chỉnh sửa bằng tay).</td>
-          </tr>
-          <tr>
-            <td><a href="commands/sync.html"><code>/morkit:sync</code></a></td>
-            <td>Quét và phân tích trực tiếp mã nguồn hiện tại để đề xuất các nội dung cần cập nhật bổ sung vào tài liệu (chế độ chỉ đọc, không tự sửa file).</td>
-          </tr>
-          <tr>
-            <td><a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a></td>
-            <td>Áp dụng hàng loạt các đề sơ xuất cập nhật tài liệu đã được bạn phê duyệt trong tệp <code>sync-proposal.md</code>.</td>
-          </tr>
-          <tr>
-            <td><a href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
-            <td>Kiểm tra chẩn đoán toàn bộ trạng thái cài đặt của docs-hero xem có gặp lỗi gì không.</td>
+            <td><a href="commands/docs.html"><code>/morkit:docs</code></a></td>
+            <td><strong>Bảo trì</strong> bộ docs đã có. Chế độ: <code>update</code> (làm mới theo thay đổi code) | <code>summarize</code> (refresh nhanh SOURCE-MAP + DOCUMENT-MAP).</td>
           </tr>
         </tbody>
       </table>
 
       <!-- ─────────────── §4 AGENT ─────────────── -->
       <h2 id="agents">5. Các tác nhân (agent) chuyên trách</h2>
-      <p>Hệ thống 9 tác nhân (agent) chuyên biệt được bộ điều phối (orchestrator) tự động kích hoạt linh hoạt theo nhu cầu thực tế — không phải các lệnh bạn nhập trực tiếp từ bàn phím.</p>
+      <p>Hệ thống 8 tác nhân (agent) chuyên biệt được bộ điều phối (orchestrator) tự động kích hoạt linh hoạt theo nhu cầu thực tế — không phải các lệnh bạn nhập trực tiếp từ bàn phím.</p>
 
       <h3>Quy trình đánh giá chuyên sâu (7 chuyên gia phân tích)</h3>
       <div class="agents-grid">
@@ -1034,12 +1020,8 @@
         </div>
       </div>
 
-      <h3>Tự động sinh tài liệu + Tác nhân lõi</h3>
+      <h3>Tác nhân lõi (Core)</h3>
       <div class="agents-grid">
-        <div class="agent">
-          <div class="name">docs-hero</div>
-          <div class="role">Kiểm soát và đánh giá chất lượng (QA) sau khi tự động sinh tài liệu SRS/API/DB — liên kết chéo FR↔Màn hình↔API↔Bảng dữ liệu, bảo đảm chất lượng chuẩn BrSE, kiểm tra cú pháp sơ đồ Mermaid. Chế độ chỉ đọc.</div>
-        </div>
         <div class="agent">
           <div class="name">code-reviewer</div>
           <div class="role">Tác nhân đánh giá chính khi cần thực hiện phân tích mã nguồn thuần túy độc lập (nằm ngoài quy trình deep-review tự động).</div>
@@ -1083,8 +1065,8 @@ rtk init -g</code></pre>
 
       <div class="footer">
         <a href="docs.html">Trường hợp sử dụng (Use cases) →</a>
-        <a href="https://github.com/mor-duongmh/claude-plugins" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/mor-duongmh/claude-plugins/blob/main/README.md" target="_blank"
+        <a href="https://github.com/mor-duongmh/morkit-plugin" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/mor-duongmh/morkit-plugin/blob/main/README.md" target="_blank"
           rel="noopener">README</a>
         <span style="margin-left:auto; color: var(--fg-subtle); font-size: 12px;">Giao diện v2 · claudekit-style trung tâm tài liệu</span>
       </div>
@@ -1137,6 +1119,7 @@ rtk init -g</code></pre>
     })();
   </script>
 
+  <script src="version-selector.js" data-docs-root="."></script>
 </body>
 
 </html>

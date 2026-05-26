@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-db-design</title>
+<title>morkit › skill › test-driven-development</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,25 +173,27 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-db-design</span></div>
-    <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">test-driven-development</span></div>
+    <span class="version-mount"></span>
+      <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-db-design</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu thiết kế database, có sơ đồ ERD bằng Mermaid.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Plan & build</span><span class="tag">Skill</span></div>
+  <h1>test-driven-development</h1>
+  <p class="lede">Bắt buộc viết test trước, code sau. Quy trình Red → Green → Refactor.</p>
 
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
-    <li>Render <code>database-design.md</code> gồm: mô tả bảng, cột, quan hệ, index</li>
-    <li>Nhúng sơ đồ <strong>ERD</strong> vẽ bằng Mermaid</li>
-    <li>3 chế độ: <code>init</code> / <code>update</code> / <code>sync</code></li>
-    <li>Sync quét ORM model (TypeORM, Prisma, SQLAlchemy...) và đề xuất <strong>Thêm / Sửa / Bỏ</strong> theo bảng</li>
+    <li><strong>Red:</strong> viết test fail trước</li>
+    <li><strong>Green:</strong> viết code tối thiểu để test pass</li>
+    <li><strong>Refactor:</strong> dọn code, giữ test vẫn pass</li>
+    <li>Không cho viết code production khi chưa có test fail</li>
+    <li>Đây là rigid skill — không bỏ qua discipline kể cả khi 'task đơn giản'</li>
   </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi cần tài liệu mô tả schema DB</li>
-  <li>Khi muốn đồng bộ tài liệu với ORM model trong mã nguồn</li>
+  <li>Khi triển khai bất kỳ tính năng hoặc bản sửa lỗi nào</li>
+  <li>Trước khi viết code production</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -200,18 +202,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-db-design (gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)</code></pre>
+    <pre><code>$ /morkit:test-driven-development (gọi trước khi bắt tay code)</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Sinh file database-design.md kèm ERD vẽ bằng Mermaid. Chế độ sync quét ORM và đề xuất Thêm/Sửa/Bỏ.</p>
+  <p class="lede" style="font-size:14px;">Viết test fail trước, rồi viết code tối thiểu để test pass, cuối cùng refactor cho gọn.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/brainstorming.html"><div class="ttl">brainstorming</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/writing-plans.html"><div class="ttl">writing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/executing-plans.html"><div class="ttl">executing-plans</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/subagent-driven-development.html"><div class="ttl">subagent-driven-development</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/systematic-debugging.html"><div class="ttl">systematic-debugging</div><div class="sub">Plan &amp; build · skill</div></a>
+    <a class="related-card" href="../skills/dispatching-parallel-agents.html"><div class="ttl">dispatching-parallel-agents</div><div class="sub">Plan &amp; build · skill</div></a>
   </div>
 
   <div class="footer">
@@ -238,5 +240,6 @@ td code { font-size: 12px; }
 })();
 </script>
 
+  <script src="../../version-selector.js" data-docs-root="../.."></script>
 </body>
 </html>

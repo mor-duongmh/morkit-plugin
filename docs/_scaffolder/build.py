@@ -208,8 +208,8 @@ def render_overview() -> str:
          ", ".join(link_cmd(s) for s in ["deep-review", "deep-review-doctor", "deep-review-post"]),
          "Review code chuyên sâu bằng 5 agent AI chạy song song."),
         ("Doc generation",
-         ", ".join(link_cmd(s) for s in ["setup", "init", "update-doc", "sync", "apply-sync", "doctor"]),
-         "Tự sinh tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc..."),
+         link_cmd("docs"),
+         "Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy + mỏ neo, file nhỏ liên kết chéo (LLM-driven, không Python)."),
     ]
     groups_table_rows = "\n".join(
         f"      <tr><td><strong>{g}</strong></td><td>{items}</td><td>{desc}</td></tr>"
@@ -244,12 +244,7 @@ def render_overview() -> str:
             ("command", "deep-review-post",     "Post báo cáo review lên PR làm comment."),
         ]),
         ("Doc generation", [
-            ("command", "setup",      "Dựng môi trường Python cho docs-hero (khoảng 30-60 giây, chạy 1 lần)."),
-            ("command", "init",       "Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON."),
-            ("command", "update-doc", "Áp dụng một change hoặc plan đã chốt vào tài liệu hiện có."),
-            ("command", "sync",       "Đọc mã nguồn và đề xuất nội dung nên cập nhật vào tài liệu (chỉ đọc, không ghi)."),
-            ("command", "apply-sync", "Áp dụng các nội dung bạn đã tick trong file sync-proposal.md."),
-            ("command", "doctor",     "Kiểm tra cài đặt docs-hero xem có ổn không."),
+            ("command", "docs", "Sinh/cập nhật bộ tài liệu dự án tối ưu cho AI agent. Chế độ: init | update | summarize (LLM-driven, không Python)."),
         ]),
     ]
 
@@ -270,7 +265,7 @@ def render_overview() -> str:
 
     sections = f"""<h2>1. Cài đặt</h2>
   <p>Cần có: <a href="https://docs.anthropic.com/claude/docs/claude-code" target="_blank" rel="noopener">Claude Code</a> và Node.js từ 18 trở lên.</p>
-  <pre><code>/plugin add marketplace github:mor-duongmh/claude-plugins
+  <pre><code>/plugin add marketplace github:mor-duongmh/morkit-plugin
 /plugin install morkit@mor-duongmh</code></pre>
   <p class="lede" style="font-size:14px;">Cài xong là dùng được luôn — không cần làm gì thêm trong từng dự án.</p>
 
@@ -282,7 +277,7 @@ def render_overview() -> str:
 {groups_table_rows}
     </tbody>
   </table>
-  <p class="lede" style="font-size:14px;">Tổng cộng <strong>22 skill + 9 agent chuyên trách + 15 slash command</strong>, tất cả đều có tiền tố <code>/morkit:</code>.</p>
+  <p class="lede" style="font-size:14px;">Tổng cộng <strong>19 skill + 8 agent chuyên trách + 10 slash command</strong>, tất cả đều có tiền tố <code>/morkit:</code>.</p>
 
   <h2>3. Danh sách command</h2>
   <p>Bấm vào tên command để xem giải thích chi tiết, cách gọi và ví dụ.</p>
@@ -339,9 +334,9 @@ def main():
         (out_commands / f"{slug}.html").write_text(html, encoding="utf-8")
         written += 1
 
-    # Overview
-    (DOCS_DIR / "index.html").write_text(render_overview(), encoding="utf-8")
-    written += 1
+    # NOTE: docs/index.html is the hand-maintained "v2 landing" (promoted from the
+    # old docs-v2.html). build.py NO LONGER overwrites it — doing so would clobber
+    # the hand-crafted hub. render_overview() is kept for reference but not called.
 
     # Cleanup orphans: HTML files in out dirs whose source .md no longer exists
     orphans = []
@@ -354,12 +349,12 @@ def main():
     for p in orphans:
         p.unlink()
 
-    print(f"Wrote {written} files. ({len(skill_slugs)} skills + {len(command_slugs)} commands + 1 overview)")
+    print(f"Wrote {written} files. ({len(skill_slugs)} skills + {len(command_slugs)} commands)")
     if orphans:
         print(f"Cleaned {len(orphans)} orphan(s): {[str(p.relative_to(REPO_ROOT)) for p in orphans]}")
     print(f"  → {out_skills.relative_to(REPO_ROOT)}/")
     print(f"  → {out_commands.relative_to(REPO_ROOT)}/")
-    print(f"  → docs/index.html")
+    print(f"  (index.html left untouched — hand-maintained v2 landing)")
 
 
 if __name__ == "__main__":
