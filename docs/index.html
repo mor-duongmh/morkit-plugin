@@ -672,10 +672,11 @@
         <a href="#plan" data-sec="plan">Lập kế hoạch & Phát triển (Plan & build)</a>
         <a href="#review" data-sec="review">Đánh giá mã nguồn (Code review)</a>
         <a href="#docs" data-sec="docs">Tự động sinh tài liệu (Doc generation)</a>
+        <a href="#git" data-sec="git">Thao tác Git (Git operations)</a>
       </div>
       <div class="sb-group">
         <div class="sb-group-title">Tác nhân (Agent)</div>
-        <a href="#agents" data-sec="agents">8 tác nhân chuyên trách</a>
+        <a href="#agents" data-sec="agents">9 tác nhân chuyên trách</a>
       </div>
       <div class="sb-group">
         <div class="sb-group-title">Công cụ hỗ trợ (Companion)</div>
@@ -700,7 +701,7 @@
           Tất cả có thể gọi trực tiếp qua tiền tố lệnh <code>/morkit:*</code>.
         </p>
         <p class="lede-small">
-          Gói gọn <strong>10 command · 8 agent · 19 skill</strong> trong một plugin duy nhất.
+          Gói gọn <strong>11 command · 9 agent · 20 skill</strong> trong một plugin duy nhất.
         </p>
       </section>
 
@@ -862,9 +863,14 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
             <td><a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/docs.html"><code>/morkit:docs</code></a></td>
             <td>Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy + mỏ neo (MAP), file nhỏ liên kết chéo. LLM-driven, không Python. <code>/morkit:init</code> khởi tạo lần đầu; <code>/morkit:docs</code> bảo trì (update / summarize).</td>
           </tr>
+          <tr>
+            <td><strong>Git operations</strong></td>
+            <td><a href="commands/git.html"><code>/morkit:git</code></a></td>
+            <td>Stage, commit, push, mở PR và merge branch — quét secret tự động, split commit theo type/scope, bảo vệ branch quan trọng.</td>
+          </tr>
         </tbody>
       </table>
-      <p class="lede-small">Tổng cộng bao gồm <strong>19 kỹ năng chuyên biệt (skill) + 8 tác nhân thông minh (agent) + 11 lệnh tắt (slash command)</strong>, tất cả đều được tích hợp tiền tố <code>/morkit:</code>.</p>
+      <p class="lede-small">Tổng cộng bao gồm <strong>20 kỹ năng chuyên biệt (skill) + 9 tác nhân thông minh (agent) + 11 lệnh tắt (slash command)</strong>, tất cả đều được tích hợp tiền tố <code>/morkit:</code>.</p>
 
       <!-- ─────────────── §3 COMMAND TABLES ─────────────── -->
       <h2 id="commands">4. Danh sách các lệnh (command)</h2>
@@ -984,9 +990,25 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
         </tbody>
       </table>
 
+      <h3 id="git">Thao tác Git (Git operations)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Lệnh viết tắt</th>
+            <th>Ý nghĩa và Công dụng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="commands/git.html"><code>/morkit:git [cm|cp|pr|merge]</code></a></td>
+            <td>Stage + commit + push + mở PR + merge branch trong một lệnh — quét secret trước khi stage, tự phân tách commit theo type/scope, xác nhận bắt buộc trước mọi thao tác vào branch được bảo vệ (<code>main</code>, <code>master</code>, <code>production</code>).</td>
+          </tr>
+        </tbody>
+      </table>
+
       <!-- ─────────────── §4 AGENT ─────────────── -->
       <h2 id="agents">5. Các tác nhân (agent) chuyên trách</h2>
-      <p>Hệ thống 8 tác nhân (agent) chuyên biệt được bộ điều phối (orchestrator) tự động kích hoạt linh hoạt theo nhu cầu thực tế — không phải các lệnh bạn nhập trực tiếp từ bàn phím.</p>
+      <p>Hệ thống 9 tác nhân (agent) chuyên biệt được bộ điều phối (orchestrator) tự động kích hoạt linh hoạt theo nhu cầu thực tế — không phải các lệnh bạn nhập trực tiếp từ bàn phím.</p>
 
       <h3>Quy trình đánh giá chuyên sâu (7 chuyên gia phân tích)</h3>
       <div class="agents-grid">
@@ -1025,6 +1047,10 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
         <div class="agent">
           <div class="name">code-reviewer</div>
           <div class="role">Tác nhân đánh giá chính khi cần thực hiện phân tích mã nguồn thuần túy độc lập (nằm ngoài quy trình deep-review tự động).</div>
+        </div>
+        <div class="agent">
+          <div class="name">git-manager</div>
+          <div class="role">Thực thi các thao tác Git (stage, commit, push, PR, merge) với conventional commits và quét secret — được skill <code>git</code> uỷ quyền để cô lập output dài.</div>
         </div>
       </div>
 
