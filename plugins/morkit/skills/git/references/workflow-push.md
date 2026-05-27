@@ -1,0 +1,56 @@
+# Push Workflow
+
+Execute via `git-manager` subagent.
+
+## Step 0: Environment check
+Run the environment detection in `safety-protocols.md` → "Environment Detection". If HEAD is detached / the sandbox blocks push (e.g. Codex App), commit locally and hand off to the host App instead of pushing.
+
+## Pre-Push Checklist
+1. All changes committed
+2. Secrets scanned (see `safety-protocols.md`)
+3. Branch pushed to remote
+
+## Tool 1: Verify State
+```bash
+git status && \
+git log origin/$(git rev-parse --abbrev-ref HEAD)..HEAD --oneline 2>/dev/null || echo "NO_UPSTREAM"
+```
+
+**If uncommitted changes:** Warn user, suggest commit first.
+**If NO_UPSTREAM:** Use `git push -u origin HEAD`.
+
+## Tool 2: Push
+```bash
+git push origin HEAD
+```
+
+**On success:** Report commit hashes pushed.
+
+## Error Handling
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `rejected - non-fast-forward` | Remote has newer commits | `git pull --rebase`, resolve conflicts, push again |
+| `no upstream branch` | Branch not tracked | `git push -u origin HEAD` |
+| `Authentication failed` | Invalid credentials | Check `gh auth status` or SSH keys |
+| `Repository not found` | Wrong remote URL | Verify `git remote -v` |
+| `Permission denied` | No write access | Check repository permissions |
+
+## Force Push (DANGER)
+
+**NEVER force push to main/master/production/prod/release/* branches.**
+
+If user explicitly requests force push on a feature branch, use `AskUserQuestion` to confirm:
+> "Force push rewrites remote history. Collaborators on this branch may lose work. Proceed?"
+
+Only after confirmation:
+```bash
+git push -f origin HEAD
+```
+
+## Output Format
+```
+✓ pushed: N commits to origin/{branch}
+  - abc123 feat(auth): add login
+  - def456 fix(api): resolve timeout
+```
