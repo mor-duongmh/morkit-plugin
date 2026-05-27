@@ -20,7 +20,10 @@
       if (!versions.length) return;
 
       var path = location.pathname;
-      var current = data.latest;
+      // On a version-specific page (path contains /<vPath>/) the active version is
+      // that snapshot. On the root/latest pages it defaults to `default` (the version
+      // shown selected on first entry), falling back to `latest` when unset.
+      var current = data.default || data.latest;
       versions.forEach(function (v) {
         if (v.path !== '.' && path.indexOf('/' + v.path + '/') !== -1) current = v.version;
       });
