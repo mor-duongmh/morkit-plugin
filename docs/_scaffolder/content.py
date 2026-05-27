@@ -39,6 +39,10 @@ GROUPS = {
         "commands": ["init", "docs"],
         "skills": ["writing-docs"],
     },
+    "git-ops": {
+        "commands": ["git"],
+        "skills":   ["git"],
+    },
     "misc": {
         "commands": [],
         "skills":   ["using-morkit"],
@@ -50,6 +54,7 @@ GROUP_LABELS = {
     "plan-build":  "Plan & build",
     "code-review": "Code review",
     "doc-gen":     "Doc generation",
+    "git-ops":     "Git operations",
     "misc":        "Khác",
 }
 
@@ -466,7 +471,45 @@ CURATED = {
     },
 
     # ====================================================================
-    # NHÓM 5 — KHÁC
+    # NHÓM 5 — GIT OPERATIONS
+    # ====================================================================
+    "skills.git": {
+        "lede": "Stage, commit, push, mở PR và merge branch an toàn — quét secret trước khi stage, tự phân tách commit theo type/scope, và delegate sang git-manager subagent.",
+        "details": [
+            "4 thao tác gọi bằng một lệnh: <strong>cm</strong> (commit), <strong>cp</strong> (commit+push), <strong>pr</strong> (tạo Pull Request), <strong>merge</strong> (gộp branch)",
+            "<strong>Secret scan</strong> bắt buộc trước khi stage — phát hiện API key, token, mật khẩu, PEM, URL kết nối DB",
+            "<strong>Split logic</strong> tự động: 1 commit khi cùng type/scope ≤ 3 file/50 dòng; nhiều commit khi mixed type/scope (config · deps · test · code · docs)",
+            "<strong>Conventional commits</strong>: <code>type(scope): mô tả</code> ≤ 72 ký tự, không AI attribution",
+            "<strong>Bảo vệ branch</strong>: xác nhận bắt buộc trước khi push, force-push, merge hoặc xoá branch được bảo vệ (<code>main</code>, <code>master</code>, <code>production</code>, <code>release/*</code>)",
+            "Delegate sang <strong>git-manager</strong> subagent để cô lập output dài; tự xử lý inline trên Codex (không có agent registry)",
+        ],
+        "when_to_use": [
+            "Khi muốn commit hoặc commit+push thay đổi hiện tại",
+            "Khi cần mở Pull Request hoặc merge branch",
+            "Khi muốn có bảo vệ secret và conventional commits tự động",
+        ],
+        "example_args": "cp   # hoặc: cm / pr [to-branch] [from-branch] / merge [to-branch]",
+        "example_note": "Chạy xong in tóm tắt: staged N file, security passed, commit HASH type(scope): mô tả, pushed yes/no.",
+    },
+    "commands.git": {
+        "lede": "Stage, commit, push, mở PR và merge branch — một lệnh cho tất cả thao tác Git, kèm bảo vệ secret và conventional commits tự động.",
+        "details": [
+            "<code>cm</code> — <strong>Stage &amp; Commit.</strong> Quét secret trước khi stage (chặn nếu phát hiện API key, token, PEM, URL DB). Phân tích diff và tự phân tách nhiều commit khi có mixed type/scope (config · deps · test · code · docs). Mỗi commit theo format <code>type(scope): mô tả</code> ≤ 72 ký tự.",
+            "<code>cp</code> — <strong>Stage, Commit rồi Push.</strong> Chạy toàn bộ quy trình của <code>cm</code>, sau đó push lên remote. Yêu cầu xác nhận trước khi push vào branch được bảo vệ (<code>main</code>, <code>master</code>, <code>production</code>, <code>release/*</code>). In tóm tắt: staged N file · security passed · commit HASH · pushed yes.",
+            "<code>pr [to-branch] [from-branch]</code> — <strong>Tạo Pull Request.</strong> Mặc định: <em>to</em> = <code>main</code>, <em>from</em> = branch hiện tại. Tự push branch lên remote nếu chưa có. Tìm GitHub issues liên quan và gắn vào body. Sinh title (conventional format, &lt;72 ký tự) và body chuẩn (Summary bullets + Test plan checklist).",
+            "<code>merge [to-branch] [from-branch]</code> — <strong>Merge branch.</strong> <code>to-branch</code> bắt buộc — không có mặc định. Nếu target là protected branch, xác nhận bắt buộc và đề nghị mở PR thay thế. Merge từ <code>origin/from-branch</code> (remote) để tránh đưa local WIP vào.",
+        ],
+        "when_to_use": [
+            "Khi kết thúc một task và muốn commit nhanh (cm) hoặc commit+push (cp)",
+            "Khi cần mở Pull Request hoặc merge branch qua CLI (pr / merge)",
+            "Khi muốn có bảo vệ secret và conventional commits tự động trong mọi thao tác Git",
+        ],
+        "example_args": "cp",
+        "example_note": "Không có tham số → hiện menu chọn thao tác (cm / cp / pr / merge). Luôn quét secret trước khi stage. Xác nhận bắt buộc trước mọi thao tác push / force-push / merge vào branch được bảo vệ.",
+    },
+
+    # ====================================================================
+    # NHÓM 6 — KHÁC
     # ====================================================================
     "skills.using-morkit": {
         "lede": "Skill nền — tự chạy ở đầu mỗi cuộc hội thoại để Claude biết cách tìm và dùng các skill khác.",
