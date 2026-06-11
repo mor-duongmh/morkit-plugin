@@ -10,7 +10,13 @@
     {
       "name": "morkit",
       "description": "Mor's all-in-one Claude Code toolkit. Consolidates spec workflow (propose/review/archive) + brainstorming/execute/TDD skills (vendored from obra/superpowers) + 5-specialist code review (deep-review) under a single /morkit:* namespace. One command installs everything.",
-      "source": "./plugins/morkit",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/mor-duongmh/morkit-plugin.git",
+        "path": "plugins/morkit",
+        "ref": "morkit--v1.0.0",
+        "sha": "eaf94a644128dc6be782572dbbaac2f9f0f03e90"
+      },
       "category": "development",
       "author": { "name": "Mor" },
       "homepage": "https://github.com/mor-duongmh/morkit-plugin/tree/main/plugins/morkit"
