@@ -35,7 +35,42 @@ Cannot proceed with merge/PR until tests pass.
 
 Stop. Don't proceed to Step 2.
 
-**If tests pass:** Continue to Step 2.
+**If tests pass:** Continue to Step 1.5.
+
+### Step 1.5: Generate Implementation Report
+
+**Only after tests pass.** Synthesize a 6-section Implementation Report and print
+it **in chat** by default. You already know what happened this session
+(tasks, commits, files, tests, reviews) — write the report from your own
+context. Use git **only to confirm** exact SHAs and changed files:
+
+```bash
+# Confirm SHAs / files (read-only)
+git log --oneline <base-branch>..HEAD
+git show --stat HEAD
+```
+
+Follow the template (6 sections, Vietnamese headings):
+`references/implementation-report-template.md`
+
+1. Tóm tắt điều hành
+2. Công việc đã thực hiện (bảng: task · commit · files changed)
+3. Tests & review
+4. Ảnh hưởng đến dự án
+5. Rủi ro / nợ kỹ thuật & follow-up
+6. Truy vết (branch · commit SHA · gate status)
+
+**Rules:**
+- Print **in chat** by default. **Only write a file if the user asks** — when
+  they do, suggest the path `plans/reports/` but never auto-create it.
+- Small change (1–2 files)? The template self-collapses — empty sections get `—`,
+  don't pad.
+- Language follows the user (VN/EN).
+- This step does **not** run on test failure. Step 1 already STOPs on failing
+  tests; at most print a short note of the failure reason, but do **not** proceed
+  to options.
+
+**If report done:** Continue to Step 2.
 
 ### Step 2: Determine Base Branch
 
