@@ -65,18 +65,6 @@ EXCLUDE_PATTERNS=(
     "plugins/morkit/skills/using-morkit/references/codex-tools.md"
     "plugins/morkit/skills/using-morkit/references/copilot-tools.md"
     "plugins/morkit/skills/using-morkit/references/gemini-tools.md"
-
-    # docs-hero restored as-is from 1.1.0; predates the MORKIT_PLUGIN_ROOT/MORKIT_DATA
-    # cascade — intentionally exempt. These SKILL.md files are kept byte-identical to
-    # the running 1.1.0 release and must NOT be modernized.
-    "plugins/morkit/skills/docs-hero-orchestrator/SKILL.md"
-    "plugins/morkit/skills/generate-srs/SKILL.md"
-    "plugins/morkit/skills/generate-api-docs/SKILL.md"
-    "plugins/morkit/skills/generate-db-design/SKILL.md"
-    "plugins/morkit/skills/generate-system-architecture/SKILL.md"
-    "plugins/morkit/skills/generate-code-standards/SKILL.md"
-    "plugins/morkit/skills/generate-codebase-summary/SKILL.md"
-    "plugins/morkit/skills/generate-design-guidelines/SKILL.md"
 )
 
 is_excluded() {

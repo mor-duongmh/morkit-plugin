@@ -733,7 +733,7 @@
         <a class="card" href="#docs">
           <div class="card-label">Tự động sinh tài liệu</div>
           <div class="card-title">Tài liệu tối ưu cho AI agent</div>
-          <p class="card-desc">Bộ skill <code>docs-hero</code> sinh trọn bộ tài liệu dự án theo chuẩn ITO Japan offshore: SRS (BrSE), API, schema DB (ERD), kiến trúc (arc42-lite), code standards, codebase summary và design guidelines (MADR). <code>/morkit:init</code> khởi tạo từ ProjectModel; <code>/morkit:update-doc</code> &amp; <code>/morkit:sync</code> bảo trì theo code.</p>
+          <p class="card-desc">Skill <code>writing-docs</code> sinh bộ <code>docs/</code> có taxonomy + mỏ neo (MAP) + file nhỏ liên kết chéo, giúp AI agent nạp đúng context tối thiểu mỗi task. LLM-driven, không Python. <code>/morkit:init</code> khởi tạo lần đầu; <code>/morkit:docs</code> bảo trì (update / summarize).</p>
           <span class="card-arrow">Xem lệnh sinh tài liệu →</span>
         </a>
         <a class="card" href="#companion">
@@ -859,8 +859,8 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
           </tr>
           <tr>
             <td><strong>Tự động sinh tài liệu (Doc generation)</strong></td>
-            <td><a href="commands/setup.html"><code>/morkit:setup</code></a>, <a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/update-doc.html"><code>/morkit:update-doc</code></a>, <a href="commands/sync.html"><code>/morkit:sync</code></a>, <a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a>, <a href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
-            <td>Sinh trọn bộ tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc… <code>/morkit:init</code> khởi tạo từ ProjectModel; <code>/morkit:update-doc</code> &amp; <code>/morkit:sync</code> bảo trì theo code.</td>
+            <td><a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/docs.html"><code>/morkit:docs</code></a></td>
+            <td>Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy + mỏ neo (MAP), file nhỏ liên kết chéo. LLM-driven, không Python. <code>/morkit:init</code> khởi tạo lần đầu; <code>/morkit:docs</code> bảo trì (update / summarize).</td>
           </tr>
         </tbody>
       </table>
@@ -974,28 +974,12 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
         </thead>
         <tbody>
           <tr>
-            <td><a href="commands/setup.html"><code>/morkit:setup</code></a></td>
-            <td>Dựng môi trường Python cho docs-hero (khoảng 30-60 giây, chạy 1 lần sau khi cài plugin).</td>
-          </tr>
-          <tr>
             <td><a href="commands/init.html"><code>/morkit:init</code></a></td>
-            <td><strong>Khởi tạo lần đầu</strong> — sinh bộ tài liệu mới (SRS, API, DB, kiến trúc…) từ một file ProjectModel JSON. Chọn 1 ngôn ngữ: JP, EN hoặc VN.</td>
+            <td><strong>Khởi tạo lần đầu</strong> — quét codebase (brownfield hoặc greenfield), dựng bộ tài liệu tối ưu cho AI agent: taxonomy (<code>00-overview…90-operations</code>) + mỏ neo MAP + file nhỏ liên kết chéo + con trỏ <code>CLAUDE.md</code>/<code>AGENTS.md</code> ở root. LLM-driven, không Python.</td>
           </tr>
           <tr>
-            <td><a href="commands/update-doc.html"><code>/morkit:update-doc</code></a></td>
-            <td>Áp dụng một change hoặc plan đã chốt vào tài liệu hiện có — vẫn giữ phần bạn đã sửa tay.</td>
-          </tr>
-          <tr>
-            <td><a href="commands/sync.html"><code>/morkit:sync</code></a></td>
-            <td>Quét mã nguồn (ORM model + REST route) và đề xuất nội dung nên cập nhật vào tài liệu (chỉ đọc, không ghi).</td>
-          </tr>
-          <tr>
-            <td><a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a></td>
-            <td>Áp dụng các nội dung bạn đã tick trong file <code>sync-proposal.md</code> vào tài liệu.</td>
-          </tr>
-          <tr>
-            <td><a href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
-            <td>Kiểm tra cài đặt docs-hero (Python, venv, dependencies, schema, mmdc) xem có ổn không.</td>
+            <td><a href="commands/docs.html"><code>/morkit:docs</code></a></td>
+            <td><strong>Bảo trì</strong> bộ docs đã có. Chế độ: <code>update</code> (làm mới theo thay đổi code) | <code>summarize</code> (refresh nhanh SOURCE-MAP + DOCUMENT-MAP).</td>
           </tr>
         </tbody>
       </table>

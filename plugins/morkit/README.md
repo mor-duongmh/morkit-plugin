@@ -105,15 +105,11 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | `/morkit:deep-review-doctor` | Health-check cài đặt |
 | `/morkit:deep-review-post` | Post-review hook |
 
-### Documentation (docs-hero)
+### Documentation (writing-docs)
 | Command | Việc |
 |---|---|
-| `/morkit:setup` | Bootstrap Python venv (~30-60s, 1 lần) |
-| `/morkit:init` | **Khởi tạo lần đầu** — sinh fresh docs từ ProjectModel JSON, chọn 1+ trong 7 outputs (SRS / API / DB / system-architecture / code-standards / codebase-summary / design-guidelines) |
-| `/morkit:update-doc` | Apply change/plan vào doc |
-| `/morkit:sync` | Quét codebase, đề xuất update (API / DB / arch / standards / summary) |
-| `/morkit:apply-sync` | Apply đề xuất từ sync |
-| `/morkit:doctor` | Health-check docs-hero |
+| `/morkit:init [path]` | **Khởi tạo lần đầu** — quét codebase (brownfield hoặc greenfield), dựng bộ tài liệu AI-optimized trong `docs/` (taxonomy 00-overview…90-operations + mỏ neo) + con trỏ `CLAUDE.md`/`AGENTS.md` ở root. LLM-driven, không Python |
+| `/morkit:docs [update\|summarize]` | **Bảo trì** bộ docs đã có: `update` làm mới theo thay đổi code · `summarize` refresh nhanh SOURCE-MAP + DOCUMENT-MAP |
 
 ## Plan review gate
 

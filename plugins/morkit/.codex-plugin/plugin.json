@@ -1,7 +1,7 @@
 {
   "name": "morkit",
   "version": "1.1.0",
-  "description": "Mor's all-in-one toolkit for OpenAI Codex CLI — spec workflow (propose/review/archive) + brainstorming/execute/TDD skills + 5-specialist deep code review + BrSE doc generation (docs-hero). Single-source with the Claude Code variant: the same plugins/morkit/skills/ is symlinked into Codex; skills keep Claude vocab and are translated at runtime via using-morkit/references/codex-tools.md. Hooks gate uses apply_patch|Edit|Write|Skill matcher.",
+  "description": "Mor's all-in-one toolkit for OpenAI Codex CLI — spec workflow (propose/review/archive) + brainstorming/execute/TDD skills + 5-specialist deep code review + AI-agent doc generation (writing-docs). Single-source with the Claude Code variant: the same plugins/morkit/skills/ is symlinked into Codex; skills keep Claude vocab and are translated at runtime via using-morkit/references/codex-tools.md. Hooks gate uses apply_patch|Edit|Write|Skill matcher.",
   "author": {
     "name": "Mor",
     "email": "duong@mor.company",
@@ -22,8 +22,8 @@
   "hooks": "./hooks/hooks.json",
   "interface": {
     "displayName": "morkit (Codex)",
-    "shortDescription": "Spec workflow + deep code review + BrSE doc generation (docs-hero) for Codex CLI",
-    "longDescription": "All-in-one Codex CLI toolkit, single-source with the Claude Code variant. Consolidates: spec workflow (propose/review/archive) + brainstorming/writing-plans/executing-plans/TDD/subagent-driven-development skills + 5-specialist parallel code review (deep-review, native multi_agent) + BrSE documentation generation (docs-hero — SRS/API/DB/architecture/code-standards/codebase-summary/design-guidelines into docs/). Single /morkit:* namespace via AGENTS.md bridge. INSTALL: codex plugin marketplace add mor-duongmh/morkit-plugin, then install plugin 'morkit'.",
+    "shortDescription": "Spec workflow + deep code review + AI-agent doc generation for Codex CLI",
+    "longDescription": "All-in-one Codex CLI toolkit, single-source with the Claude Code variant. Consolidates: spec workflow (propose/review/archive) + brainstorming/writing-plans/executing-plans/TDD/subagent-driven-development skills + 5-specialist parallel code review (deep-review, native multi_agent) + AI-agent documentation generation (writing-docs — docs/ taxonomy + AGENTS.md/CLAUDE.md pointer). Single /morkit:* namespace via AGENTS.md bridge. INSTALL: codex plugin marketplace add mor-duongmh/morkit-plugin, then install plugin 'morkit'.",
     "developerName": "Mor",
     "category": "Development",
     "capabilities": ["Interactive", "Write"],
