@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "mor-duongmh",
-  "description": "Mor's Claude Code plugin marketplace — single all-in-one toolkit (morkit) consolidating spec workflow, vendored Superpowers, and deep code review under a unified /morkit:* namespace.",
+  "description": "Mor's Claude Code plugin marketplace — single all-in-one toolkit (morkit) consolidating spec workflow, vendored Superpowers, deep code review, and BrSE document generation (docs-hero) under a unified /morkit:* namespace.",
   "owner": {
     "name": "duongmh",
     "email": "duongmh@mor.com.vn"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "morkit",
-      "description": "Mor's all-in-one Claude Code toolkit. Consolidates spec workflow (propose/review/archive) + brainstorming/execute/TDD skills (vendored from obra/superpowers) + 5-specialist code review (deep-review) under a single /morkit:* namespace. One command installs everything.",
+      "description": "Mor's all-in-one Claude Code toolkit. Consolidates spec workflow (propose/review/archive) + brainstorming/execute/TDD skills (vendored from obra/superpowers) + 5-specialist code review (deep-review) + BrSE doc generation (docs-hero) under a single /morkit:* namespace. One command installs everything.",
       "source": {
         "source": "git-subdir",
         "url": "https://github.com/mor-duongmh/morkit-plugin.git",
