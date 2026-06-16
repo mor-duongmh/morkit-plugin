@@ -16,4 +16,4 @@ The skill will:
 
 Run this once a change is fully implemented and merged.
 
-**Tip:** run `/morkit:update-doc` (or `/morkit:sync`) BEFORE archiving — it bridges this change's `proposal`/`design`/`tasks`/`spec` into `docs/`. Once archived, the change is out of scope for the docs bridge and its WHAT/WHY won't reach `docs/`.
+**Tip:** run `/morkit:docs update` BEFORE archiving — it bridges this change's `proposal`/`design`/`tasks`/`spec` into `docs/` (decisions→ADR, requirements→FEATURE-LIST, scenarios→TEST-MATRIX). Once archived, the change is out of scope for the docs bridge and its WHAT/WHY won't reach `docs/`.

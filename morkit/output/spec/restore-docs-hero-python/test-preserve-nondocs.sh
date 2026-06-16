@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
-# test-preserve-nondocs.sh — Preservation guard for Tasks 2 & 3
-#   (restore docs-hero / remove writing-docs + reconcile manifests & prose).
+# test-preserve-nondocs.sh — Preservation guard for Task 2 (restore docs-hero / remove writing-docs).
 #
-# Asserts the change touched ONLY the intended surface vs the base commit e1ede2e:
-#   (a) the 89 docs-hero paths in restore-manifest.txt  (Task 2, restored)
-#   (b) files under plugins/morkit/skills/writing-docs/  (Task 2, removed)
+# Asserts the restore touched ONLY the intended surface vs the base commit e1ede2e:
+#   (a) the 89 docs-hero paths in restore-manifest.txt  (restored)
+#   (b) files under plugins/morkit/skills/writing-docs/  (removed)
 #   (c) explicitly-reported orphans removed by Task 2    (NONE — see ORPHANS below)
-#   (e) the Task 3 manifest/prose files in TASK3_FILES   (reconciled / removed)
 # Any changed path outside that allow-list = FAIL.
 #
-# Also asserts the docs/ tree is UNCHANGED vs e1ede2e (docs site = Task 4).
-# NOTE: plugin.json + marketplace.json are NO LONGER immutable — Task 3
-# legitimately edits them (see TASK3_FILES); only docs/ stays frozen here.
+# Also asserts the deferred files are UNCHANGED vs e1ede2e:
+#   - plugins/morkit/.claude-plugin/plugin.json   (Task 3)
+#   - .claude-plugin/marketplace.json             (Task 4)
+#   - everything under docs/                        (Task 4)
 #
 # Prints PASS/FAIL, exits non-zero on any failure.
 
@@ -28,22 +27,6 @@ MANIFEST="morkit/output/spec/restore-docs-hero-python/restore-manifest.txt"
 # Task 2 removed NONE (commands/docs.md kept-and-flagged due to references in
 # kept files AGENTS.md / README.md / archive.md / brainstorming). Empty by design.
 ORPHANS=()
-
-# Task 3 manifest/prose reconciliation: files this task legitimately changes to
-# advertise docs-hero instead of the removed writing-docs skill / dead
-# /morkit:docs command. Manifests are scrubbed of writing-docs wording, prose is
-# pointed at the docs-hero commands, and the dead commands/docs.md is removed.
-# These are ALLOWED to differ vs the base; everything else must still be
-# preserved.
-TASK3_FILES=(
-  "plugins/morkit/.claude-plugin/plugin.json"
-  ".claude-plugin/marketplace.json"
-  "plugins/morkit/.codex-plugin/plugin.json"
-  "plugins/morkit/AGENTS.md"
-  "plugins/morkit/README.md"
-  "plugins/morkit/commands/archive.md"
-  "plugins/morkit/commands/docs.md"
-)
 
 fail=0
 
@@ -70,11 +53,6 @@ is_allowed() {
   for o in "${ORPHANS[@]:-}"; do
     [ -n "$o" ] && [ "$o" = "$path" ] && return 0
   done
-  # (e) Task 3 manifest/prose files
-  local t
-  for t in "${TASK3_FILES[@]}"; do
-    [ "$t" = "$path" ] && return 0
-  done
   return 1
 }
 
@@ -99,8 +77,21 @@ else
   echo "OK: all changed paths are in {manifest, writing-docs/, declared orphans}"
 fi
 
-# --- docs/ immutability check ------------------------------------------------
-# docs/ site is Task 4 — must remain untouched here.
+# --- Deferred-file immutability check ----------------------------------------
+DEFERRED=(
+  "plugins/morkit/.claude-plugin/plugin.json"
+  ".claude-plugin/marketplace.json"
+)
+for f in "${DEFERRED[@]}"; do
+  if [ -n "$(git diff --name-only "$BASE" -- "$f")" ]; then
+    echo "FAIL: deferred file changed vs $BASE: $f"
+    fail=1
+  else
+    echo "OK: deferred file unchanged: $f"
+  fi
+done
+
+# docs/ tree must be untouched
 docs_changed="$(git diff --name-only "$BASE" -- docs/ | sort -u)"
 if [ -n "$docs_changed" ]; then
   echo "FAIL: docs/ tree changed vs $BASE:"
