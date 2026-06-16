@@ -36,8 +36,13 @@ GROUPS = {
         "skills":   ["deep-review"],
     },
     "doc-gen": {
-        "commands": ["init", "docs"],
-        "skills": ["writing-docs"],
+        "commands": ["setup", "init", "update-doc", "sync", "apply-sync", "doctor"],
+        "skills": [
+            "generate-srs", "generate-api-docs", "generate-db-design",
+            "generate-system-architecture", "generate-code-standards",
+            "generate-codebase-summary", "generate-design-guidelines",
+            "docs-hero-orchestrator",
+        ],
     },
     "misc": {
         "commands": [],
@@ -425,44 +430,179 @@ CURATED = {
     # ====================================================================
     # NHÓM 4 — SINH TÀI LIỆU
     # ====================================================================
-    "skills.writing-docs": {
-        "lede": "Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy có cấu trúc + file mỏ neo (MAP) + file nhỏ liên kết chéo, để agent nạp đúng context tối thiểu mỗi task.",
+    "skills.docs-hero-orchestrator": {
+        "lede": "Điều phối các sub-skill để sinh hoặc cập nhật bộ tài liệu đầy đủ cho một dự án.",
         "details": [
-            "LLM-driven hoàn toàn — <strong>không Python</strong>, dispatch qua Task tool / dispatching-parallel-agents",
-            "3 chế độ, 2 lối vào:",
-            "<ul><li><code>init</code> (qua <code>/morkit:init</code>) — quét codebase, dựng taxonomy (<code>00-overview</code> … <code>90-operations</code>)</li><li><code>update</code> (qua <code>/morkit:docs</code>) — làm mới docs theo thay đổi code</li><li><code>summarize</code> (qua <code>/morkit:docs</code>) — refresh nhanh SOURCE-MAP + DOCUMENT-MAP</li></ul>",
-            "<code>init</code> tự rẽ <strong>2 nhánh</strong> ở Stage 0:",
-            "<ul><li><strong>brownfield</strong> (đã có code) — quét rồi suy ra docs đầy đủ</li><li><strong>greenfield</strong> (repo rỗng: không manifest + ~0 dòng code) — chỉ gieo khung đúng định dạng (<code>SCOPE</code>, <code>DOCUMENT-MAP</code>, <code>FEATURE-LIST</code> rỗng, con trỏ <code>CLAUDE.md</code>), <strong>không bịa</strong> feature/kiến trúc/nguồn; <code>update</code> bồi phần còn lại khi code lớn dần</li></ul>",
-            "Mỏ neo: MAP files + cross-link + front-matter nhẹ → agent load context tối thiểu mỗi task",
-            "<code>init</code>/<code>update</code> ghi pointer block vào <code>CLAUDE.md</code> gốc (và <code>AGENTS.md</code> khi phát hiện Codex) qua approve gate",
-            "CHỈ viết tài liệu — KHÔNG sửa code ứng dụng",
+            "Gọi 7 sub-skill theo thứ tự ít xung đột nhất: SRS, API, DB, system architecture, code standards, codebase summary, design guidelines",
+            "3 chế độ chính:",
+            "<ul><li><code>init</code> — tạo mới từ ProjectModel JSON</li><li><code>update</code> — áp dụng change/plan có sẵn</li><li><code>sync</code> — quét codebase và đề xuất cập nhật</li></ul>",
+            "Theo các chuẩn: <strong>BrSE ITO Japan</strong> (SRS), <strong>arc42-lite</strong> (kiến trúc), <strong>Conventional Commits</strong> + <strong>MADR</strong> (guidelines)",
         ],
         "when_to_use": [
-            "Khi lần đầu dựng docs/ cho dự án — brownfield (quét code có sẵn) hay greenfield (gieo khung cho repo rỗng) đều dùng init",
-            "Khi code đổi và muốn làm mới docs (update)",
-            "Khi cần refresh nhanh các file MAP (summarize)",
+            "Khi cần sinh nguyên bộ tài liệu (SRS, API, DB, kiến trúc…) một lần",
+            "Khi muốn các sub-skill phối hợp với nhau, ít xung đột nhất có thể",
         ],
-        "example_args": "init   # hoặc update / summarize",
-        "example_note": "Đầu ra ở docs/ của project đích. Ví dụ theo chế độ: `/morkit:init` (dựng taxonomy lần đầu — brownfield quét code, greenfield repo rỗng chỉ gieo khung, không bịa) · `/morkit:docs update` (làm mới doc lệch theo code) · `/morkit:docs summarize` (refresh nhanh SOURCE-MAP + DOCUMENT-MAP). Mỗi file nhỏ, liên kết chéo, có MAP làm mỏ neo cho agent.",
+        "example_args": "(gọi qua /morkit:init hoặc /morkit:update-doc)",
+        "example_note": "Theo các chuẩn quen thuộc: BrSE ITO Japan cho SRS, arc42-lite cho kiến trúc, MADR cho ADR.",
+    },
+    "skills.generate-srs": {
+        "lede": "Sinh hoặc cập nhật tài liệu yêu cầu phần mềm (SRS) theo chuẩn BrSE cho ITO Japan offshore.",
+        "details": [
+            "Render template SRS <strong>13 section + 2 phụ lục</strong>:",
+            "<ul><li>Doc Control</li><li>Overview</li><li>Business Flow (kèm UC detail)</li><li>FR detail</li><li>Business Rules</li><li>Roles &amp; Permissions</li><li>NFR theo IPA-6 (kèm Security/PII)</li><li>Data Items với retention</li><li>External Interfaces</li><li>Reports</li><li>Acceptance / UAT</li><li>Traceability</li><li>Open Q&amp;A</li><li>Constraints / Assumptions / Risks (phụ lục)</li><li>Screen Index + Glossary (phụ lục)</li></ul>",
+            "2 chế độ: <code>init</code> sinh từ ProjectModel JSON; <code>update</code> apply Delta và giữ phần bạn sửa tay",
+        ],
+        "when_to_use": [
+            "Khi dự án cần SRS theo chuẩn của khách Nhật",
+            "Khi yêu cầu thay đổi và cần làm mới SRS",
+        ],
+        "example_args": "(gọi qua /morkit:init hoặc /morkit:update-doc)",
+        "example_note": "Gồm 13 mục lớn và 2 phụ lục: Doc Control, tổng quan, luồng nghiệp vụ, FR/NFR, quyền, dữ liệu, UAT, traceability...",
+    },
+    "skills.generate-api-docs": {
+        "lede": "Sinh hoặc cập nhật tài liệu REST API.",
+        "details": [
+            "Render <code>api-docs.md</code> mô tả endpoint, request, response, error code",
+            "3 chế độ:",
+            "<ul><li><code>init</code> — sinh từ ProjectModel</li><li><code>update</code> — áp dụng Delta có sẵn</li><li><code>sync</code> — pipeline 2 bước: <strong>propose → apply</strong>, có checkbox để bạn tick chọn</li></ul>",
+            "Chế độ sync quét REST route trong codebase, xuất file <code>sync-proposal.md</code>",
+        ],
+        "when_to_use": [
+            "Khi cần tài liệu mô tả endpoint, request, response",
+            "Khi route trong mã nguồn đã đổi và muốn đồng bộ lại tài liệu",
+        ],
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_note": "Chế độ init sinh từ ProjectModel; update áp dụng thay đổi; sync quét mã và đề xuất nội dung cần cập nhật.",
+    },
+    "skills.generate-db-design": {
+        "lede": "Sinh hoặc cập nhật tài liệu thiết kế database, có sơ đồ ERD bằng Mermaid.",
+        "details": [
+            "Render <code>database-design.md</code> gồm: mô tả bảng, cột, quan hệ, index",
+            "Nhúng sơ đồ <strong>ERD</strong> vẽ bằng Mermaid",
+            "3 chế độ: <code>init</code> / <code>update</code> / <code>sync</code>",
+            "Sync quét ORM model (TypeORM, Prisma, SQLAlchemy...) và đề xuất <strong>Thêm / Sửa / Bỏ</strong> theo bảng",
+        ],
+        "when_to_use": [
+            "Khi cần tài liệu mô tả schema DB",
+            "Khi muốn đồng bộ tài liệu với ORM model trong mã nguồn",
+        ],
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_note": "Sinh file database-design.md kèm ERD vẽ bằng Mermaid. Chế độ sync quét ORM và đề xuất Thêm/Sửa/Bỏ.",
+    },
+    "skills.generate-system-architecture": {
+        "lede": "Sinh hoặc cập nhật tài liệu kiến trúc hệ thống theo arc42-lite, kèm sơ đồ thành phần bằng Mermaid.",
+        "details": [
+            "Render <code>system-architecture.md</code> theo <strong>arc42-lite 8 section</strong>:",
+            "<ul><li>Introduction</li><li>Constraints</li><li>Context</li><li>Solution Strategy</li><li>Building Blocks</li><li>Runtime</li><li>Deployment</li><li>Crosscutting</li></ul>",
+            "Nhúng sơ đồ component bằng Mermaid",
+            "Sync quét services, packages, Dockerfile, k8s manifest và import graph để đề xuất Component cần Thêm / Bỏ",
+        ],
+        "when_to_use": [
+            "Khi cần tài liệu kiến trúc cho dự án",
+            "Khi muốn nhúng sơ đồ component vẽ bằng Mermaid",
+        ],
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_note": "Gồm 8 mục theo chuẩn arc42-lite. Sync quét services, packages, Docker, k8s và đồ thị import.",
+    },
+    "skills.generate-code-standards": {
+        "lede": "Sinh hoặc cập nhật tài liệu quy ước code (Conventional Commits + cấu hình lint/format).",
+        "details": [
+            "Render <code>code-standards.md</code> từ ProjectModel",
+            "Auto-extract rule từ ESLint, Prettier, Ruff, EditorConfig... đang có trong repo",
+            "Phân loại theo scope: <strong>LNT</strong> (lint) / <strong>NAM</strong> (naming) / <strong>CMT</strong> (commit) / <strong>FMT</strong> (format)",
+            "Sync đề xuất Thêm / Bỏ rule khi cấu hình đổi",
+            "Nếu repo đã có <code>CONTRIBUTING.md</code>, link sang thay vì duplicate",
+        ],
+        "when_to_use": [
+            "Khi dự án cần một tài liệu thống nhất về quy ước code",
+            "Khi muốn rút quy ước từ các file cấu hình lint/format đang có",
+        ],
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_note": "Nếu đã có CONTRIBUTING.md, sẽ link sang chứ không nhân đôi nội dung.",
+    },
+    "skills.generate-codebase-summary": {
+        "lede": "Sinh hoặc cập nhật tài liệu tổng quan mã nguồn dạng README: tech stack, cấu trúc, gói, entry point.",
+        "details": [
+            "Render <code>codebase-summary.md</code> dạng README-style overview gồm:",
+            "<ul><li>Tech stack</li><li>Repo layout (file tree gọn)</li><li>Packages chính</li><li>Entry points</li><li>LOC theo ngôn ngữ</li></ul>",
+            "Sync quét file tree + manifest (<code>package.json</code>, <code>pyproject.toml</code>, <code>go.mod</code>...) và đề xuất Thêm / Bỏ",
+            "Hợp khi <strong>onboard người mới</strong> — nắm dự án trong 5 phút",
+        ],
+        "when_to_use": [
+            "Khi cần một bản tổng quan dự án dành cho người mới onboard",
+            "Khi muốn ai đó hiểu nhanh dự án mà không cần đọc hết code",
+        ],
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_note": "Liệt kê công nghệ, bố cục thư mục, các package, entry point và số dòng code theo ngôn ngữ.",
+    },
+    "skills.generate-design-guidelines": {
+        "lede": "Sinh hoặc cập nhật tài liệu Design Principles, Patterns và các ADR (MADR format).",
+        "details": [
+            "Render <code>design-guidelines.md</code> gồm 3 phần:",
+            "<ul><li><strong>Design Principles</strong></li><li><strong>Patterns</strong></li><li><strong>ADRs</strong> theo chuẩn MADR</li></ul>",
+            "Khi <code>init</code>, mỗi ADR có file riêng tại <code>docs/adr/NNN-slug.md</code>",
+            "Phân loại theo scope: <strong>DPR</strong> / <strong>PTN</strong> / <strong>ADR</strong>",
+            "<em>Không hỗ trợ</em> chế độ sync — guidelines là quyết định của người, không auto-generate",
+        ],
+        "when_to_use": [
+            "Khi cần một tài liệu thống nhất về nguyên tắc thiết kế",
+            "Khi muốn ghi lại các quyết định kiến trúc theo MADR format",
+        ],
+        "example_args": "(gọi qua /morkit:init / /morkit:update-doc)",
+        "example_note": "Khi init, mỗi ADR sẽ có một file riêng tại docs/adr/NNN-slug.md. Skill này không hỗ trợ chế độ sync — guidelines do người viết.",
+    },
+
+    "commands.setup": {
+        "lede": "Chạy 1 lần sau khi cài plugin để dựng môi trường Python cho docs-hero.",
+        "when_to_use": [
+            "Lần đầu sau khi /plugin install morkit",
+            "Sau khi đổi Python version và muốn dựng lại venv",
+        ],
+        "example_args": "",
+        "example_note": "Mất khoảng 30-60 giây. Lệnh idempotent — chạy lại không gây hại.",
     },
     "commands.init": {
-        "lede": "Khởi tạo lần đầu bộ tài liệu dự án tối ưu cho AI agent — tự nhận biết brownfield (đã có code → quét rồi suy ra docs) hay greenfield (repo rỗng → chỉ gieo khung docs đúng định dạng, không bịa nội dung). Chạy một lần cho mỗi dự án.",
+        "lede": "Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON.",
         "when_to_use": [
-            "Brownfield — dự án đã có code: muốn quét (read-only) rồi dựng taxonomy 00-overview … 90-operations đầy đủ.",
-            "Greenfield — repo rỗng (chưa có manifest như package.json/pyproject.toml/go.mod, ~0 dòng code): muốn gieo sẵn khung docs để vừa viết code vừa bồi tài liệu.",
-            "Lần đầu dựng docs/ (chưa có taxonomy 00-overview); về sau bảo trì bằng /morkit:docs update | summarize.",
+            "Khi dự án chưa có tài liệu, muốn sinh lần đầu từ ProjectModel",
         ],
-        "example_args": "# tự nhận brownfield/greenfield rồi dựng docs/ + con trỏ CLAUDE.md/AGENTS.md",
-        "example_note": "Tự nhận diện ở Stage 0. BROWNFIELD → quét code (read-only) → taxonomy 00-overview … 90-operations + mỏ neo + con trỏ root. GREENFIELD (repo rỗng) → bỏ qua scout, chỉ gieo khung tối thiểu: SCOPE · DOCUMENT-MAP · FEATURE-LIST rỗng · con trỏ CLAUDE.md (hỏi thêm có gieo STACK/ARCHITECTURE dự kiến không), TUYỆT ĐỐI không bịa feature/kiến trúc/nguồn — `/morkit:docs update` bồi phần còn lại khi code lớn dần. Ví dụ: `/morkit:init` (hỏi scale project/module) · `/morkit:init ../new-service --yes` (bỏ gate; greenfield bỏ luôn prompt STACK/ARCHITECTURE) · `/morkit:init --scope module --agents` (monorepo, ghi thêm AGENTS.md). LLM-driven, không Python.",
+        "example_args": "--lang VN",
+        "example_note": "Có menu chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra nằm ở thư mục docs/ của dự án. Chọn 1 ngôn ngữ: JP, EN hoặc VN.",
     },
-    "commands.docs": {
-        "lede": "Bảo trì bộ tài liệu dự án đã có (taxonomy + mỏ neo). Shortcut gọi skill writing-docs. Khởi tạo lần đầu dùng /morkit:init.",
+    "commands.update-doc": {
+        "lede": "Áp dụng một change hoặc plan đã chốt vào tài liệu đang có — vẫn giữ phần bạn đã sửa tay.",
         "when_to_use": [
-            "Khi code đổi và muốn làm mới docs đã có (update)",
-            "Khi cần refresh nhanh các file MAP (summarize)",
+            "Khi một change đã merge và cần cập nhật vào tài liệu tương ứng",
+            "Khi plan brainstorm đã chốt và muốn cập nhật tài liệu theo plan đó",
         ],
-        "example_args": "update --yes        # hoặc: summarize",
-        "example_note": "Ví dụ cụ thể: `/morkit:docs update` (liệt kê doc lệch rồi hỏi scope) · `/morkit:docs update --yes` (cập nhật hết, bỏ gate) · `/morkit:docs update ../api-service` (project khác) · `/morkit:docs summarize` (refresh nhanh SOURCE-MAP + DOCUMENT-MAP). Khởi tạo lần đầu dùng /morkit:init. LLM-driven, không Python.",
+        "example_args": "<tên-change>",
+        "example_note": "Phần bạn đã sửa tay trong tài liệu sẽ được giữ nguyên nhờ diff engine.",
+    },
+    "commands.sync": {
+        "lede": "Đọc mã nguồn, đề xuất các nội dung nên cập nhật vào tài liệu. Chỉ đọc, không ghi.",
+        "when_to_use": [
+            "Khi schema hoặc route trong code đã đổi nhưng tài liệu chưa cập nhật",
+            "Khi muốn xem trước các thay đổi sẽ áp dụng trước khi quyết",
+        ],
+        "example_args": "",
+        "example_note": "Xuất file sync-proposal.md có checkbox để bạn tick các nội dung muốn áp dụng. Sau đó gõ /morkit:apply-sync.",
+    },
+    "commands.apply-sync": {
+        "lede": "Áp dụng các nội dung bạn đã tick trong sync-proposal.md vào tài liệu.",
+        "when_to_use": [
+            "Ngay sau khi /morkit:sync đã sinh proposal và bạn đã tick chọn",
+        ],
+        "example_args": "",
+        "example_note": "Chuyển các mục được tick thành thay đổi cụ thể rồi chạy update flow chuẩn.",
+    },
+    "commands.doctor": {
+        "lede": "Kiểm tra cài đặt docs-hero xem có ổn không (Python, venv, dependencies...).",
+        "when_to_use": [
+            "Khi /morkit:init hoặc /morkit:update-doc báo lỗi cài đặt",
+            "Sau khi cài lần đầu, muốn xác nhận môi trường đã sẵn sàng",
+        ],
+        "example_args": "",
+        "example_note": "Chỉ đọc và báo cáo, không sửa gì. Kiểm tra Python version, venv, dependencies, schema và mmdc.",
     },
 
     # ====================================================================

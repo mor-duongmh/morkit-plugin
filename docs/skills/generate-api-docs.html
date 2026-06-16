@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › writing-docs</title>
+<title>morkit › skill › generate-api-docs</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,33 +173,28 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">writing-docs</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-api-docs</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
   <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>writing-docs</h1>
-  <p class="lede">Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy có cấu trúc + file mỏ neo (MAP) + file nhỏ liên kết chéo, để agent nạp đúng context tối thiểu mỗi task.</p>
+  <h1>generate-api-docs</h1>
+  <p class="lede">Sinh hoặc cập nhật tài liệu REST API.</p>
 
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
-    <li>LLM-driven hoàn toàn — <strong>không Python</strong>, dispatch qua Task tool / dispatching-parallel-agents</li>
-    <li>3 chế độ, 2 lối vào:</li>
-    <li><ul><li><code>init</code> (qua <code>/morkit:init</code>) — quét codebase, dựng taxonomy (<code>00-overview</code> … <code>90-operations</code>)</li><li><code>update</code> (qua <code>/morkit:docs</code>) — làm mới docs theo thay đổi code</li><li><code>summarize</code> (qua <code>/morkit:docs</code>) — refresh nhanh SOURCE-MAP + DOCUMENT-MAP</li></ul></li>
-    <li><code>init</code> tự rẽ <strong>2 nhánh</strong> ở Stage 0:</li>
-    <li><ul><li><strong>brownfield</strong> (đã có code) — quét rồi suy ra docs đầy đủ</li><li><strong>greenfield</strong> (repo rỗng: không manifest + ~0 dòng code) — chỉ gieo khung đúng định dạng (<code>SCOPE</code>, <code>DOCUMENT-MAP</code>, <code>FEATURE-LIST</code> rỗng, con trỏ <code>CLAUDE.md</code>), <strong>không bịa</strong> feature/kiến trúc/nguồn; <code>update</code> bồi phần còn lại khi code lớn dần</li></ul></li>
-    <li>Mỏ neo: MAP files + cross-link + front-matter nhẹ → agent load context tối thiểu mỗi task</li>
-    <li><code>init</code>/<code>update</code> ghi pointer block vào <code>CLAUDE.md</code> gốc (và <code>AGENTS.md</code> khi phát hiện Codex) qua approve gate</li>
-    <li>CHỈ viết tài liệu — KHÔNG sửa code ứng dụng</li>
+    <li>Render <code>api-docs.md</code> mô tả endpoint, request, response, error code</li>
+    <li>3 chế độ:</li>
+    <li><ul><li><code>init</code> — sinh từ ProjectModel</li><li><code>update</code> — áp dụng Delta có sẵn</li><li><code>sync</code> — pipeline 2 bước: <strong>propose → apply</strong>, có checkbox để bạn tick chọn</li></ul></li>
+    <li>Chế độ sync quét REST route trong codebase, xuất file <code>sync-proposal.md</code></li>
   </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi lần đầu dựng docs/ cho dự án — brownfield (quét code có sẵn) hay greenfield (gieo khung cho repo rỗng) đều dùng init</li>
-  <li>Khi code đổi và muốn làm mới docs (update)</li>
-  <li>Khi cần refresh nhanh các file MAP (summarize)</li>
+  <li>Khi cần tài liệu mô tả endpoint, request, response</li>
+  <li>Khi route trong mã nguồn đã đổi và muốn đồng bộ lại tài liệu</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -208,14 +203,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:writing-docs init   # hoặc update / summarize</code></pre>
+    <pre><code>$ /morkit:generate-api-docs (gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Đầu ra ở docs/ của project đích. Ví dụ theo chế độ: `/morkit:init` (dựng taxonomy lần đầu — brownfield quét code, greenfield repo rỗng chỉ gieo khung, không bịa) · `/morkit:docs update` (làm mới doc lệch theo code) · `/morkit:docs summarize` (refresh nhanh SOURCE-MAP + DOCUMENT-MAP). Mỗi file nhỏ, liên kết chéo, có MAP làm mỏ neo cho agent.</p>
+  <p class="lede" style="font-size:14px;">Chế độ init sinh từ ProjectModel; update áp dụng thay đổi; sync quét mã và đề xuất nội dung cần cập nhật.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/docs.html"><div class="ttl">/morkit:docs</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
   </div>
 
   <div class="footer">

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › init</title>
+<title>morkit › skill › git</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,42 +173,35 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">git</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>init</h1>
-  <p class="lede">Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Khác</span><span class="tag">Skill</span></div>
+  <h1>git</h1>
+  <p class="lede">Use when the user asks to commit, push, create a PR, or merge branches. Handles conventional commits, secret scanning, and auto-splits commits by type/scope.</p>
 
-  <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:init [tham số]</code></pre>
-  <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
-
-  <h2>2. Khi nào dùng</h2>
+  
+  <h2>1. Khi nào dùng</h2>
   <ul>
-  <li>Khi dự án chưa có tài liệu, muốn sinh lần đầu từ ProjectModel</li>
+  <li>Khi the user asks to commit, push, create a PR, or merge branches.</li>
   </ul>
 
-  <h2>3. Ví dụ</h2>
+  <h2>2. Ví dụ</h2>
   <div class="window">
     <div class="window-bar">
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:init --lang VN</code></pre>
+    <pre><code>$ /morkit:git</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Có menu chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra nằm ở thư mục docs/ của dự án. Chọn 1 ngôn ngữ: JP, EN hoặc VN.</p>
+  <p class="lede" style="font-size:14px;">Đây là ví dụ minh hoạ — tham khảo SKILL.md để xem cú pháp đầy đủ.</p>
 
-  <h2>4. Xem thêm</h2>
+  <h2>3. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
+    <p class="lede" style="font-size:13px;">(Không có item liên quan trong cùng nhóm.)</p>
   </div>
 
   <div class="footer">

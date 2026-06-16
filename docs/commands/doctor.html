@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › init</title>
+<title>morkit › command › doctor</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,23 +173,24 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">doctor</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
   <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>init</h1>
-  <p class="lede">Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON.</p>
+  <h1>doctor</h1>
+  <p class="lede">Kiểm tra cài đặt docs-hero xem có ổn không (Python, venv, dependencies...).</p>
 
   <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:init [tham số]</code></pre>
+  <pre><code>/morkit:doctor [tham số]</code></pre>
   <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi dự án chưa có tài liệu, muốn sinh lần đầu từ ProjectModel</li>
+  <li>Khi /morkit:init hoặc /morkit:update-doc báo lỗi cài đặt</li>
+  <li>Sau khi cài lần đầu, muốn xác nhận môi trường đã sẵn sàng</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -198,17 +199,17 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:init --lang VN</code></pre>
+    <pre><code>$ /morkit:doctor</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Có menu chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra nằm ở thư mục docs/ của dự án. Chọn 1 ngôn ngữ: JP, EN hoặc VN.</p>
+  <p class="lede" style="font-size:14px;">Chỉ đọc và báo cáo, không sửa gì. Kiểm tra Python version, venv, dependencies, schema và mmdc.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
     <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
   </div>
 
   <div class="footer">

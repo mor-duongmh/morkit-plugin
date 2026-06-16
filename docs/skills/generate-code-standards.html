@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › init</title>
+<title>morkit › skill › generate-code-standards</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,23 +173,29 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-code-standards</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>init</h1>
-  <p class="lede">Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
+  <h1>generate-code-standards</h1>
+  <p class="lede">Sinh hoặc cập nhật tài liệu quy ước code (Conventional Commits + cấu hình lint/format).</p>
 
-  <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:init [tham số]</code></pre>
-  <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
+  <h2>1. Nhiệm vụ</h2>
+  <ul class="duties">
+    <li>Render <code>code-standards.md</code> từ ProjectModel</li>
+    <li>Auto-extract rule từ ESLint, Prettier, Ruff, EditorConfig... đang có trong repo</li>
+    <li>Phân loại theo scope: <strong>LNT</strong> (lint) / <strong>NAM</strong> (naming) / <strong>CMT</strong> (commit) / <strong>FMT</strong> (format)</li>
+    <li>Sync đề xuất Thêm / Bỏ rule khi cấu hình đổi</li>
+    <li>Nếu repo đã có <code>CONTRIBUTING.md</code>, link sang thay vì duplicate</li>
+  </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi dự án chưa có tài liệu, muốn sinh lần đầu từ ProjectModel</li>
+  <li>Khi dự án cần một tài liệu thống nhất về quy ước code</li>
+  <li>Khi muốn rút quy ước từ các file cấu hình lint/format đang có</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -198,17 +204,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:init --lang VN</code></pre>
+    <pre><code>$ /morkit:generate-code-standards (gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Có menu chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra nằm ở thư mục docs/ của dự án. Chọn 1 ngôn ngữ: JP, EN hoặc VN.</p>
+  <p class="lede" style="font-size:14px;">Nếu đã có CONTRIBUTING.md, sẽ link sang chứ không nhân đôi nội dung.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
   </div>
 
   <div class="footer">
