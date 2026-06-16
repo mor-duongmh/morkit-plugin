@@ -18,6 +18,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FETCH="$SCRIPT_DIR/fetch-checklist.sh"
 
+# shellcheck source=lib/common.sh
+source "$SCRIPT_DIR/lib/common.sh"
+
 CHANGE_DIR=""
 VARIANT_OVERRIDE=""
 REFRESH=0
@@ -146,6 +149,10 @@ if [[ -z "$SECTION" ]]; then
     echo "  The doc structure may have changed; inspect $DOC_TMP" >&2
     exit 4
 fi
+
+# Convert plain bullet items ("* foo") into tickable markdown checkboxes
+# ("- [ ] foo") so the written file is natively tickable.
+SECTION="$(printf '%s' "$SECTION" | bullets_to_checkboxes)"
 
 # ---------------------------------------------------------------------------
 # Step 4: build the file
