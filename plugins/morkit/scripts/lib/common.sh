@@ -137,6 +137,17 @@ atomic_jq() {
 }
 
 # ---------------------------------------------------------------------------
+# Checklist formatting
+# Convert Google-Doc-exported bullet items ("* foo") into markdown task-list
+# checkboxes ("- [ ] foo"), preserving indentation. Headings (### …), bold
+# (**…**), table rows (|…), and plain text pass through untouched. Reads stdin,
+# writes stdout. Never auto-runs (file is source-only).
+# ---------------------------------------------------------------------------
+bullets_to_checkboxes() {
+    sed -E 's/^([[:space:]]*)\* /\1- [ ] /'
+}
+
+# ---------------------------------------------------------------------------
 # Marker file management
 # ---------------------------------------------------------------------------
 ensure_marker() {
