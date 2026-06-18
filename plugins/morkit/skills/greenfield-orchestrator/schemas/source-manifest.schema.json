@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "morkit/greenfield/source-manifest.schema.json",
+  "title": "Greenfield doc-ingest source manifest",
+  "description": "Each customer doc → the ProjectModel entity types it feeds → a short provenance fact list (no full-text dump). See references/greenfield-conventions.md §4-§5.",
+  "type": "object",
+  "required": ["sources"],
+  "additionalProperties": true,
+  "properties": {
+    "generated": { "type": "string", "description": "ISO 8601 timestamp." },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "type", "classified_as", "facts"],
+        "additionalProperties": true,
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "description": "Source file path (relative to workspace)." },
+          "type": {
+            "type": "string",
+            "enum": ["pdf", "excel", "docx", "md", "openspec", "other"]
+          },
+          "classified_as": {
+            "type": "array",
+            "description": "ProjectModel entity type names this source feeds (see conventions §5 classification table).",
+            "items": { "type": "string" }
+          },
+          "facts": {
+            "type": "array",
+            "description": "Atomic provenance facts extracted from this source.",
+            "items": {
+              "type": "object",
+              "required": ["summary", "target"],
+              "additionalProperties": true,
+              "properties": {
+                "summary": { "type": "string", "minLength": 1, "description": "One-line fact (no full-text dump)." },
+                "target": { "type": "string", "description": "ProjectModel entity type this fact seeds." },
+                "ref": { "type": "string", "description": "Locator within the source (page/section/sheet/row)." }
+              }
+            }
+          },
+          "warnings": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
