@@ -109,8 +109,9 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | Command | Việc |
 |---|---|
 | `/morkit:setup` | Bootstrap Python venv (~30-60s, 1 lần) |
-| `/morkit:init` | **Khởi tạo lần đầu** — sinh fresh docs từ ProjectModel JSON, chọn 1+ trong 7 outputs (SRS / API / DB / system-architecture / code-standards / codebase-summary / design-guidelines) |
-| `/morkit:update-doc` | Apply change/plan vào doc |
+| `/morkit:init` | **Cửa chính tạo docs** — hỏi loại dự án rồi route: *greenfield* (pipeline BA từ tài liệu yêu cầu) hoặc *brownfield* (render từ ProjectModel + quét code). Chọn 1+ trong 7 outputs (SRS / API / DB / system-architecture / code-standards / codebase-summary / design-guidelines) |
+| `/morkit:greenfield` | Shortcut thẳng vào nhánh greenfield của init — pipeline BA G0→G7 (brainstorm → user stories → gap/risk → clarify → ProjectModel → docs), 3 human gate, resume-able |
+| `/morkit:docs-update` | Apply change/plan vào doc |
 | `/morkit:sync` | Quét codebase, đề xuất update (API / DB / arch / standards / summary) |
 | `/morkit:apply-sync` | Apply đề xuất từ sync |
 | `/morkit:doctor` | Health-check docs-hero |

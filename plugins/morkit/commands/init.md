@@ -1,6 +1,6 @@
 ---
-description: Generate fresh docs (SRS / API / DB / system-architecture / code-standards / codebase-summary / design-guidelines — user picks which) from a ProjectModel JSON. Outputs to ./docs/ in current project. Single-language (JP|EN|VN).
-argument-hint: "--project-model <path> --language <JP|EN|VN> [--outputs srs,api,db,arch,standards,summary,guidelines]"
+description: Single entry for doc generation. Asks project type — greenfield (build docs from requirements/customer docs via the BA pipeline) or brownfield (render docs from a ProjectModel against an existing codebase) — then routes. Outputs to ./docs/. Single-language (JP|EN|VN).
+argument-hint: "[--type greenfield|brownfield] [--project-model <path>] [--language <JP|EN|VN>] [--outputs srs,api,db,arch,standards,summary,guidelines]"
 ---
 
 Pre-flight check:
@@ -11,6 +11,27 @@ test -d "${HOME}/.claude/plugins/data/docs-hero/.venv" || {
   exit 1
 }
 ```
+
+## Step 0 — Project type (routing — do this FIRST)
+
+Decide the starting point before anything else:
+
+- If `--type greenfield` or `--type brownfield` was passed, use it.
+- If the user invoked `/morkit:greenfield`, treat as `greenfield`.
+- Otherwise call **AskUserQuestion** (single-select):
+  - question: "Điểm xuất phát của dự án?"
+  - header: "Project type"
+  - options:
+    - label: "Greenfield — từ tài liệu yêu cầu", description: "Dự án mới: có tài liệu khách hàng / yêu cầu, chưa (hoặc ít) code. Chạy pipeline BA G0→G7: brainstorm → user stories → gap/risk → clarify → ProjectModel → docs."
+    - label: "Brownfield — từ code/model sẵn có", description: "Đã có codebase và/hoặc ProjectModel JSON (hoặc inputs). Render thẳng bộ docs, có quét repo dò trạng thái implement."
+
+Route on the answer:
+- **greenfield** → invoke the `greenfield-orchestrator` skill via the **Skill tool**, passing through any args (`<proj>`, `--format`, `--lang`, `--resume`). That pipeline owns the full G0→G7 flow and renders the docs itself at G6/G7. **Stop here — do NOT run the brownfield flow below.**
+- **brownfield** → continue with the flow below.
+
+---
+
+## Brownfield flow — render from a ProjectModel (+ repo scan)
 
 **Ask the user which doc types to generate (BEFORE invoking the orchestrator):**
 
@@ -65,7 +86,7 @@ Use the **Skill tool** to invoke `docs-hero-orchestrator` with mode `init`, pass
 6. Dispatch to the selected sub-skills only (parallel where safe). The `generate-srs` sub-skill consumes the `impl_status` / `evidence_refs` populated in step 2 and renders the §3 dashboard + Impl Status column automatically — no extra flag needed.
 7. Render docs to `${PWD}/docs/`
 8. Generate aggregate report; Claude then appends a "Gaps & Risks" section copying the unresolved entries (placeholder + assumption) from `docs-plan.md`.
-9. Spawn the `docs-hero` QA agent for cross-reference + BrSE-quality validation. The agent verifies every blocker/warning gap in `docs-plan.md` is either resolved or explicitly carried forward as `<TBD: …>`, and cross-checks that the Implementation Status snapshot in SRS §3 matches the project-model values.
+9. Spawn the `docs-reviewer` QA agent for cross-reference + BrSE-quality validation. The agent verifies every blocker/warning gap in `docs-plan.md` is either resolved or explicitly carried forward as `<TBD: …>`, and cross-checks that the Implementation Status snapshot in SRS §3 matches the project-model values.
 
 Output files (per selected output):
 

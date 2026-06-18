@@ -16,4 +16,4 @@ The skill will:
 
 Run this once a change is fully implemented and merged.
 
-**Tip:** run `/morkit:update-doc` (or `/morkit:sync`) BEFORE archiving — it bridges this change's `proposal`/`design`/`tasks`/`spec` into `docs/`. Once archived, the change is out of scope for the docs bridge and its WHAT/WHY won't reach `docs/`.
+**Docs bridge gate:** if docs-hero is set up (venv + `.docs-hero-meta.json`), `/morkit:archive` now **prompts** to bridge this change into `docs/` (via `/morkit:docs-update`) before moving — because once archived, the change is out of bridge scope and its WHAT/WHY won't reach `docs/`. Spec-only projects (no docs-hero) skip the prompt and archive directly. You can also bridge manually anytime with `/morkit:docs-update` (or `/morkit:sync`).
