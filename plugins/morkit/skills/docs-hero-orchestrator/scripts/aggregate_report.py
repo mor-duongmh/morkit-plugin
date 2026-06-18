@@ -2,7 +2,7 @@
 
 Reads `docs/srs.md`, `docs/api-docs.md`, `docs/database-design.md` (whichever
 exist) and generated `docs/screen-specs/*.md`, then produces a markdown summary
-suitable for showing the user or feeding into the docs-hero QA agent.
+suitable for showing the user or feeding into the docs-reviewer QA agent.
 
 CLI:
     aggregate_report.py --docs-dir docs/ --output .tmp/docs-report.md
@@ -115,10 +115,10 @@ def render_report(docs_dir: Path) -> str:
                 issues.append(f"- `{ds.name}` has 0 `{label}` anchors")
 
     if not issues:
-        out.append("All checks passed. Spawn docs-hero QA agent for deeper review.\n")
+        out.append("All checks passed. Spawn docs-reviewer QA agent for deeper review.\n")
     else:
         out.extend(issue + "\n" for issue in issues)
-        out.append("\nRun docs-hero QA agent for deeper analysis.\n")
+        out.append("\nRun docs-reviewer QA agent for deeper analysis.\n")
 
     return "".join(out)
 
