@@ -171,7 +171,7 @@ mkdir -p "$PROJECT_TMP"
 #     action was "placeholder" or "assumption"). Resolved gaps are
 #     omitted.
 
-# 5. Spawn docs-hero agent for QA review (Skill tool: docs-hero)
+# 5. Spawn docs-reviewer agent for QA review (Task tool: docs-reviewer)
 #    The QA agent must cross-check that every blocker/warning gap
 #    from docs-plan.md is either resolved in the rendered docs or
 #    explicitly carried forward as a <TBD: ...> placeholder.
@@ -197,12 +197,14 @@ trap '"$PY" "$ORCH_SCRIPTS/lock_manager.py" release --lock "$PROJECT_LOCK"' EXIT
   --docs-dir "$PROJECT_DOCS_DIR" \
   --meta "$PROJECT_META"
 
-# 3. Aggregate + spawn docs-hero agent
+# 3. Aggregate + spawn docs-reviewer agent
 ```
 
 ## Sync Flow (2-step)
 
-Step 1 — propose (read-only, no lock):
+Step 1 — propose (read-only, no lock). All 5 code-derived docs; each
+`*_sync_propose.py` scans the codebase for its own signals and writes a checkbox
+proposal:
 ```bash
 "$PY" "$API_SCRIPTS/api_sync_propose.py" \
   --codebase-paths "$CODEBASE_PATHS" \
@@ -213,16 +215,45 @@ Step 1 — propose (read-only, no lock):
   --codebase-paths "$CODEBASE_PATHS" \
   --existing-doc "$PROJECT_DOCS_DIR/database-design.md" \
   --output "$PROJECT_TMP/db-sync-proposal.md"
+
+"$PY" "$SUM_SCRIPTS/codebase_summary_sync_propose.py" \
+  --codebase-paths "$CODEBASE_PATHS" \
+  --existing-doc "$PROJECT_DOCS_DIR/codebase-summary.md" \
+  --output "$PROJECT_TMP/codebase-summary-sync-proposal.md"
+
+"$PY" "$ARCH_SCRIPTS/system_architecture_sync_propose.py" \
+  --codebase-paths "$CODEBASE_PATHS" \
+  --existing-doc "$PROJECT_DOCS_DIR/system-architecture.md" \
+  --output "$PROJECT_TMP/system-architecture-sync-proposal.md"
+
+"$PY" "$STD_SCRIPTS/code_standards_sync_propose.py" \
+  --codebase-paths "$CODEBASE_PATHS" \
+  --existing-doc "$PROJECT_DOCS_DIR/code-standards.md" \
+  --output "$PROJECT_TMP/code-standards-sync-proposal.md"
 # SRS sync not supported (requirements cannot be inferred from code)
+# design-guidelines sync not supported (ADRs are manual)
 ```
 
-Step 2 — apply-sync (after user ticks checkboxes):
+Step 2 — apply-sync (after user ticks checkboxes). Run only for proposals the
+user actually edited. Map each proposal to its apply script:
+
+| Proposal | Apply script |
+|---|---|
+| `api-sync-proposal.md` | `$API_SCRIPTS/api_sync_apply.py` |
+| `db-sync-proposal.md` | `$DB_SCRIPTS/db_sync_apply.py` |
+| `codebase-summary-sync-proposal.md` | `$SUM_SCRIPTS/codebase_summary_sync_apply.py` |
+| `system-architecture-sync-proposal.md` | `$ARCH_SCRIPTS/system_architecture_sync_apply.py` |
+| `code-standards-sync-proposal.md` | `$STD_SCRIPTS/code_standards_sync_apply.py` |
+
 ```bash
+# Per acted-on proposal: parse checked items → scoped Delta JSON.
+# Example (api); repeat with the matching script for each edited proposal:
 "$PY" "$API_SCRIPTS/api_sync_apply.py" \
   --proposal "$PROJECT_TMP/api-sync-proposal.md" \
   --output "$PROJECT_TMP/api-delta.json"
 
-# Then run standard update flow with the resulting delta
+# Apply each resulting delta — run_update routes every entity_type to its doc
+# (api/db/summary/arch/standards all handled; guidelines is manual-only):
 "$PY" "$ORCH_SCRIPTS/dispatch_coordinator.py" update \
   --delta "$PROJECT_TMP/api-delta.json" \
   --docs-dir "$PROJECT_DOCS_DIR" \
