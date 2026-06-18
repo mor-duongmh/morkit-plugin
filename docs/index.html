@@ -280,6 +280,41 @@
       min-width: 0;
     }
 
+    /* ─── SECTION DIVIDER — tách quy trình cài đặt với phần giới thiệu ─── */
+    .section-divider {
+      margin: 52px 0 8px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-divider .eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 9px;
+      background: var(--accent-soft);
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .section-divider h2.section-lead {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin: 0 0 8px;
+    }
+
+    .section-divider .section-sub {
+      font-size: 15px;
+      color: var(--fg-muted);
+      margin: 0;
+      max-width: 680px;
+      line-height: 1.55;
+    }
+
     .hero {
       padding: 4px 0 8px;
     }
@@ -383,7 +418,7 @@
 
     /* ─── SECTIONS ────────────────────────────────────────── */
     h2 {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 600;
       margin: 48px 0 14px;
       padding-bottom: 8px;
@@ -396,8 +431,8 @@
     }
 
     h3 {
-      font-size: 11.5px;
-      font-weight: 600;
+      font-size: 14px;
+      font-weight: bolder;
       margin: 22px 0 8px;
       color: var(--fg-muted);
       text-transform: uppercase;
@@ -664,6 +699,9 @@
         <div class="sb-group-title">Bắt đầu</div>
         <a href="#install" data-sec="install">Cài đặt</a>
         <a href="#update" data-sec="update">Cập nhật plugin</a>
+      </div>
+      <div class="sb-group">
+        <div class="sb-group-title">Giới thiệu tổng quan</div>
         <a href="#overview" data-sec="overview">Tổng quan</a>
       </div>
       <div class="sb-group">
@@ -708,45 +746,45 @@
       <div class="cards">
         <a class="card" href="#install">
           <div class="card-label">Bắt đầu</div>
-          <div class="card-title">Cài đặt 2 lệnh</div>
-          <p class="card-desc">Thêm chợ ứng dụng (marketplace) + cài đặt plugin. Xong là sử dụng được ngay, không cần cấu hình thêm trong từng dự án riêng lẻ.</p>
+          <div class="card-title">Cài đặt</div>
+          <p class="card-desc">Thêm marketplace và cài morkit. Khi cài xong, có thể áp dụng vào dự án luôn.</p>
           <span class="card-arrow">Xem cách cài đặt →</span>
         </a>
         <a class="card" href="#spec">
-          <div class="card-label">Quy trình đặc tả (Spec workflow)</div>
-          <div class="card-title">3 lệnh chuẩn hóa đặc tả</div>
-          <p class="card-desc"><code>propose</code> · <code>review</code> · <code>archive</code> — tự động sinh đề xuất (proposal), thiết kế (design), danh sách việc (tasks) và danh sách kiểm tra (checklist) trong một lần chạy duy nhất.</p>
+          <div class="card-label">Sinh tài liệu đặc tả</div>
+          <div class="card-title">Có 3 skills sử dụng để tạo ra các tài liệu đặc tả đã được chuẩn hoá.</div>
+          <p class="card-desc"><code>propose</code> · <code>review</code> · <code>archive</code> — tự động sinh đề xuất (proposal), thiết kế hệ thống (design), tasks và danh sách checklist để người dùng review.</p>
           <span class="card-arrow">Xem danh sách lệnh →</span>
         </a>
         <a class="card" href="#plan">
-          <div class="card-label">Kế hoạch &amp; Phát triển (Plan &amp; build)</div>
+          <div class="card-label">Lên kế hoạch</div>
           <div class="card-title">Brainstorm → plan → run</div>
-          <p class="card-desc">8 kỹ năng chuyên sâu: lên ý tưởng (brainstorming), lập kế hoạch (writing-plans), thực thi kế hoạch (executing-plans), phát triển hướng kiểm thử (TDD), gỡ lỗi hệ thống và quản lý worktree.</p>
+          <p class="card-desc">8 kỹ năng chuyên sâu: lên ý tưởng (brainstorming), lập kế hoạch (writing-plans), chạy kế hoạch (executing-plans), phát triển hướng kiểm thử (TDD), debug và quản lý worktree.</p>
           <span class="card-arrow">Xem danh sách kỹ năng →</span>
         </a>
         <a class="card" href="#review">
-          <div class="card-label">Đánh giá mã nguồn (Code review)</div>
-          <div class="card-title">Đánh giá đa tác nhân chuyên sâu</div>
-          <p class="card-desc">Hệ thống 5 tác nhân (agent) AI chuyên biệt chạy song song phân tích PR/git diff: đánh giá rủi ro (risk), bảo mật (security), thiết kế (pattern), kiểm thử (test) và quy chuẩn mã nguồn (convention).</p>
-          <span class="card-arrow">Xem cơ chế đánh giá chuyên sâu →</span>
+          <div class="card-label">Code Review</div>
+          <div class="card-title">Triển khai nhiều sub-agent để review code</div>
+          <p class="card-desc">5 agent chuyên biệt chạy song song để phân tích PR hoặc code trên nhánh: đánh giá rủi ro, bảo mật, thiết kế, kiểm thử và quy chuẩn code.</p>
+          <span class="card-arrow">Xem cơ chế code review →</span>
         </a>
         <a class="card" href="#docs">
           <div class="card-label">Tự động sinh tài liệu</div>
           <div class="card-title">Tài liệu tối ưu cho AI agent</div>
-          <p class="card-desc">Bộ skill <code>docs-hero</code> sinh trọn bộ tài liệu dự án theo chuẩn ITO Japan offshore: SRS (BrSE), API, schema DB (ERD), kiến trúc (arc42-lite), code standards, codebase summary và design guidelines (MADR). <code>/morkit:init</code> khởi tạo từ ProjectModel; <code>/morkit:update-doc</code> &amp; <code>/morkit:sync</code> bảo trì theo code.</p>
+          <p class="card-desc">Bộ skill <code>docs-hero</code> tự động hóa việc lập tài liệu dự án theo chuẩn Offshore Nhật Bản (bao gồm đầy đủ tài liệu yêu cầu SRS, API, sơ đồ cơ sở dữ liệu, kiến trúc hệ thống, quy chuẩn viết code và nhật ký quyết định thiết kế). Lệnh <code>/morkit:init</code> giúp thiết lập ban đầu từ ProjectModel, còn các lệnh <code>/morkit:update-doc</code> và <code>/morkit:sync</code> đóng vai trò bảo trì, giữ cho tài liệu luôn đồng bộ chính xác với mã nguồn thực tế.</p>
           <span class="card-arrow">Xem lệnh sinh tài liệu →</span>
         </a>
         <a class="card" href="#companion">
-          <div class="card-label">Công cụ bổ trợ (Companion)</div>
-          <div class="card-title">Context7 + RTK</div>
-          <p class="card-desc">Context7 tra cứu tài liệu thư viện/API chuẩn xác theo phiên bản sử dụng. RTK tối ưu và nén dữ liệu đầu ra dòng lệnh giúp tiết kiệm 60-90% lượng token.</p>
+          <div class="card-label">Công cụ bổ trợ</div>
+          <div class="card-title">Context7 + RTK + caveman</div>
+          <p class="card-desc"><code>Context7</code> giúp AI tra cứu tài liệu thư viện/API hiệu quả hơn. <code>RTK</code> giúp tối ưu token cho các command thường chạy (VD: <code>grep</code>, <code>cat</code>, <code>ls</code>, <code>git diff</code>, ...). <code>caveman</code> giúp nén output đầu ra của AI để lược bỏ các từ ngữ không cần thiết mà vẫn giữ đúng ngữ nghĩa của câu văn gốc.</p>
           <span class="card-arrow">Xem chi tiết công cụ →</span>
         </a>
       </div>
 
       <!-- ─────────────── §1 CÀI ĐẶT ─────────────── -->
       <h2 id="install">1. Cài đặt</h2>
-      <p>Yêu cầu hệ thống: Node.js phiên bản 18 trở lên. morkit dùng <strong>một nguồn</strong> cho cả Claude Code và Codex — cùng bộ skill, dịch vocab lúc chạy.</p>
+      <p>Yêu cầu hệ thống: Node.js phiên bản 18 trở lên. morkit dùng <strong>một nguồn</strong> cho cả Claude Code và Codex.</p>
       <h3>Cài đặt trên Claude Code</h3>
       <ol class="steps">
         <li>
@@ -785,12 +823,12 @@
       <p><strong>Cách 1 — Marketplace native (Codex CLI ≥ 0.131):</strong></p>
       <pre><code>codex plugin marketplace add mor-duongmh/morkit-plugin</code></pre>
       <p class="lede-small">Codex sẽ liệt kê plugin <code>morkit</code> — chọn cài. Cùng nguồn với Claude Code.</p>
-      <p><strong>Cách 2 — Script (Codex &lt; 0.131 hoặc fallback):</strong></p>
+      <p><strong>Cách 2 — Script (Codex &lt; 0.131):</strong></p>
       <pre><code>git clone https://github.com/mor-duongmh/morkit-plugin.git ~/.codex/morkit-source
 bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
 
       <!-- ─────────────── §2 CẬP NHẬT ─────────────── -->
-      <h2 id="update">2. Cập nhật plugin</h2>
+      <h2 id="update">2. Cập nhật plugin (Chỉ áp dụng cho Claude/Claude Code)</h2>
       <p>Bạn có thể lựa chọn 1 trong 2 phương thức cập nhật dưới đây:</p>
 
       <h3>Cách 1 — Bật tự động cập nhật (Chỉ cần thiết lập 1 lần)</h3>
@@ -821,9 +859,18 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
         Lưu ý: Tất cả cấu hình riêng biệt của plugin (trong Project Scope) đều được bảo toàn nguyên vẹn sau khi cập nhật — quá trình này chỉ thay thế nội dung mã nguồn của plugin.
       </div>
 
+      <!-- ─────────────── DẢI NGĂN CÁCH: hết phần cài đặt → bắt đầu phần giới thiệu ─────────────── -->
+      <div class="section-divider">
+        <span class="eyebrow">Giới thiệu tổng quan</span>
+        <h2 class="section-lead">Tìm hiểu morkit</h2>
+        <p class="section-sub">
+          Phần trên hướng dẫn cài đặt và cập nhật. Từ đây trở xuống là phần giới thiệu tổng quan về morkit, bao gồm danh sách lệnh, các tác nhân (agent) và công cụ hỗ trợ.
+        </p>
+      </div>
+
       <!-- ─────────────── §3 TỔNG QUAN ─────────────── -->
       <h2 id="overview">3. morkit có những gì?</h2>
-      <p>Một plugin tích hợp trọn bộ 4 nhóm chức năng cao cấp, tất cả có thể được kích hoạt thông qua tiền tố lệnh <code>/morkit:*</code>:</p>
+      <p><code>morkit</code> tích hợp trọn bộ 4 nhóm chức năng cao cấp, tất cả có thể được kích hoạt thông qua prefix <code>/morkit:*</code>:</p>
       <table>
         <thead>
           <tr>
@@ -838,17 +885,17 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
             <td><a href="commands/propose.html"><code>/morkit:propose</code></a>, <a
                 href="commands/review.html"><code>/morkit:review</code></a>, <a
                 href="commands/archive.html"><code>/morkit:archive</code></a></td>
-            <td>Tự động sinh đề xuất (proposal), kiến trúc thiết kế (design), danh sách công việc (tasks) và danh sách kiểm tra (checklist) để người dùng phê duyệt trước khi bắt đầu viết mã nguồn.</td>
+            <td>Tự động sinh đề xuất (proposal), kiến trúc thiết kế (design), danh sách tasks và danh sách checklist (để người dùng phê duyệt) trước khi bắt đầu code.</td>
           </tr>
           <tr>
-            <td><strong>Lập kế hoạch &amp; Phát triển (Plan &amp; build)</strong></td>
+            <td><strong>Lập kế hoạch &amp; tích hợp (Plan &amp; build)</strong></td>
             <td><a href="skills/brainstorming.html"><code>brainstorming</code></a>, <a
                 href="skills/writing-plans.html"><code>writing-plans</code></a>, <a
                 href="skills/executing-plans.html"><code>executing-plans</code></a>, <a
                 href="skills/subagent-driven-development.html"><code>subagent-driven-development</code></a>, <a
                 href="skills/test-driven-development.html"><code>test-driven-development</code></a>, <a
                 href="skills/systematic-debugging.html"><code>systematic-debugging</code></a></td>
-            <td>Động não phát triển ý tưởng, lập kế hoạch chi tiết nhiều bước, thực thi từng phần kế hoạch, viết kiểm thử trước (TDD), gỡ lỗi (debug) có hệ thống chặt chẽ.</td>
+            <td>Phát triển ý tưởng và brainstorming, lập kế hoạch chi tiết nhiều bước, thực thi từng phần kế hoạch, viết kiểm thử trước (TDD), gỡ lỗi (debug) có hệ thống chặt chẽ.</td>
           </tr>
           <tr>
             <td><strong>Đánh giá mã nguồn (Code review)</strong></td>
@@ -860,15 +907,15 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
           <tr>
             <td><strong>Tự động sinh tài liệu (Doc generation)</strong></td>
             <td><a href="commands/setup.html"><code>/morkit:setup</code></a>, <a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/update-doc.html"><code>/morkit:update-doc</code></a>, <a href="commands/sync.html"><code>/morkit:sync</code></a>, <a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a>, <a href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
-            <td>Sinh trọn bộ tài liệu dự án theo chuẩn ITO Japan offshore: SRS, API, schema DB, kiến trúc… <code>/morkit:init</code> khởi tạo từ ProjectModel; <code>/morkit:update-doc</code> &amp; <code>/morkit:sync</code> bảo trì theo code.</td>
+            <td>Sinh trọn bộ tài liệu dự án theo chuẩn ITO của Nhật Bản: SRS, API, schema DB, kiến trúc… <code>/morkit:init</code> khởi tạo từ ProjectModel; <code>/morkit:update-doc</code> &amp; <code>/morkit:sync</code> bảo trì theo code.</td>
           </tr>
         </tbody>
       </table>
-      <p class="lede-small">Tổng cộng bao gồm <strong>19 kỹ năng chuyên biệt (skill) + 8 tác nhân thông minh (agent) + 11 lệnh tắt (slash command)</strong>, tất cả đều được tích hợp tiền tố <code>/morkit:</code>.</p>
+      <p class="lede-small">Tổng cộng bao gồm <strong>19 skills + 8 agents + 11 slash commands</strong>, tất cả đều có prefix <code>/morkit:</code>.</p>
 
       <!-- ─────────────── §3 COMMAND TABLES ─────────────── -->
       <h2 id="commands">4. Danh sách các lệnh (command)</h2>
-      <p>Nhấp chọn trực tiếp vào tên lệnh để xem tài liệu hướng dẫn chi tiết, cú pháp và các ví dụ thực tế.</p>
+      <p>Click vào từng lệnh để xem tài liệu hướng dẫn chi tiết, cú pháp và các ví dụ thực tế.</p>
 
       <h3 id="spec">Quy trình đặc tả (Spec workflow)</h3>
       <table>
