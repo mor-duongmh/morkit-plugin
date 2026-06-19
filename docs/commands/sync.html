@@ -181,7 +181,7 @@ td code { font-size: 12px; }
   </div>
   <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
   <h1>sync</h1>
-  <p class="lede">Đọc mã nguồn, đề xuất các nội dung nên cập nhật vào tài liệu. Chỉ đọc, không ghi.</p>
+  <p class="lede">Đọc mã nguồn, đề xuất nội dung cập nhật cho 5 tài liệu suy ra từ code (API / DB / codebase-summary / system-architecture / code-standards). Chỉ đọc, không ghi.</p>
 
   <h2>1. Cách gọi</h2>
   <pre><code>/morkit:sync [tham số]</code></pre>
@@ -189,8 +189,8 @@ td code { font-size: 12px; }
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi schema hoặc route trong code đã đổi nhưng tài liệu chưa cập nhật</li>
-  <li>Khi muốn xem trước các thay đổi sẽ áp dụng trước khi quyết</li>
+  <li>Khi code (route / schema / cấu trúc / lint) đã đổi nhưng tài liệu chưa cập nhật</li>
+  <li>Khi muốn xem trước các thay đổi trước khi quyết</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -199,15 +199,15 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:sync</code></pre>
+    <pre><code>$ /morkit:sync --codebase-paths src,api</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Xuất file sync-proposal.md có checkbox để bạn tick các nội dung muốn áp dụng. Sau đó gõ /morkit:apply-sync.</p>
+  <p class="lede" style="font-size:14px;">Xuất các *-sync-proposal.md có checkbox để bạn tick. Sau đó gõ /morkit:apply-sync cho từng proposal đã tick. SRS + design-guidelines không sync (không suy được từ code).</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
     <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/update-doc.html"><div class="ttl">/morkit:update-doc</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/docs-update.html"><div class="ttl">/morkit:docs-update</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
   </div>

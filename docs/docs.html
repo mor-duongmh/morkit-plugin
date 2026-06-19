@@ -628,32 +628,30 @@
             <li><a href="#uc1-s6">Step 6 · Bảo trì bằng /morkit:docs update</a></li>
           </ul>
           <a class="uc-link" data-target="uc2" href="#uc2">
-            <span class="uc-num">2.</span>Khởi tạo dự án mới (Greenfield project)
+            <span class="uc-num">2.</span>Feature mới hoàn toàn
           </a>
-          <ul class="step-list" data-for="uc2">
-            <li><a href="#uc2-s1">Step 1 · Brainstorm ý tưởng (/morkit:brainstorming)</a></li>
-            <li><a href="#uc2-s2">Step 2 · /morkit:init — gieo khung docs rỗng (Stage 1G)</a></li>
-            <li><a href="#uc2-s3">Step 3 · 🚦 Opt-in: gieo STACK + ARCHITECTURE dự kiến?</a></li>
-            <li><a href="#uc2-s4">Step 4 · Viết spec cho thay đổi (/morkit:propose + review)</a></li>
-            <li><a href="#uc2-s5">Step 5 · Code theo plan (executing-plans / TDD)</a></li>
-            <li><a href="#uc2-s6">Step 6 · /morkit:docs update — bồi docs khi code lớn dần</a></li>
-            <li><a href="#uc2-s7">Step 7 · 🚦 docs update trước khi /morkit:archive</a></li>
-          </ul>
           <a class="uc-link" data-target="uc3" href="#uc3">
-            <span class="uc-num">3.</span>Feature mới hoàn toàn
+            <span class="uc-num">3.</span>Fix bug
           </a>
           <a class="uc-link" data-target="uc4" href="#uc4">
-            <span class="uc-num">4.</span>Fix bug
+            <span class="uc-num">4.</span>Code review
           </a>
           <a class="uc-link" data-target="uc5" href="#uc5">
-            <span class="uc-num">5.</span>Code review
+            <span class="uc-num">5.</span>Figma → code (MCP)
           </a>
           <a class="uc-link" data-target="uc6" href="#uc6">
-            <span class="uc-num">6.</span>Figma → code (MCP)
+            <span class="uc-num">6.</span>Figma export HTML → mockup
           </a>
           <a class="uc-link" data-target="uc7" href="#uc7">
-            <span class="uc-num">7.</span>Figma export HTML → mockup
+            <span class="uc-num">7.</span>Greenfield: tài liệu từ tài liệu khách hàng (chưa có code)
           </a>
+          <ul class="step-list" data-for="uc7">
+            <li><a href="#uc7-s1">Step 1 · /morkit:greenfield — intake + brainstorm (G0–G1)</a></li>
+            <li><a href="#uc7-s2">Step 2 · User story (brse|agile) (G2)</a></li>
+            <li><a href="#uc7-s3">Step 3 · 🚦 Gap &amp; Risk — cổng BA (G3)</a></li>
+            <li><a href="#uc7-s4">Step 4 · 🚦 Làm rõ requirement (G4)</a></li>
+            <li><a href="#uc7-s5">Step 5 · 🌉 Bridge → ProjectModel → SRS + design docs (G5–G7)</a></li>
+          </ul>
         </div>
         <div class="sb-group">
           <div class="sb-group-title">Bộ docs cho AI Agent</div>
@@ -934,282 +932,15 @@
 <span class="tcom"># Mẹo: chạy /morkit:docs update TRƯỚC /morkit:archive để WHAT/WHY
 # của change kịp vào docs/ trước khi change bị archive.
 #
-# docs/ giờ là input chất lượng cho: UC3 (feature) · UC4 (fix) · UC5 (review).</span>
+# docs/ giờ là input chất lượng cho: UC2 (feature) · UC3 (fix) · UC4 (review).</span>
             </div>
           </div>
         </div>
 
       </section>
 
-      <!-- ──────────── USE CASE 2 — GREENFIELD: IDEA → FULL DOC SET ──────────── -->
+      <!-- ──────────── USE CASE 2 — FEATURE ──────────── -->
       <section id="uc2" class="panel" role="tabpanel">
-        <div class="panel-head">
-          <h2>Greenfield project — từ ý tưởng đến docs lớn dần cùng code</h2>
-          <p>
-            <b>Tình huống thực tế:</b> bạn được giao một dự án greenfield — <i>chưa có
-            code, chưa có docs</i>, chỉ có idea note / requirement. Khác brownfield, ở đây
-            <b><code class="mono">/morkit:init</code> KHÔNG quét được gì để suy ra docs</b>:
-            nó chỉ gieo một khung docs đúng định dạng (no fiction), rồi
-            <code class="mono">/morkit:docs update</code> bồi dần phần suy-từ-code khi bạn
-            viết code. UC này là quy trình end-to-end cho TaskFlow, mọi bước bám lệnh có thật.
-          </p>
-          <p class="callout">
-            <b>Khác UC1 thế nào?</b> Brownfield có code làm anchor → init quét ra docs đầy
-            đủ ngay. Greenfield không có anchor → init chỉ gieo SPINE (SCOPE · DOCUMENT-MAP
-            · FEATURE-LIST rỗng · con trỏ CLAUDE.md). WHAT/WHY nắm qua
-            <code class="mono">/morkit:propose</code>; docs code-derived (SOURCE-MAP, SYS-SPEC,
-            DATA/API/UI-MAP) do <code class="mono">/morkit:docs update</code> tạo dần khi có code.
-          </p>
-        </div>
-
-        <!-- Step 1 — Brainstorm -->
-        <div class="phase" id="uc2-s1">
-          <h3 class="phase-title">
-            <span class="phase-num">Step 1</span> Brainstorm ý tưởng với <code class="mono">/morkit:brainstorming</code>
-            <span class="phase-desc">— explore stance · thinking partner free-form, không viết code · auto-save design log cuối phiên</span>
-          </h3>
-          <div class="term">
-            <div class="term-bar">
-              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
-              <span class="term-title">claude-code · ~/Documents/work/TaskFlow (greenfield, chưa có code)</span>
-            </div>
-            <div class="term-body">
-<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
-# Greenfield bắt đầu từ 0, không có code/docs làm anchor. Trước
-# khi gieo docs, làm rõ vision/scope đã. Brainstorming ở "explore
-# stance": mở thread, vẽ ASCII diagram, KHÔNG viết code — cuối
-# phiên tự lưu design log để feed các bước sau.
-# ──────────────────────────────────────────────────────────</span>
-
-<span class="label input">▶ Bạn làm</span><span class="skill-chip">/morkit:brainstorming</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:brainstorming</span>
-  TaskFlow: trình quản lý công việc cho team nhỏ. Giúp tôi shape scope.
-
-<span class="label output">▼ Bạn thấy (explore stance)</span>
-▸ Hỏi câu mở thread thay vì checklist:
-   "Cho IC độc lập hay cho team? Khác biệt này quyết định data model,
-    billing, SSO…"
-▸ Vẽ ASCII diagram khi cần (so sánh approach, state machine, data flow)
-▸ Surface risks &amp; unknowns: "OTP email tốn $ → Magic Link như Notion?"
-▸ Khi đủ shape → confirm rồi auto-save design log:
-   <span class="tstr">morkit/output/specs/2026-05-27-taskflow-design.md</span>
-
-<span class="tcom"># design log: problem · approaches · decisions · open questions · next step
-# → là ngữ cảnh cho /morkit:propose (Step 4) và để bạn viết SCOPE ở Step 2.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 2 — init seeds spine (Stage 1G) -->
-        <div class="phase" id="uc2-s2">
-          <h3 class="phase-title">
-            <span class="phase-num">Step 2</span> <code class="mono">/morkit:init</code> — gieo khung docs rỗng <i>(Stage 1G)</i>
-            <span class="phase-desc">— init tự phát hiện greenfield (không manifest + ~0 LOC) · gieo SPINE đúng định dạng · TUYỆT ĐỐI không bịa</span>
-          </h3>
-          <div class="term">
-            <div class="term-bar">
-              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
-              <span class="term-title">/morkit:init · Stage 0 → Stage 1G (greenfield seed)</span>
-            </div>
-            <div class="term-body">
-<span class="tcom"># ─ Tại sao init không sinh SRS/HLD ở đây? ─────────────────
-# Chưa có code thì không có gì để "suy ra" — bịa feature/kiến
-# trúc/nguồn là sai (no fiction). Nên greenfield chỉ gieo SPINE
-# đúng định dạng để vừa code vừa bồi. Docs code-derived để dành
-# cho /morkit:docs update khi code đã có.
-# ──────────────────────────────────────────────────────────</span>
-
-<span class="label input">▶ Bạn làm</span><span class="skill-chip">/morkit:init</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:init</span>
-
-<span class="label output">▼ Bạn thấy — Stage 0 phát hiện greenfield</span>
-[detect]  manifest (package.json/pyproject/go.mod…)  <span class="tok-warn">không có</span>
-          source LOC (trừ README/LICENSE/dotfiles)    <span class="tok-warn">~0</span>
-          → <span class="tflag">GREENFIELD</span> → Stage 1G (bỏ scout)
-
-<span class="label output">▼ Gieo SPINE (chỉ những file này)</span>
-  <span class="tok-add">A</span> docs/00-overview/SCOPE.md            status: draft (hỏi 1–2 câu In/Out scope)
-  <span class="tok-add">A</span> docs/00-overview/DOCUMENT-MAP.md     chỉ liệt kê folder đã gieo
-  <span class="tok-add">A</span> docs/10-requirements/FEATURE-LIST.md  bảng RỖNG (Legend + header, sẵn cho FR-001)
-  <span class="tok-add">A</span> CLAUDE.md (root)                     con trỏ → DOCUMENT-MAP (qua approve gate)
-
-<span class="tcom"># BỎ QUA (update bồi sau): SOURCE-MAP · SYS-SPEC · TEST-* ·
-# CODE-STANDARDS · DATA/API/UI-MAP — vì chưa có code.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3 — opt-in STACK/ARCHITECTURE -->
-        <div class="phase" id="uc2-s3">
-          <h3 class="phase-title">
-            <span class="phase-num">Step 3</span> 🚦 Opt-in: gieo <code class="mono">STACK</code> + <code class="mono">ARCHITECTURE</code> dự kiến?
-            <span class="phase-desc">— một cổng duy nhất · mặc định KHÔNG (--yes cũng = KHÔNG) · đây là intent, không phải code-derived</span>
-          </h3>
-          <div class="term">
-            <div class="term-bar">
-              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
-              <span class="term-title">Stage 1G · opt-in intent docs (1 gate)</span>
-            </div>
-            <div class="term-body">
-<span class="tcom"># ─ Tại sao tách riêng + mặc định KHÔNG? ───────────────────
-# STACK/ARCHITECTURE là dự kiến (intent), CÓ THỂ lệch code về
-# sau. Nên chỉ gieo khi bạn chủ động chọn, và đánh dấu bằng
-# status để /morkit:docs update đối chiếu lại với code thật.
-# ──────────────────────────────────────────────────────────</span>
-
-<span class="label gate">▼ Cổng (AskUserQuestion · default NO)</span>
-  Cũng gieo STACK + ARCHITECTURE dự kiến (forward-looking)?
-    ( ) <span class="tok-ok">Có</span>  → tạo 2 file intent:
-          00-overview/STACK.md               status: draft   (bỏ source_files)
-          20-design/00-core/ARCHITECTURE.md  status: planned
-    (•) <span class="tok-warn">Không</span> (mặc định) — để update dựng từ code thật sau
-
-<span class="tcom"># status: planned/draft đánh dấu "intent gieo trước code". --yes
-# → tự chọn Không. Sau Stage 1G: ghi con trỏ CLAUDE.md + validate
-# rút gọn (link resolve, front-matter) → báo cáo "đã gieo gì +
-# chạy /morkit:docs update khi có code".</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4 — capture WHAT/WHY via propose -->
-        <div class="phase" id="uc2-s4">
-          <h3 class="phase-title">
-            <span class="phase-num">Step 4</span> Viết spec cho từng thay đổi: <code class="mono">/morkit:propose</code> → <code class="mono">/morkit:review</code>
-            <span class="phase-desc">— nắm WHAT/WHY trước khi code · sinh proposal · design · tasks (TDD) · review-checklist</span>
-          </h3>
-          <div class="term">
-            <div class="term-bar">
-              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
-              <span class="term-title">/morkit:propose · morkit/output/spec/&lt;change&gt;/</span>
-            </div>
-            <div class="term-body">
-<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
-# FEATURE-LIST đang rỗng. Thay vì bịa, ta nắm WHAT/WHY của từng
-# thay đổi qua /morkit:propose — sinh proposal (lý do) + design
-# (cách làm) + tasks (TDD). /morkit:docs update sẽ "bridge" các
-# spec này vào docs/ ở Step 6.
-# ──────────────────────────────────────────────────────────</span>
-
-<span class="label input">▶ Bạn làm</span><span class="skill-chip">/morkit:propose</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:propose</span> Email signup + OTP verify cho TaskFlow
-<span class="tprompt">$</span> <span class="tcmd">/morkit:review</span>   <span class="tcom"># sinh checklist; ghi "Overall Decision: OK" để mở khoá thực thi</span>
-
-<span class="label output">▼ Bạn thấy — morkit/output/spec/email-signup-otp/</span>
-  <span class="tok-add">A</span> proposal.md   Why + Capabilities ("What changes")
-  <span class="tok-add">A</span> design.md     Decisions · Risks · Tech Stack · Non-Goals
-  <span class="tok-add">A</span> tasks.md      chia bước theo TDD (write failing test trước)
-  <span class="tok-add">A</span> review-checklist.md   <span class="tok-warn">PENDING → bạn duyệt OK</span>
-
-<span class="tcom"># Lặp /morkit:propose cho mỗi capability (Epic-Auth, Epic-Tasks…).</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 5 — build code -->
-        <div class="phase" id="uc2-s5">
-          <h3 class="phase-title">
-            <span class="phase-num">Step 5</span> Code theo plan — <code class="mono">executing-plans</code> / TDD
-            <span class="phase-desc">— bị plan-review-gate chặn tới khi checklist OK · viết test trước, code sau · giờ repo MỚI có code</span>
-          </h3>
-          <div class="term">
-            <div class="term-bar">
-              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
-              <span class="term-title">executing-plans / test-driven-development</span>
-            </div>
-            <div class="term-body">
-<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
-# Có spec OK rồi thì build. Sau bước này repo greenfield bắt đầu
-# CÓ code thật (manifest, route, model, test) — chính là thứ
-# /morkit:docs update cần để dựng docs code-derived ở Step 6.
-# ──────────────────────────────────────────────────────────</span>
-
-<span class="label input">▶ Bạn làm</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:execute-plan</span>   <span class="tcom"># hoặc skill executing-plans / subagent-driven-development</span>
-
-<span class="label output">▼ Bạn thấy</span>
-  test-driven-development: Red → Green → Refactor (test fail trước)
-  <span class="tok-add">A</span> package.json · src/app/api/auth/** · drizzle schema · *.test.ts
-  <span class="tok-ok">✓</span> tests pass · checklist "Overall Decision: OK" đã mở khoá thực thi
-
-<span class="tcom"># Repo giờ KHÔNG còn rỗng → đủ điều kiện để update suy ra docs.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 6 — docs update backfills -->
-        <div class="phase" id="uc2-s6">
-          <h3 class="phase-title">
-            <span class="phase-num">Step 6</span> <code class="mono">/morkit:docs update</code> — bồi docs khi code lớn dần
-            <span class="phase-desc">— "new components" tạo folder điều kiện · bridge change-spec · dựng SOURCE-MAP/SYS-SPEC/DATA·API·UI-MAP</span>
-          </h3>
-          <div class="term">
-            <div class="term-bar">
-              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
-              <span class="term-title">/morkit:docs update · backfill code-derived + bridge specs</span>
-            </div>
-            <div class="term-body">
-<span class="tcom"># ─ Tại sao dùng update, không init lại? ───────────────────
-# init đã chạy 1 lần (gieo spine). Khi code xuất hiện, update lo
-# phần còn lại: scout vùng mới → bước "new components" tạo folder
-# điều kiện (vd thêm DB → 20-data) + dựng docs code-derived, đồng
-# thời bridge các change-spec (Step 4) vào docs.
-# ──────────────────────────────────────────────────────────</span>
-
-<span class="label input">▶ Bạn làm</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:docs update</span>
-
-<span class="label output">▼ Bạn thấy</span>
-[new]    scout thấy component chưa có folder → tạo:
-         <span class="tok-add">A</span> 20-design/30-api/API-MAP · 20-design/20-data/DATA-MAP
-         <span class="tok-add">A</span> 00-overview/SOURCE-MAP · 20-design/.../*-SYS-SPEC · 30-test/TEST-MATRIX
-[bridge] change-spec active (tasks đã tick hết, chưa archive):
-         proposal/design/tasks → FEATURE-LIST (FR-001 Email signup) · ADR · TEST-MATRIX
-         <span class="tok-ok">✓</span> FEATURE-LIST rỗng lúc đầu giờ có FR thật, suy từ spec + code
-         <span class="tcom">// spec khẳng định nhưng chưa thấy trong code → status: drift (vào báo cáo)</span>
-[stack]  STACK/ARCHITECTURE (nếu đã gieo ở Step 3) đối chiếu lại code thật
-
-<span class="tcom"># Lặp theo mỗi đợt build: code lớn tới đâu, docs/ bồi tới đó.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 7 — update before archive -->
-        <div class="phase" id="uc2-s7">
-          <h3 class="phase-title">
-            <span class="phase-num">Step 7</span> 🚦 Chạy <code class="mono">/morkit:docs update</code> TRƯỚC <code class="mono">/morkit:archive</code>
-            <span class="phase-desc">— archive xong thì change ra khỏi tầm bridge · WHAT/WHY sẽ không kịp vào docs/</span>
-          </h3>
-          <div class="term">
-            <div class="term-bar">
-              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
-              <span class="term-title">thứ tự bắt buộc · docs update → archive</span>
-            </div>
-            <div class="term-body">
-<span class="tcom"># ─ Tại sao thứ tự này quan trọng? ─────────────────────────
-# Bridge CHỈ đọc change đang active (morkit/output/spec/, không
-# đọc archive/). Nếu archive trước, intent (WHAT/WHY) của change
-# mất hút khỏi docs. Nên: docs update trước, archive sau.
-# ──────────────────────────────────────────────────────────</span>
-
-<span class="label input">▶ Bạn làm (đúng thứ tự)</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:docs update</span>   <span class="tcom"># gấp WHAT/WHY của change vào FEATURE-LIST/ADR/TEST-MATRIX</span>
-<span class="tprompt">$</span> <span class="tcmd">/morkit:archive</span> email-signup-otp   <span class="tcom"># giờ mới đóng change → archive/YYYY-MM/</span>
-
-<span class="label output">▼ Kết quả</span>
-  <span class="tok-ok">✓</span> docs/ giữ đủ WHAT/WHY của change · change đã archive gọn gàng
-  <span class="tok-warn">⚠</span> change archive khi tasks còn dở → KHÔNG bridge được (đừng archive sớm)
-
-<span class="tcom"># Vòng đời greenfield: lặp Step 4→7 cho mỗi đợt tính năng. docs/
-# lớn dần cùng code, luôn bám sự thật — input tốt cho UC3/UC4/UC5.</span>
-            </div>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ──────────── USE CASE 3 — FEATURE ──────────── -->
-      <section id="uc3" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Feature mới hoàn toàn — tích hợp TipTap editor để edit note</h2>
           <!-- <p>
@@ -1495,14 +1226,14 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
 <span class="tprompt">$</span> <span class="tcmd">/morkit:archive</span> editor-wire-v1   <span class="tcom"># → archive/2026-05/ · WHAT/WHY đã nằm trong docs/</span>
 
 <span class="tcom"># Thứ tự VÀNG: docs update → archive. docs/ giờ phản ánh đúng
-# feature vừa ship — input chất lượng cho UC4 (fix) / UC5 (review).</span>
+# feature vừa ship — input chất lượng cho UC3 (fix) / UC4 (review).</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ──────────── USE CASE 4 — BUG FIX ──────────── -->
-      <section id="uc4" class="panel" role="tabpanel">
+      <!-- ──────────── USE CASE 3 — BUG FIX ──────────── -->
+      <section id="uc3" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Bug fix — Unicode normalize trong CommandPalette</h2>
           <p>
@@ -1654,8 +1385,8 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
         </div>
       </section>
 
-      <!-- ──────────── USE CASE 5 — REVIEW ──────────── -->
-      <section id="uc5" class="panel" role="tabpanel">
+      <!-- ──────────── USE CASE 4 — REVIEW ──────────── -->
+      <section id="uc4" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Code review — /morkit:deep-review &lt;PR#&gt;</h2>
           <p>
@@ -1806,8 +1537,8 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
         </div>
       </section>
 
-      <!-- ──────────── USE CASE 6 — FIGMA → CODE (MCP) ──────────── -->
-      <section id="uc6" class="panel" role="tabpanel">
+      <!-- ──────────── USE CASE 5 — FIGMA → CODE (MCP) ──────────── -->
+      <section id="uc5" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Figma → code — 4 bước MCP chuẩn</h2>
           <p>
@@ -1988,8 +1719,8 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
         </div>
       </section>
 
-      <!-- ──────────── USE CASE 7 — FIGMA EXPORT HTML → MOCKUP ──────────── -->
-      <section id="uc7" class="panel" role="tabpanel">
+      <!-- ──────────── USE CASE 6 — FIGMA EXPORT HTML → MOCKUP ──────────── -->
+      <section id="uc6" class="panel" role="tabpanel">
         <div class="panel-head">
           <h2>Figma export HTML → Claude đọc file → mockup UI</h2>
           <p>
@@ -2109,6 +1840,198 @@ Tổng: 0 Critical · <span class="tok-warn">4 Major</span> · <span class="tok-
    <span class="tok-ok">[✓]</span> Responsive theo breakpoint dự án (export thường fixed-width)
    <span class="tok-ok">[✓]</span> (nếu còn nối Figma MCP) <span class="tcmd">get_screenshot</span> frame gốc → đối chiếu pixel
    <span class="tok-ok">[✓]</span> npm run build · typecheck sạch
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────── USE CASE 7 — GREENFIELD: CUSTOMER DOCS → SRS ──────────── -->
+      <section id="uc7" class="panel" role="tabpanel">
+        <div class="panel-head">
+          <h2>Greenfield — từ tài liệu khách hàng đến SRS + bộ design docs</h2>
+          <p>
+            <b>Tình huống thực tế:</b> dự án mới <i>chưa có code</i>, chỉ có tài liệu
+            khách hàng (PRD · Excel · Docx) và một buổi brainstorm. UC này dùng
+            <code class="mono">/morkit:greenfield</code> đi qua các giai đoạn
+            <code class="mono">G0→G7</code> để biến tài liệu thành một
+            <code class="mono">project-model.json</code> đã validate, rồi sinh
+            <code class="mono">docs/srs.md</code> + bộ design docs. Khác UC1: brownfield
+            có code làm anchor; ở greenfield <b>tài liệu khách hàng LÀ nguồn chính</b>.
+          </p>
+          <p class="callout">
+            <b>Chạy trên docs-hero (cần <code class="mono">/morkit:setup</code> dựng venv một lần).</b>
+            Stateful qua <code class="mono">state.json</code> → kill giữa chừng vẫn
+            <code class="mono">--resume</code> được. 3 cổng duyệt: BA (G3) · làm rõ (G4) ·
+            stakeholder (G6). Nguyên tắc <b>KHÔNG bịa</b>: mọi fact seed phải trace về một
+            tài liệu nguồn (<code class="mono">source</code>); thiếu nguồn → thành câu hỏi
+            làm rõ chứ không bịa giá trị.
+          </p>
+        </div>
+
+        <!-- Step 1 — /morkit:greenfield: intake + brainstorm (G0–G1) -->
+        <div class="phase" id="uc7-s1">
+          <h3 class="phase-title">
+            <span class="phase-num">Step 1</span> Gõ <code class="mono">/morkit:greenfield</code> — intake + brainstorm
+            <span class="phase-desc">— G0: gom tài liệu vào inputs/ + tạo state.json · G1: brainstorming chốt vision/scope</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
+              <span class="term-title">claude-code · ~/work/acme-portal (greenfield, chưa có code)</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Greenfield không có code làm anchor → bắt đầu từ TÀI LIỆU
+# khách hàng. G0 gom file vào inputs/ và tạo state.json (bộ đếm
+# giai đoạn). G1 brainstorming làm rõ vision/scope trước khi
+# rút ra requirement — vẫn ở chế độ "explore", chưa sinh docs.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label input">▶ Bạn làm</span><span class="skill-chip">/morkit:greenfield</span>
+<span class="tprompt">$</span> <span class="tcmd">/morkit:greenfield acme-portal --format brse --lang JP</span>
+<span class="tcom"># --format brse|agile · --lang JP|EN|VN · --resume (vào lại giai đoạn đang dở)</span>
+
+<span class="label output">▼ Bạn thấy — G0 Intake</span>
+[workspace] morkit/output/greenfield/acme-portal/   <span class="tok-ok">✓ tạo</span>
+            inputs/  ← prd.pdf · screens.xlsx · glossary.docx
+[state]     state.json  stage=<span class="tflag">G0</span> → G1   <span class="tok-ok">✓</span>
+[parse]     parse_inputs.py: 1 PDF · 1 Excel · 1 Docx   <span class="tok-ok">✓ không crash</span>
+
+<span class="label output">▼ G1 Brainstorm</span>
+brainstorm-report.md  ← scope · mục tiêu · actor · ràng buộc
+<span class="tcom"># Mọi fact đều ghi kèm nguồn (source-manifest.json) — không bịa.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 — User stories (G2) -->
+        <div class="phase" id="uc7-s2">
+          <h3 class="phase-title">
+            <span class="phase-num">Step 2</span> Sinh user story <i>(G2 — generate-user-stories)</i>
+            <span class="phase-desc">— brse = function list (khớp SRS §3.1, khách ITO Nhật) · agile = As-a / I-want / So-that</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
+              <span class="term-title">generate-user-stories · --format brse</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# User story là deliverable S2 — tách riêng thay vì chôn trong
+# SRS §3. Một "item shape" chung, 2 renderer (brse/agile) →
+# không lệch nhau, và bridge map được sang FR/UseCase bất kể
+# format. ID ổn định (FUNC-001…) để re-run không đổi số.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label output">▼ Bạn thấy</span>
+user-story-list.md  (format = brse → 機能一覧 / Function List)
+  ┌─ FUNC-ID │ 機能名 │ 概要 │ Actor │ 優先度 │ 関連FR │ Source ─┐
+  │ FUNC-001 │ Đăng nhập │ … │ User │ High │ FR-001 │ prd.pdf §2.1 │
+  │ FUNC-002 │ Reset mật khẩu │ … │ User │ Mid │ FR-002 │ prd.pdf §2.2 │
+  └────────────────────────────────────────────────────────────────┘
+<span class="tcom"># Mỗi dòng có Source + status Draft. agile thì đổi sang US-001 /
+# As-a…/I-want…/So-that… + acceptance criteria.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 — Gap &amp; Risk + GATE (G3) -->
+        <div class="phase" id="uc7-s3">
+          <h3 class="phase-title">
+            <span class="phase-num">Step 3</span> 🚦 Gap &amp; Risk — cổng BA <i>(G3 — gap-risk-analysis)</i>
+            <span class="phase-desc">— gap (new-requirement vs out-of-scope) + risk chấm điểm · High ≥ 6 buộc có mitigation</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
+              <span class="term-title">gap-risk-analysis · 2 file canonical · cổng BA</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này QUAN TRỌNG? ───────────────────────────
+# Đây là chốt chặn BA trước khi đông cứng requirement. Gap chỉ
+# ra chỗ thiếu/mơ hồ; risk được chấm điểm số (H/M/L→3/2/1,
+# Score=P×I). 2 file này là CANONICAL → SRS §12/§13 render
+# từ chúng, không sửa rủi ro ở 2 nơi.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label output">▼ Bạn thấy</span>
+gap-analysis.md   GAP-001 │ thiếu acceptance cho FR-002 │ new-requirement │ blocker
+risk-register.md  RISK-001 │ Technical │ Prob=M Impact=H │ <span class="tok-warn">Score=6</span> │ <span class="tflag">High</span> → cần mitigation
+
+<span class="label gate">▼ Cổng #1 (G3) — BA review (AskUserQuestion)</span>
+  → Bạn chọn?
+    (•) <span class="tok-ok">Proceed</span>  — chốt gap/risk, sang G4
+    ( ) <span class="tok-warn">Adjust</span>   — sửa lại các dòng rồi chạy lại G3
+    ( ) <span class="tok-bad">Abort</span>    — huỷ
+<span class="tcom"># Quyết định được ghi vào state.json (stages.G3.gate).</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 — Clarification loop + GATE (G4) -->
+        <div class="phase" id="uc7-s4">
+          <h3 class="phase-title">
+            <span class="phase-num">Step 4</span> 🚦 Làm rõ requirement <i>(G4 — clarification-loop)</i>
+            <span class="phase-desc">— AI sinh câu hỏi theo từng US/gap · BA trả lời inline hoặc forward · resume async qua file</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
+              <span class="term-title">clarification-loop · state nằm trong clarification-log.md</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao bước này? ──────────────────────────────────────
+# Còn chỗ &lt;TBD&gt;/gap mơ hồ → hỏi stakeholder. Depth = template-
+# only: toàn bộ state nằm trong clarification-log.md, không cần
+# tracker riêng → loop resume được qua nhiều phiên/nhiều ngày.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label output">▼ Bạn thấy — clarification-log.md (round N)</span>
+  US-001 │ Q-001 │ Hết hạn link reset là bao lâu? │ <span class="tok-warn">open</span>
+         │ Q-002 │ Cần OTP 2 lớp không?            │ <span class="tok-ok">answered</span> → FR-001
+  GAP-002│ Q-003 │ SLA uptime mục tiêu?            │ forwarded → customer-pm
+
+<span class="label gate">▼ Cổng #2 (G4) — đủ câu trả lời? (AskUserQuestion)</span>
+    (•) <span class="tok-ok">Close loop</span>  — đủ trả lời → sang G5
+    ( ) <span class="tok-warn">Another round</span>  — sinh tiếp câu hỏi
+    ( ) <span class="tok-bad">Force-close</span>   — chốt, phần forward để &lt;TBD&gt;
+<span class="tcom"># Câu đã trả lời → sau này thành SRS §12. Không bao giờ bịa đáp án.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 — Bridge → ProjectModel → SRS + design docs (G5–G7) -->
+        <div class="phase" id="uc7-s5">
+          <h3 class="phase-title">
+            <span class="phase-num">Step 5</span> 🌉 Bridge → ProjectModel → SRS + design docs <i>(G5–G7)</i>
+            <span class="phase-desc">— build-project-model author JSON → validate → /morkit:init render docs/ (không cần JSON tay)</span>
+          </h3>
+          <div class="term">
+            <div class="term-bar">
+              <span class="lights"><span class="light"></span><span class="light"></span><span class="light"></span></span>
+              <span class="term-title">build-project-model → dispatch init · docs/srs.md</span>
+            </div>
+            <div class="term-body">
+<span class="tcom"># ─ Tại sao đây là KEYSTONE? ───────────────────────────────
+# G5 là mắt xích còn thiếu giữa brainstorm và init. LLM author
+# project-model.json theo normalized_schema; validate_project_
+# model.py xác nhận nó load đúng như ProjectModel mà init dùng
+# → đảm bảo init render được. Đây là chỗ nối brainstorm → init.
+# ──────────────────────────────────────────────────────────</span>
+
+<span class="label output">▼ G5 Bridge</span>
+build-project-model → <span class="tcmd">project-model.json</span>
+validate_project_model.py …            <span class="tok-ok">OK (FR=2, traced to source)</span>
+<span class="tcom"># Lỗi → in path field chính xác → author lại đúng chỗ → lặp tới khi sạch.</span>
+
+<span class="label gate">▼ Cổng #3 (G6) — stakeholder duyệt SRS</span>
+<span class="tprompt">$</span> <span class="tcmd">init --outputs srs</span>  → <span class="tcmd">docs/srs.md</span> + <span class="tcmd">srs.html</span> (visualize)
+    (•) <span class="tok-ok">Proceed</span>   ( ) <span class="tok-warn">Revise</span>   ( ) <span class="tok-bad">Abort</span>
+
+<span class="label output">▼ G7 Design docs</span>
+<span class="tprompt">$</span> <span class="tcmd">init --outputs arch,standards,summary,db</span>
+  docs/system-architecture.md · code-standards.md · codebase-summary.md · database-design.md  <span class="tok-ok">✓</span>
+<span class="tcom"># Toàn bộ docs/ sinh ra từ project-model.json — một nguồn sự thật.</span>
             </div>
           </div>
         </div>

@@ -710,6 +710,7 @@
         <a href="#plan" data-sec="plan">Lập kế hoạch & Phát triển (Plan & build)</a>
         <a href="#review" data-sec="review">Đánh giá mã nguồn (Code review)</a>
         <a href="#docs" data-sec="docs">Tự động sinh tài liệu (Doc generation)</a>
+        <a href="#greenfield" data-sec="greenfield">Quy trình greenfield (Greenfield pipeline)</a>
       </div>
       <div class="sb-group">
         <div class="sb-group-title">Tác nhân (Agent)</div>
@@ -738,7 +739,7 @@
           Tất cả có thể gọi trực tiếp qua tiền tố lệnh <code>/morkit:*</code>.
         </p>
         <p class="lede-small">
-          Gói gọn <strong>10 command · 8 agent · 19 skill</strong> trong một plugin duy nhất.
+          Gói gọn <strong>12 command · 8 agent · 19 skill</strong> trong một plugin duy nhất.
         </p>
       </section>
 
@@ -771,7 +772,7 @@
         <a class="card" href="#docs">
           <div class="card-label">Tự động sinh tài liệu</div>
           <div class="card-title">Tài liệu tối ưu cho AI agent</div>
-          <p class="card-desc">Bộ skill <code>docs-hero</code> tự động hóa việc lập tài liệu dự án theo chuẩn Offshore Nhật Bản (bao gồm đầy đủ tài liệu yêu cầu SRS, API, sơ đồ cơ sở dữ liệu, kiến trúc hệ thống, quy chuẩn viết code và nhật ký quyết định thiết kế). Lệnh <code>/morkit:init</code> giúp thiết lập ban đầu từ ProjectModel, còn các lệnh <code>/morkit:update-doc</code> và <code>/morkit:sync</code> đóng vai trò bảo trì, giữ cho tài liệu luôn đồng bộ chính xác với mã nguồn thực tế.</p>
+          <p class="card-desc">Bộ skill <code>docs-hero</code> tự động hóa việc lập tài liệu dự án theo chuẩn Offshore Nhật Bản (bao gồm đầy đủ tài liệu yêu cầu SRS, API, sơ đồ cơ sở dữ liệu, kiến trúc hệ thống, quy chuẩn viết code và nhật ký quyết định thiết kế). Lệnh <code>/morkit:init</code> là cửa chính (hỏi greenfield/brownfield rồi route), còn các lệnh <code>/morkit:docs-update</code> và <code>/morkit:sync</code> đóng vai trò bảo trì, giữ cho tài liệu luôn đồng bộ chính xác với mã nguồn thực tế.</p>
           <span class="card-arrow">Xem lệnh sinh tài liệu →</span>
         </a>
         <a class="card" href="#companion">
@@ -906,12 +907,17 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
           </tr>
           <tr>
             <td><strong>Tự động sinh tài liệu (Doc generation)</strong></td>
-            <td><a href="commands/setup.html"><code>/morkit:setup</code></a>, <a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/update-doc.html"><code>/morkit:update-doc</code></a>, <a href="commands/sync.html"><code>/morkit:sync</code></a>, <a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a>, <a href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
-            <td>Sinh trọn bộ tài liệu dự án theo chuẩn ITO của Nhật Bản: SRS, API, schema DB, kiến trúc… <code>/morkit:init</code> khởi tạo từ ProjectModel; <code>/morkit:update-doc</code> &amp; <code>/morkit:sync</code> bảo trì theo code.</td>
+            <td><a href="commands/setup.html"><code>/morkit:setup</code></a>, <a href="commands/init.html"><code>/morkit:init</code></a>, <a href="commands/docs-update.html"><code>/morkit:docs-update</code></a>, <a href="commands/sync.html"><code>/morkit:sync</code></a>, <a href="commands/apply-sync.html"><code>/morkit:apply-sync</code></a>, <a href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
+            <td>Sinh trọn bộ tài liệu dự án theo chuẩn ITO của Nhật Bản: SRS, API, schema DB, kiến trúc… <code>/morkit:init</code> là cửa chính (greenfield/brownfield); <code>/morkit:docs-update</code> &amp; <code>/morkit:sync</code> bảo trì theo code.</td>
+          </tr>
+          <tr>
+            <td><strong>Quy trình greenfield (Greenfield pipeline)</strong></td>
+            <td><a href="commands/greenfield.html"><code>/morkit:greenfield</code></a></td>
+            <td>Pipeline tài liệu cho dự án mới <em>chưa có code</em>: biến tài liệu khách hàng + brainstorm thành user story, phân tích gap/rủi ro, ProjectModel đã validate, rồi bộ <code>docs/</code> (SRS + design docs). Stateful, resume được qua các giai đoạn G0→G7 với 3 cổng duyệt.</td>
           </tr>
         </tbody>
       </table>
-      <p class="lede-small">Tổng cộng bao gồm <strong>19 skills + 8 agents + 11 slash commands</strong>, tất cả đều có prefix <code>/morkit:</code>.</p>
+      <p class="lede-small">Tổng cộng bao gồm <strong>19 skills + 8 agents + 12 slash commands</strong>, tất cả đều có prefix <code>/morkit:</code>.</p>
 
       <!-- ─────────────── §3 COMMAND TABLES ─────────────── -->
       <h2 id="commands">4. Danh sách các lệnh (command)</h2>
@@ -1029,7 +1035,7 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
             <td><strong>Khởi tạo lần đầu</strong> — sinh bộ tài liệu mới (SRS, API, DB, kiến trúc…) từ một file ProjectModel JSON. Chọn 1 ngôn ngữ: JP, EN hoặc VN.</td>
           </tr>
           <tr>
-            <td><a href="commands/update-doc.html"><code>/morkit:update-doc</code></a></td>
+            <td><a href="commands/docs-update.html"><code>/morkit:docs-update</code></a></td>
             <td>Áp dụng một change hoặc plan đã chốt vào tài liệu hiện có — vẫn giữ phần bạn đã sửa tay.</td>
           </tr>
           <tr>
@@ -1043,6 +1049,22 @@ bash ~/.codex/morkit-source/plugins/morkit/scripts/install-codex.sh</code></pre>
           <tr>
             <td><a href="commands/doctor.html"><code>/morkit:doctor</code></a></td>
             <td>Kiểm tra cài đặt docs-hero (Python, venv, dependencies, schema, mmdc) xem có ổn không.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 id="greenfield">Quy trình greenfield (Greenfield pipeline)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Lệnh viết tắt</th>
+            <th>Ý nghĩa và Công dụng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="commands/greenfield.html"><code>/morkit:greenfield [proj] [--format brse|agile] [--lang JP|EN|VN] [--resume]</code></a></td>
+            <td>Chạy pipeline tài liệu cho dự án mới <em>chưa có code</em>: biến tài liệu khách hàng + brainstorm thành user story, gap/risk analysis, một <code>project-model.json</code> đã validate, rồi bộ <code>docs/</code> (SRS + design docs) — không cần viết JSON tay. Đi qua các giai đoạn G0→G7, dừng ở 3 cổng duyệt (BA · làm rõ · stakeholder); resume được sau khi dừng giữa chừng.</td>
           </tr>
         </tbody>
       </table>

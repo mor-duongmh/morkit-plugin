@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › skill › generate-db-design</title>
+<title>morkit › skill › generate-user-stories</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,28 +173,28 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-db-design</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-user-stories</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
-  <h1>generate-db-design</h1>
-  <p class="lede">Sinh hoặc cập nhật tài liệu thiết kế database, có sơ đồ ERD bằng Mermaid.</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Greenfield pipeline</span><span class="tag">Skill</span></div>
+  <h1>generate-user-stories</h1>
+  <p class="lede">Biến brainstorm report thành user-story-list.md độc lập. Hai format qua --format brse|agile: brse = function list khớp SRS §3.1 (khách ITO Nhật); agile = As-a/I-want/So-that.</p>
 
   <h2>1. Nhiệm vụ</h2>
   <ul class="duties">
-    <li>Render <code>database-design.md</code> gồm: mô tả bảng, cột, quan hệ, index</li>
-    <li>Nhúng sơ đồ <strong>ERD</strong> vẽ bằng Mermaid</li>
-    <li>3 chế độ: <code>init</code> / <code>update</code> / <code>sync</code></li>
-    <li>Sync quét ORM model (TypeORM, Prisma, SQLAlchemy...) và đề xuất <strong>Thêm / Sửa / Bỏ</strong> theo bảng</li>
+    <li>Một item shape chung, hai renderer — format không drift</li>
+    <li>brse → cột khớp 1:1 SRS §3.1; agile → kèm acceptance criteria</li>
+    <li>ID ổn định (FUNC-001/US-001), re-run tái dùng ID cũ</li>
+    <li>Mỗi story mang Source + status Draft (greenfield — không bịa)</li>
   </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Khi cần tài liệu mô tả schema DB</li>
-  <li>Khi muốn đồng bộ tài liệu với ORM model trong mã nguồn</li>
+  <li>Stage G2 của pipeline greenfield</li>
+  <li>Khi cần danh sách chức năng/user story tách riêng khỏi SRS</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -203,18 +203,16 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:generate-db-design (gọi qua /morkit:init / /morkit:docs-update / /morkit:sync)</code></pre>
+    <pre><code>$ /morkit:generate-user-stories --format brse --lang JP</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Sinh file database-design.md kèm ERD vẽ bằng Mermaid. Chế độ sync quét ORM và đề xuất Thêm/Sửa/Bỏ.</p>
+  <p class="lede" style="font-size:14px;">Sinh user-story-list.md; bridge map brse→FunctionalRequirement, agile→UseCase cho ProjectModel.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
-    <a class="related-card" href="../skills/generate-design-guidelines.html"><div class="ttl">generate-design-guidelines</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/greenfield-orchestrator.html"><div class="ttl">greenfield-orchestrator</div><div class="sub">Greenfield pipeline · skill</div></a>
+    <a class="related-card" href="../skills/build-project-model.html"><div class="ttl">build-project-model</div><div class="sub">Greenfield pipeline · skill</div></a>
+    <a class="related-card" href="../skills/gap-risk-analysis.html"><div class="ttl">gap-risk-analysis</div><div class="sub">Greenfield pipeline · skill</div></a>
+    <a class="related-card" href="../skills/clarification-loop.html"><div class="ttl">clarification-loop</div><div class="sub">Greenfield pipeline · skill</div></a>
   </div>
 
   <div class="footer">
