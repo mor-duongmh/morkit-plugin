@@ -14,8 +14,8 @@
         "source": "git-subdir",
         "url": "https://github.com/mor-duongmh/morkit-plugin.git",
         "path": "plugins/morkit",
-        "ref": "morkit--v1.2.0",
-        "sha": "845470bf2d97c72e2ac90cc8b91723d1b11c399a"
+        "ref": "morkit--v1.2.1",
+        "sha": "bfb03e67cc50aa129da4f004d966ddcc70dc9d7d"
       },
       "category": "development",
       "author": { "name": "Mor" },
