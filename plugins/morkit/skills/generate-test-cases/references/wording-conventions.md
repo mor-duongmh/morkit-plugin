@@ -73,7 +73,17 @@ Embed both. Examples of abnormal/edge to always consider:
 - Permission-denied / not-logged-in.
 - Error/timeout responses.
 
-(Viewpoint + normal/abnormal tags live in scope.md as metadata; they are NOT written to the Excel — the template has no column for them.)
+(Normal/abnormal and viewpoint tags are NOT stored in scope.md or the Excel — they're derived metadata, surfaced only in the Step-5 chat coverage summary.)
+
+## Scope preview table (Step 5)
+Step 5's `<feature-slug>-test-scope.md` previews cases BEFORE full expansion. Per section, one markdown table, **one row per case**:
+
+| Test Case Description | Pre-condition | Test Case Procedures | Expected Output |
+|---|---|---|---|
+| Check region search with valid input | Have data | Type "Sydney", pick a suggestion | List filters to region, counter updates |
+| Check search with gibberish | | Type "zzzzz" | No suggestions, no error |
+
+Keep it **minimal** — short phrases, not the numbered steps / multiline expected of Step 6. It's an overview the tester skims and approves. The four columns map to Excel B/C/D/E.
 
 ## Output language
-B/C/D/E text is written in the **output language** chosen per run (en / vi / ja). The sample above is English. Keep UI labels verbatim regardless of language (they appear as shown in the app).
+B/C/D/E text is written in the **output language** chosen per run (en / vi / ja). The sample above is English. Keep UI labels verbatim regardless of language (they appear as shown in the app). The Step-5 preview table follows the same output language.

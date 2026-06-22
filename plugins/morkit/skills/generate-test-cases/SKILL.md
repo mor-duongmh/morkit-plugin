@@ -8,7 +8,7 @@ allowed-tools: Bash, Read, Write, AskUserQuestion
 argument-hint: "[feature description] [--url <live-url>] [--out <workbook>] [--template <xlsx>] [--lang <comm-language>]"
 metadata:
   author: morkit
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Generate Test Cases
@@ -83,8 +83,8 @@ agent-browser screenshot <path>
 3. The tester edits/reorders/confirms. This confirmation is mandatory.
 
 ### Step 5 — Scope review gate 🚦
-1. Write `<feature-slug>-test-scope.md` beside the output: per section, a one-line list of planned cases — `description | viewpoint | normal/abnormal` (NO full steps yet). Add a header `status: draft`.
-2. Show a **coverage summary** (normal vs abnormal counts, viewpoints covered) and **flag suspected gaps once** (missing edge/error/empty/boundary).
+1. Write `<feature-slug>-test-scope.md` beside the output, starting with a `status: draft` header. Under each section, draft a **markdown table** with **one row per planned case** and these columns: **Test Case Description · Pre-condition · Test Case Procedures · Expected Output**. Keep the wording **minimal — a preview/overview, NOT the full steps**: a short description, a sparse pre-condition, 1–2 brief procedure notes, a one-line expected result. The columns mirror the final Excel sheet so the tester sees at a glance what each case will become; full numbered procedures and concrete multiline expected outputs come later in Step 6. See `references/wording-conventions.md` → "Scope preview table".
+2. Show a **coverage summary** (normal vs abnormal counts, viewpoints covered) and **flag suspected gaps once** (missing edge/error/empty/boundary). This summary stays in chat — the scope file carries only the four case columns; normal/abnormal and viewpoints are derived, not stored.
 3. Ask the tester to **open the file themselves, review/edit it, and change `status: draft` → `status: approved` by hand.** You never edit that line. Approval given only in chat does NOT count — the file must say approved.
 4. Re-read after they say they're done; if still not approved, tell them it's blocked and wait. Loop until the file shows approved. **Never proceed otherwise.**
 
@@ -96,7 +96,7 @@ agent-browser screenshot <path>
    ```
    If this prints `BLOCKED`, STOP: do not expand cases, do not emit `cases.json`, do not run the writer. Return to Step 5 and wait for the human to approve in the file. Never edit the status line to unblock yourself.
 1. **Ask the output language** for the test-case text (`AskUserQuestion`: English / Vietnamese / Japanese). This is per-run and distinct from the communication language.
-2. Expand each approved scope line into full content following `references/wording-conventions.md`: terse `Check "X"` descriptions, blank-B continuation rows, sparse pre-conditions, numbered procedures, multiline concrete expected outputs.
+2. Expand each approved scope row into full content following `references/wording-conventions.md`: terse `Check "X"` descriptions, blank-B continuation rows, sparse pre-conditions, numbered procedures, multiline concrete expected outputs. A single scope row may become one case with several continuation rows.
 3. Emit `cases.json` beside the output, conforming to `references/cases-schema.json` (nested `rows[]` per case for continuations; `viewpoint`/`type` are metadata only).
 
 ### Step 7 — Write to Excel

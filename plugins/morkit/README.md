@@ -115,6 +115,11 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | `/morkit:apply-sync` | Apply đề xuất từ sync |
 | `/morkit:doctor` | Health-check docs-hero |
 
+### Test cases (standalone)
+| Command | Việc |
+|---|---|
+| `/morkit:generate-test-cases [feature]` | Viết test-case spec vào Excel template cho tester — bao gồm hiểu feature, brainstorm, duyệt scope, tạo file test case. Chạy độc lập, KHÔNG thuộc `morkit` workflow, KHÔNG thuộc docs-hero; chỉ viết spec (không chạy test). |
+
 ## Plan review gate
 
 Sau `/morkit:propose`, plugin sinh `morkit/output/spec/<name>/review-checklist.md` từ canonical Google Doc. Auto-detect variant (BE/FE × Feature/BugFix/Refactor).
