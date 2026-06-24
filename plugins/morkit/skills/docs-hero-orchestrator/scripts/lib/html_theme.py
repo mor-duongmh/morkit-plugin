@@ -13,11 +13,28 @@ Public API:
 """
 from __future__ import annotations
 
+import base64
 import re
 import unicodedata
 from collections import namedtuple
+from pathlib import Path
 
 Heading = namedtuple("Heading", "level text slug")
+
+# Bundled Mor logo (scripts/assets/). Embedded as a data URI so srs.html stays
+# self-contained. Swap the asset file to rebrand — no code change needed.
+_ASSET_DIR = Path(__file__).resolve().parent.parent / "assets"
+_LOGO_FILE = _ASSET_DIR / "mor-logo.webp"
+_LOGO_MIME = "image/webp"
+
+
+def _logo_data_uri() -> str | None:
+    """Base64 data URI for the bundled logo, or None if the asset is missing."""
+    try:
+        raw = _LOGO_FILE.read_bytes()
+    except OSError:
+        return None
+    return f"data:{_LOGO_MIME};base64," + base64.b64encode(raw).decode("ascii")
 
 # --------------------------------------------------------------------------- #
 # Slugify
@@ -141,6 +158,10 @@ body{margin:0;font-family:var(--font);color:var(--ink);background:var(--soft);fo
 .brand .logo{width:36px;height:36px;border-radius:9px;flex:0 0 36px;background:linear-gradient(135deg,var(--mor-blue),#2580DD);display:grid;place-items:center;font-weight:800;color:#fff;font-size:13px;box-shadow:0 4px 12px rgba(1,109,208,.4)}
 .brand .bt{font-weight:700;color:#fff;font-size:14.5px;line-height:1.2}
 .brand .bs{font-size:11px;color:#7f8fb0;letter-spacing:.3px}
+.brand.brand-stacked{flex-direction:column;align-items:stretch;gap:10px}
+.brand-logo-panel{background:#fff;border-radius:10px;padding:9px 14px;display:flex;justify-content:center;align-items:center}
+.brand-logo{max-width:100%;max-height:40px;height:auto;display:block}
+.brand-stacked .bt{font-size:13px;color:#cdd7ea;font-weight:600;text-align:center}
 .search{padding:12px 16px 6px}
 .search input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:8px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none}
 .search input::placeholder{color:#7f8fb0}
@@ -246,6 +267,21 @@ def _esc(text: str) -> str:
     return (text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
 
 
+def _brand_block(title: str) -> str:
+    """Sidebar brand: bundled logo on a light panel when available, else text mark."""
+    uri = _logo_data_uri()
+    if uri:
+        return (
+            '<div class="brand brand-stacked">'
+            f'<div class="brand-logo-panel"><img class="brand-logo" src="{uri}" alt="Mor Software"></div>'
+            f'<div class="bt">{_esc(title)}</div></div>'
+        )
+    return (
+        '<div class="brand"><div class="logo">Mor</div>'
+        f'<div><div class="bt">{_esc(title)}</div><div class="bs">Mor Software</div></div></div>'
+    )
+
+
 def wrap_document(title: str, body_html: str, nav_html: str, lang: str = "vi") -> str:
     """Assemble the full, self-contained HTML document."""
     return f"""<!DOCTYPE html>
@@ -258,7 +294,7 @@ def wrap_document(title: str, body_html: str, nav_html: str, lang: str = "vi") -
 <div id="progress"></div>
 <div class="shell">
   <aside class="sidebar">
-    <div class="brand"><div class="logo">Mor</div><div><div class="bt">{_esc(title)}</div><div class="bs">Mor Software</div></div></div>
+    {_brand_block(title)}
     <div class="search"><input id="navsearch" placeholder="🔎  Lọc mục / nhảy tới phần…"></div>
     {nav_html}
   </aside>

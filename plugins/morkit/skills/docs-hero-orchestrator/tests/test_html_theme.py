@@ -94,6 +94,13 @@ def test_wrap_document_is_self_contained_with_mor_tokens():
     assert 'lang="vi"' in doc
 
 
+def test_wrap_document_embeds_brand_logo():
+    doc = wrap_document("PropCity SRS", "<p>body</p>", "<nav></nav>")
+    # bundled Mor logo embedded as a self-contained data URI <img>, on a light panel
+    assert "data:image/webp;base64," in doc
+    assert "brand-logo" in doc
+
+
 def test_wrap_document_embeds_nav_and_scripts():
     doc = wrap_document("T", "<p>body</p>", '<nav class="nav"><a href="#x">X</a></nav>')
     assert 'href="#x"' in doc            # nav embedded
