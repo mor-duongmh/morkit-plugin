@@ -158,9 +158,8 @@ body{margin:0;font-family:var(--font);color:var(--ink);background:var(--soft);fo
 .brand .logo{width:36px;height:36px;border-radius:9px;flex:0 0 36px;background:linear-gradient(135deg,var(--mor-blue),#2580DD);display:grid;place-items:center;font-weight:800;color:#fff;font-size:13px;box-shadow:0 4px 12px rgba(1,109,208,.4)}
 .brand .bt{font-weight:700;color:#fff;font-size:14.5px;line-height:1.2}
 .brand .bs{font-size:11px;color:#7f8fb0;letter-spacing:.3px}
-.brand.brand-stacked{flex-direction:column;align-items:flex-start;gap:9px;padding:20px 20px 15px}
+.brand.brand-stacked{padding:20px 20px 16px}
 .brand-logo{max-width:185px;max-height:40px;height:auto;display:block;filter:brightness(0) invert(1);opacity:.96}
-.brand-stacked .bt{font-size:12.5px;color:#9fb0cf;font-weight:500;text-align:left;letter-spacing:.2px}
 .search{padding:12px 16px 6px}
 .search input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:8px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none}
 .search input::placeholder{color:#7f8fb0}
@@ -272,8 +271,7 @@ def _brand_block(title: str) -> str:
     if uri:
         return (
             '<div class="brand brand-stacked">'
-            f'<img class="brand-logo" src="{uri}" alt="Mor Software">'
-            f'<div class="bt">{_esc(title)}</div></div>'
+            f'<img class="brand-logo" src="{uri}" alt="Mor Software"></div>'
         )
     return (
         '<div class="brand"><div class="logo">Mor</div>'
