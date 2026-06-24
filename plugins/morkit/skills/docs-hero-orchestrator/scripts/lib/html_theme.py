@@ -202,8 +202,20 @@ hr{border:0;border-top:1px solid var(--line);margin:28px 0}
 #totop{position:fixed;right:26px;bottom:26px;width:44px;height:44px;border-radius:50%;border:none;background:var(--mor-blue);color:#fff;font-size:18px;cursor:pointer;box-shadow:0 8px 22px rgba(1,109,208,.4);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50}
 #totop.show{opacity:1;pointer-events:auto}
 #totop:hover{transform:translateY(-3px)}
-@media (max-width:860px){.sidebar{display:none}.content{padding:20px}}
+/* Intro cover */
+body.cover-open{overflow:hidden}
+#cover{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;background:linear-gradient(135deg,var(--mor-blue),var(--mor-navy));color:#fff;transition:opacity .45s ease,visibility .45s ease}
+#cover::after{content:"";position:absolute;right:-80px;bottom:-120px;width:480px;height:480px;background:radial-gradient(circle,rgba(245,174,24,.18),transparent 70%);pointer-events:none}
+#cover.hide{opacity:0;visibility:hidden}
+#cover .cover-logo{max-width:300px;max-height:74px;height:auto;filter:brightness(0) invert(1);margin-bottom:26px;position:relative;z-index:1}
+#cover .cover-title{font-size:34px;font-weight:800;letter-spacing:-.4px;margin:0 0 10px;max-width:760px;position:relative;z-index:1}
+#cover .cover-sub{font-size:15px;color:#cfe0f5;margin:0 0 32px;position:relative;z-index:1}
+#cover .enter{position:relative;z-index:1;border:none;cursor:pointer;background:var(--mor-gold);color:#3a2900;font-weight:700;font-size:15px;font-family:inherit;padding:13px 30px;border-radius:30px;box-shadow:0 10px 28px rgba(245,174,24,.4);transition:transform .15s,box-shadow .15s}
+#cover .enter:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(245,174,24,.5)}
+#cover .cover-foot{position:absolute;bottom:24px;font-size:12px;color:#9fb8dc;z-index:1}
+@media (max-width:860px){.sidebar{display:none}.content{padding:20px}#cover .cover-title{font-size:25px}}
 @media print{
+  #cover{display:none !important}
   #progress,.sidebar,.topbar,#totop{display:none !important}
   body{background:#fff;font-size:11.5px}
   .content{max-width:none;padding:0}
@@ -217,6 +229,16 @@ hr{border:0;border-top:1px solid var(--line);margin:28px 0}
 
 THEME_JS = """
 (function(){
+  // Intro cover -> document
+  var cover=document.getElementById('cover');
+  var enter=document.getElementById('enter-doc');
+  function openDoc(){
+    if(cover) cover.classList.add('hide');
+    document.body.classList.remove('cover-open');
+  }
+  if(enter) enter.addEventListener('click',openDoc);
+  if(cover) cover.addEventListener('keydown',function(e){if(e.key==='Enter')openDoc();});
+
   var prog=document.getElementById('progress');
   var totop=document.getElementById('totop');
   function onScroll(){
@@ -279,6 +301,21 @@ def _brand_block(title: str) -> str:
     )
 
 
+def _cover_block(title: str) -> str:
+    """Full-screen intro shown before the document; click to enter."""
+    uri = _logo_data_uri()
+    logo = f'<img class="cover-logo" src="{uri}" alt="Mor Software">' if uri else ""
+    return (
+        '<div id="cover" tabindex="-1">'
+        f'{logo}'
+        f'<h1 class="cover-title">{_esc(title)}</h1>'
+        '<p class="cover-sub">Software Requirements Specification · Mor Software</p>'
+        '<button id="enter-doc" class="enter">Xem tài liệu →</button>'
+        '<div class="cover-foot">© Mor Software</div>'
+        "</div>"
+    )
+
+
 def wrap_document(title: str, body_html: str, nav_html: str, lang: str = "vi") -> str:
     """Assemble the full, self-contained HTML document."""
     return f"""<!DOCTYPE html>
@@ -287,7 +324,8 @@ def wrap_document(title: str, body_html: str, nav_html: str, lang: str = "vi") -
 <title>{_esc(title)}</title>
 {_FONT_LINK}
 <style>{THEME_CSS}</style></head>
-<body>
+<body class="cover-open">
+{_cover_block(title)}
 <div id="progress"></div>
 <div class="shell">
   <aside class="sidebar">
