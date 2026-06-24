@@ -111,10 +111,14 @@ user, then `state_manager set-stage G7 done "$PWD/docs"`.
 
 ## Visualize (G6, stakeholder-facing)
 
-After `docs/srs.md` renders, produce a self-contained `srs.html` for stakeholders
-by reusing the `preview` / `show-off` skill on `docs/srs.md` (no bespoke renderer).
-For JP stakeholders, prefer a clean print-friendly layout. This is presentation
-only — it never edits the SRS content.
+`srs.html` is produced **deterministically by the render backend** — the same
+`dispatch_coordinator.py init` call at G6 emits `docs/srs.html` alongside
+`docs/srs.md` (visualize defaults on whenever `srs` is built). It applies the
+fixed **Mor theme** (brand tokens + sidebar navigation + scrollspy) via
+`render_html.py`, so output is consistent every run and on-brand — no ad-hoc
+preview/show-off rendering. The HTML is print-friendly (sidebar/topbar hidden
+on print, ideal for JP stakeholders). Presentation only — it never edits the
+SRS content.
 
 ## Invariants
 

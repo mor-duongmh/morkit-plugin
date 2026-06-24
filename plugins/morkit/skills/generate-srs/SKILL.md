@@ -140,6 +140,9 @@ This skill owns:
 - `docs/srs.md`
 - `docs/screen-specs/SCREEN-*.md`
 - `assets/screens/*-annotated.png`
+- `docs/srs.html` — Mor-themed stakeholder view, rendered from `srs.md` by the
+  backend (`render_html.py`) during `init`. Presentation only (brand tokens +
+  sidebar nav); never changes SRS content.
 
 It does **not** modify:
 - `docs/api-docs.md`

@@ -92,7 +92,7 @@ Output files (per selected output):
 
 | Output flag | File(s) written |
 |---|---|
-| `srs` | `docs/srs.md` + `docs/screen-specs/SCREEN-*.md` (per screen) |
+| `srs` | `docs/srs.md` + `docs/screen-specs/SCREEN-*.md` (per screen) + `docs/srs.html` (Mor-themed stakeholder view; default on, disable with `--no-visualize`) |
 | `api` | `docs/api-docs.md` |
 | `db` | `docs/database-design.md` |
 | `arch` | `docs/system-architecture.md` |
