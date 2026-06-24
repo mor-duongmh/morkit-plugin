@@ -91,4 +91,19 @@ def test_non_dict_input():
 
 def test_stage_constants_are_g0_through_g7():
     assert STAGES == ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"]
-    assert GATED_STAGES == {"G3", "G4", "G6"}
+    # G2 is gated too — the foundational function-list confirm gate.
+    assert GATED_STAGES == {"G2", "G3", "G4", "G6"}
+
+
+def test_g2_gate_is_valid_and_decision_checked():
+    s = _valid_state()
+    s["stages"]["G2"] = {
+        "status": "in_progress",
+        "artifact": None,
+        "gate": {"decision": "proceed", "note": "BrSE confirmed list"},
+    }
+    assert validate_state(s) == []
+    # An invalid G2 gate decision is still rejected by the shared gate validator.
+    s["stages"]["G2"]["gate"]["decision"] = "nope"
+    errors = validate_state(s)
+    assert any("gate.decision must be one of" in e for e in errors)

@@ -30,7 +30,7 @@ workspace. The workspace holds only intermediate/BA artifacts.
 |---|---|---|---|---|
 | G0 | Intake | orchestrator | — | `inputs/`, `state.json` |
 | G1 | Brainstorm | `brainstorming` (+ doc-ingest) | — | `brainstorm-report.md` |
-| G2 | UserStory | `generate-user-stories` | — | `user-story-list.md` |
+| G2 | UserStory | `generate-user-stories` | **BrSE: confirm list** | `user-story-list.md` (+ `g2-clarification-log.md`) |
 | G3 | Analysis | `gap-risk-analysis` | **BA: Proceed/Adjust** | `gap-analysis.md`, `risk-register.md` |
 | G4 | Clarify | `clarification-loop` | **enough-answered/force-close** | `clarification-log.md` |
 | G5 | Bridge | `build-project-model` | — | `project-model.json` |
@@ -56,7 +56,8 @@ alone. Schema: [`schemas/state.schema.json`](../schemas/state.schema.json).
   "stages": {
     "G0": { "status": "done", "artifact": "inputs/", "updated": "2026-06-18T00:00:00Z" },
     "G1": { "status": "done", "artifact": "brainstorm-report.md", "updated": "2026-06-18T00:00:00Z" },
-    "G2": { "status": "done", "artifact": "user-story-list.md", "updated": "2026-06-18T00:00:00Z" },
+    "G2": { "status": "done", "artifact": "user-story-list.md", "updated": "2026-06-18T00:00:00Z",
+            "gate": { "decision": "proceed", "note": "BrSE confirmed list" } },
     "G3": { "status": "in_progress", "artifact": null, "updated": null,
             "gate": { "decision": "pending", "note": "" } }
   }
@@ -67,7 +68,8 @@ alone. Schema: [`schemas/state.schema.json`](../schemas/state.schema.json).
 - `format` — `brse` | `agile` (user-story render format; default `brse`).
 - `lang` — `JP` | `EN` | `VN` (matches `normalized_schema.Language`).
 - `stages.<Gx>.status` — `pending` | `in_progress` | `done` | `blocked`.
-- `stages.<Gx>.gate` (gated stages only) — `{ decision: pending|proceed|adjust|force-close, note }`.
+- `stages.<Gx>.gate` (gated stages **G2, G3, G4, G6**) — `{ decision: pending|proceed|adjust|force-close, note }`.
+  G2 uses `proceed` (confirm function list) / `adjust` (run another G2 scoped-Q&A round); `Abort` halts (not persisted), same as G3/G6.
 
 Validated by [`scripts/validate_state.py`](../scripts/validate_state.py) on every load.
 

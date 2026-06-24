@@ -3,7 +3,7 @@
 > **BrSE format** (JP ITO clients). Function-list rows. Columns mirror SRS §3.1 so
 > the SRS later fills from this with zero remap (`FUNC-ID→FR-ID`, `Function→Function`,
 > `Description→Summary`, `Actor→Role`, `Priority→Priority`, `Source→Source`).
-> All rows are `status: Draft` until reconciled (greenfield). Every row carries a Source.
+> All rows are `doc_status: Draft` until reconciled (greenfield). Every row carries a Source.
 
 | FUNC-ID | 機能名 / Function | 概要 / Description | アクター / Actor | 優先度 / Priority | 関連FR / Related FR | Source |
 |---|---|---|---|---|---|---|

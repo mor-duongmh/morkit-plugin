@@ -25,7 +25,9 @@ FORMATS = {"brse", "agile"}
 LANGS = {"JP", "EN", "VN"}
 GATE_DECISIONS = {"pending", "proceed", "adjust", "force-close"}
 # Stages that carry a human-review gate (see conventions §2).
-GATED_STAGES = {"G3", "G4", "G6"}
+# G2 (function list / user story) is gated too — it is the foundational artifact
+# everything downstream is built on, so it gets its own confirm gate.
+GATED_STAGES = {"G2", "G3", "G4", "G6"}
 
 _REQUIRED_TOP = ("project", "stage", "stages")
 

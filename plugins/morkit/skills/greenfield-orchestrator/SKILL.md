@@ -1,6 +1,6 @@
 ---
 name: greenfield-orchestrator
-description: "Stateful guide for /morkit:greenfield — walks the BA/BrSE documentation pipeline G0→G7, runs the owning skill per stage, enforces the 3 human gates, and resumes from state.json. Thin glue: holds NO business logic — every stage delegates to an existing skill (brainstorming, generate-user-stories, gap-risk-analysis, clarification-loop, build-project-model) or to /morkit:init for the final SRS + design docs. Turns customer docs into a validated ProjectModel and a full docs/ set with no hand-authored JSON."
+description: "Stateful guide for /morkit:greenfield — walks the BA/BrSE documentation pipeline G0→G7, runs the owning skill per stage, enforces the 4 human gates, and resumes from state.json. Thin glue: holds NO business logic — every stage delegates to an existing skill (brainstorming, generate-user-stories, gap-risk-analysis, clarification-loop, build-project-model) or to /morkit:init for the final SRS + design docs. Turns customer docs into a validated ProjectModel and a full docs/ set with no hand-authored JSON."
 category: documentation
 keywords: [greenfield, orchestrator, brse, ba, srs, pipeline, state-machine, resume, gates, japan-ito]
 argument-hint: "<proj> [--format brse|agile] [--lang JP|EN|VN] [--resume]"
@@ -51,7 +51,7 @@ writes are atomic (`state_manager.py`), so a kill mid-pipeline never corrupts it
 |---|---|---|---|
 | **G0** Intake | collect `inputs/`, `state_manager init` | — | `advance` → G1 |
 | **G1** Brainstorm | `/morkit:brainstorming` (+ doc-ingest from `build-project-model` Step 1) → `brainstorm-report.md` | — | `advance` → G2 |
-| **G2** UserStory | `generate-user-stories --format <fmt>` → `user-story-list.md` | — | `advance` → G3 |
+| **G2** UserStory | `generate-user-stories --format <fmt>` → `user-story-list.md` (+ scoped Q&A) | **BrSE: confirm list** | gate `proceed` → `advance` → G3 |
 | **G3** Analysis | `gap-risk-analysis` → `gap-analysis.md`, `risk-register.md` | **BA: Proceed/Adjust** | gate `proceed` → `advance` → G4 |
 | **G4** Clarify | `clarification-loop` → `clarification-log.md` | **enough-answered / force-close** | gate → `advance` → G5 |
 | **G5** Bridge | `build-project-model` → `project-model.json` (validated) | — | `advance` → G6 |
@@ -61,15 +61,22 @@ writes are atomic (`state_manager.py`), so a kill mid-pipeline never corrupts it
 Per stage: run the action → on success `state_manager set-stage <Gx> done <artifact>`
 → for gated stages evaluate the gate → `advance`.
 
-## The 3 gates (only 3 — avoid gate fatigue)
+## The 4 gates (focused — value over count)
 
 Each uses `AskUserQuestion` and persists via `state_manager set-gate`:
 
+- **G2 — story confirm (foundational doc):** `Proceed` (accept list) / `Another round`
+  (re-run G2 scoped Q&A — decision `adjust`) / `Abort`. The function list is what every
+  downstream stage is built on, so it gets its own gate. This *cleans* G3/G4 (they now run
+  on a human-validated list) — net friction stays ~flat despite the extra gate. The gate is
+  cheap because `generate-user-stories` surfaces a review-aid (low-confidence stories,
+  zero-coverage areas) for the BrSE to react to, not a blank "approve?".
 - **G3 — BA review:** `Proceed` / `Adjust` (revise gap/risk rows, re-run G3) / `Abort`.
 - **G4 — clarification:** `Close loop` (enough answered) / `Another round` / `Force-close`.
 - **G6 — stakeholder SRS review:** `Proceed` / `Revise` / `Abort`.
 
 ```bash
+"$PY" "$SM" set-gate --state "$WS/state.json" --stage G2 --decision proceed --note "BrSE confirmed function list"
 "$PY" "$SM" set-gate --state "$WS/state.json" --stage G3 --decision proceed --note "BA approved"
 "$PY" "$SM" advance  --state "$WS/state.json"
 ```

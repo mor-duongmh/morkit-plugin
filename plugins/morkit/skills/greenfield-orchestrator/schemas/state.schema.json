@@ -34,7 +34,7 @@
           "updated": { "type": ["string", "null"] },
           "gate": {
             "type": ["object", "null"],
-            "description": "Present only on gated stages (G3, G4, G6).",
+            "description": "Present only on gated stages (G2, G3, G4, G6).",
             "required": ["decision"],
             "additionalProperties": true,
             "properties": {

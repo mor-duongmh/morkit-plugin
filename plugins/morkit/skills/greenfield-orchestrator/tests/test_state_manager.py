@@ -18,8 +18,8 @@ def test_init_state_is_valid_and_at_g0():
     assert state["stage"] == "G0"
     assert state["stages"]["G0"]["status"] == "in_progress"
     assert all(state["stages"][s]["status"] == "pending" for s in ["G1", "G7"])
-    # Gated stages get a pending gate up front.
-    for g in ("G3", "G4", "G6"):
+    # Gated stages get a pending gate up front (G2 included — foundational doc).
+    for g in ("G2", "G3", "G4", "G6"):
         assert state["stages"][g]["gate"]["decision"] == "pending"
 
 
@@ -48,8 +48,25 @@ def test_set_gate_only_on_gated_stages():
     state = sm.init_state("acme")
     sm.set_gate(state, "G3", "proceed", "looks good")
     assert state["stages"]["G3"]["gate"] == {"decision": "proceed", "note": "looks good"}
+    # G2 is now gated (function-list confirm gate).
+    sm.set_gate(state, "G2", "proceed", "BrSE confirmed list")
+    assert state["stages"]["G2"]["gate"] == {"decision": "proceed", "note": "BrSE confirmed list"}
     with pytest.raises(ValueError):
-        sm.set_gate(state, "G2", "proceed")  # G2 is not gated
+        sm.set_gate(state, "G1", "proceed")  # G1 is not gated
+
+
+def test_g2_gate_confirm_then_advance_to_g3():
+    state = sm.init_state("acme", "brse", "JP")
+    sm.advance(state)  # → G1
+    sm.advance(state)  # → G2
+    assert state["stage"] == "G2"
+    # "Another round" (adjust) then "Proceed" (confirm).
+    sm.set_gate(state, "G2", "adjust", "needs another Q&A round")
+    sm.set_gate(state, "G2", "proceed", "confirmed")
+    assert state["stages"]["G2"]["gate"]["decision"] == "proceed"
+    sm.advance(state)  # → G3
+    assert state["stage"] == "G3"
+    assert validate_state(state) == []
 
 
 def test_set_stage_rejects_unknown_stage():
