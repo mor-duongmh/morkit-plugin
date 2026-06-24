@@ -26,15 +26,26 @@ Heading = namedtuple("Heading", "level text slug")
 _ASSET_DIR = Path(__file__).resolve().parent.parent / "assets"
 _LOGO_FILE = _ASSET_DIR / "mor-logo.webp"
 _LOGO_MIME = "image/webp"
+_FAVICON_FILE = _ASSET_DIR / "favicon.png"
+_FAVICON_MIME = "image/png"
+
+
+def _data_uri(path: Path, mime: str) -> str | None:
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return None
+    return f"data:{mime};base64," + base64.b64encode(raw).decode("ascii")
 
 
 def _logo_data_uri() -> str | None:
     """Base64 data URI for the bundled logo, or None if the asset is missing."""
-    try:
-        raw = _LOGO_FILE.read_bytes()
-    except OSError:
-        return None
-    return f"data:{_LOGO_MIME};base64," + base64.b64encode(raw).decode("ascii")
+    return _data_uri(_LOGO_FILE, _LOGO_MIME)
+
+
+def _favicon_data_uri() -> str | None:
+    """Base64 data URI for the bundled favicon, or None if the asset is missing."""
+    return _data_uri(_FAVICON_FILE, _FAVICON_MIME)
 
 # --------------------------------------------------------------------------- #
 # Slugify
@@ -316,12 +327,18 @@ def _cover_block(title: str) -> str:
     )
 
 
+def _favicon_link() -> str:
+    uri = _favicon_data_uri()
+    return f'<link rel="icon" type="{_FAVICON_MIME}" href="{uri}"/>' if uri else ""
+
+
 def wrap_document(title: str, body_html: str, nav_html: str, lang: str = "vi") -> str:
     """Assemble the full, self-contained HTML document."""
     return f"""<!DOCTYPE html>
 <html lang="{lang}"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>{_esc(title)}</title>
+{_favicon_link()}
 {_FONT_LINK}
 <style>{THEME_CSS}</style></head>
 <body class="cover-open">

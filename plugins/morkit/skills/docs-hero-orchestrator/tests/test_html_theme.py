@@ -101,6 +101,12 @@ def test_wrap_document_embeds_brand_logo():
     assert "brand-logo" in doc
 
 
+def test_wrap_document_embeds_favicon():
+    doc = wrap_document("PropCity SRS", "<p>body</p>", "<nav></nav>")
+    assert 'rel="icon"' in doc
+    assert "data:image/png;base64," in doc   # favicon embedded self-contained
+
+
 def test_wrap_document_has_intro_cover_with_enter_button():
     doc = wrap_document("PropCity SRS", "<p>body</p>", "<nav></nav>")
     assert 'id="cover"' in doc            # intro/landing overlay
