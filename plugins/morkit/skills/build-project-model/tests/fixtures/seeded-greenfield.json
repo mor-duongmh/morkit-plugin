@@ -1,0 +1,24 @@
+{
+  "meta": { "project_name": "Acme Portal", "language": "EN", "version": "0.1" },
+  "overview": {
+    "purpose": "Self-service customer portal.",
+    "in_scope": ["password reset", "profile view"],
+    "out_of_scope": ["billing"]
+  },
+  "functional_requirements": [
+    {
+      "id": "FR-001", "name": "Password reset",
+      "description": "User resets password via an emailed one-time link.",
+      "doc_status": "Draft",
+      "source": { "origin": "pdf", "file_path": "inputs/prd.pdf" },
+      "external_sources": ["inputs/prd.pdf"],
+      "acceptance_criteria": ["Link expires in 30 minutes"]
+    },
+    {
+      "id": "FR-002", "name": "View profile",
+      "description": "Authenticated user views their profile details.",
+      "doc_status": "Draft",
+      "source": { "origin": "pdf", "file_path": "inputs/prd.pdf" }
+    }
+  ]
+}

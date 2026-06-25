@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "morkit/greenfield/state.schema.json",
+  "title": "Greenfield orchestrator state",
+  "description": "Stage tracker for /morkit:greenfield. A run resumes from this file alone. See references/greenfield-conventions.md §3.",
+  "type": "object",
+  "required": ["project", "stage", "stages"],
+  "additionalProperties": true,
+  "properties": {
+    "project": { "type": "string", "minLength": 1, "description": "Project slug." },
+    "stage": {
+      "type": "string",
+      "enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"],
+      "description": "Current stage id."
+    },
+    "format": { "type": "string", "enum": ["brse", "agile"], "default": "brse" },
+    "lang": { "type": "string", "enum": ["JP", "EN", "VN"], "default": "EN" },
+    "created": { "type": "string", "description": "ISO 8601 timestamp." },
+    "updated": { "type": "string", "description": "ISO 8601 timestamp." },
+    "stages": {
+      "type": "object",
+      "description": "Per-stage record keyed by stage id (G0..G7).",
+      "propertyNames": { "enum": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"] },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "additionalProperties": true,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "done", "blocked"]
+          },
+          "artifact": { "type": ["string", "null"], "description": "Path relative to the workspace root." },
+          "updated": { "type": ["string", "null"] },
+          "gate": {
+            "type": ["object", "null"],
+            "description": "Present only on gated stages (G2, G3, G4, G6).",
+            "required": ["decision"],
+            "additionalProperties": true,
+            "properties": {
+              "decision": {
+                "type": "string",
+                "enum": ["pending", "proceed", "adjust", "force-close"]
+              },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

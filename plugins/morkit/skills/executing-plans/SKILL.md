@@ -41,14 +41,25 @@ For each task:
 
 ### Step 3: Complete Development
 
-After all tasks complete and verified:
+After all tasks complete and verified, offer the post-implementation steps
+**interactively** — ask, don't just proceed:
+
+1. **Review** — call **AskUserQuestion**: "Code đã xong. Chạy review
+   (`/morkit:deep-review --diff`) trước khi hoàn tất không?"
+   - `Có, review ngay` → run `/morkit:deep-review --diff`. If it surfaces
+     blocking issues, fix them (loop back to Step 2), then re-review until clean.
+   - `Bỏ qua review` → continue.
+2. **Update docs** — once review is clean (or skipped), call **AskUserQuestion**:
+   "Cập nhật `docs/` từ change này (`/morkit:docs-update`) không?"
+   - `Có, update docs` → run `/morkit:docs-update --from-openspec <change-name>`
+     (or `--from-plan <path>`) to bridge the change into `docs/` **before** it is
+     archived.
+   - `Bỏ qua` → continue (WHAT/WHY won't reach `docs/` unless bridged before archive).
+
+Then finish the branch:
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use morkit:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
-- **Recommended before push:** run `/morkit:deep-review --diff` on the
-  local diff to catch risk / security / pattern issues before opening
-  the PR. The `finishing-a-development-branch` skill calls this out
-  under Option 2 (Push and Create PR).
 
 After PR is merged, close out the morkit change:
 ```bash

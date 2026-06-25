@@ -107,9 +107,14 @@ def run_init(
     language: str,
     outputs: list[str],
     docs_dir: Path,
+    visualize: bool | None = None,
 ) -> list[StepResult]:
     docs_dir.mkdir(parents=True, exist_ok=True)
     results: list[StepResult] = []
+
+    # Default: produce the stakeholder-facing srs.html whenever SRS is rendered.
+    if visualize is None:
+        visualize = "srs" in outputs
 
     if "srs" in outputs:
         srs_out = docs_dir / "srs.md"
@@ -136,6 +141,18 @@ def run_init(
                     "--output", str(spec_out),
                 ])
                 results.append(StepResult(f"screen-{screen.id}", ok2, str(spec_out), msg2))
+
+        # Stakeholder-facing HTML (Mor theme). Presentation only; non-fatal —
+        # srs.md remains the source of truth even if this step fails.
+        if ok and visualize:
+            srs_html = docs_dir / "srs.html"
+            okh, msgh = _run([
+                PYTHON, str(_THIS_DIR / "render_html.py"),
+                "--input", str(srs_out),
+                "--output", str(srs_html),
+                "--lang", language,
+            ])
+            results.append(StepResult("srs-html", okh, str(srs_html), msgh))
 
     if "api" in outputs:
         api_out = docs_dir / "api-docs.md"
@@ -301,6 +318,10 @@ def main() -> int:
     init_p.add_argument("--outputs", default="srs,api,db",
                         help="Comma-separated subset of srs,api,db")
     init_p.add_argument("--docs-dir", default="docs")
+    init_p.add_argument("--visualize", dest="visualize", action="store_true",
+                        default=None, help="Also render srs.html (default: on when srs is built)")
+    init_p.add_argument("--no-visualize", dest="visualize", action="store_false",
+                        help="Skip srs.html generation")
 
     upd_p = sub.add_parser("update")
     upd_p.add_argument("--delta", required=True)
@@ -312,7 +333,8 @@ def main() -> int:
 
     if args.command == "init":
         outputs = [s.strip() for s in args.outputs.split(",") if s.strip()]
-        results = run_init(Path(args.project_model), args.language, outputs, Path(args.docs_dir))
+        results = run_init(Path(args.project_model), args.language, outputs,
+                           Path(args.docs_dir), visualize=args.visualize)
     else:
         results = run_update(Path(args.delta), Path(args.docs_dir),
                               Path(args.meta), Path(args.tmp_dir))

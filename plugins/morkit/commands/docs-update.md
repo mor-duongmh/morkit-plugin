@@ -23,7 +23,7 @@ Then invoke the orchestrator skill with mode `update` (internal keyword — unch
 /morkit:propose "feature-X"                         # creates openspec/changes/feature-X/...
 # (review-checklist gate)
 /morkit:apply feature-X                             # implements code
-/morkit:update-doc --from-openspec feature-X        # SRS/API/DB updated atomically
+/morkit:docs-update --from-openspec feature-X        # SRS/API/DB updated atomically
 ```
 
 The diff engine flow:
@@ -31,4 +31,4 @@ The diff engine flow:
 2. `detect_manual_edits.py` → identify BrSE manual edits to preserve
 3. `compute_diff.py` → compute patch plan
 4. `apply_patch.py` → atomic write
-5. Spawn `docs-hero` QA agent for verification
+5. Spawn `docs-reviewer` QA agent for verification

@@ -17,3 +17,10 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.sh"
 ```
 
 If any check shows FAIL or MISSING, re-run `/morkit:setup` or report the doctor output.
+
+## Next step
+
+Once doctor passes, offer to start docs generation — call **AskUserQuestion**:
+"Setup xong ✅ Chạy `/morkit:init` để tạo bộ docs ngay không?"
+- `Có, chạy /morkit:init` → follow the `/morkit:init` flow (it asks greenfield/brownfield + doc types).
+- `Để sau` → stop, and remind the user they can run `/morkit:init` anytime.

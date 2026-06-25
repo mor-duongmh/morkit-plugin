@@ -34,7 +34,34 @@ Archive a completed change by moving it from `${MORKIT_ROOT:-morkit/output/spec}
      ```
      If `$pending > 0`, ask via AskUserQuestion whether to archive anyway.
 
-3. **Move to archive**
+3. **Docs bridge gate (soft — only when docs-hero is set up)**
+
+   This change's `proposal`/`design`/`tasks`/`spec` only reach `docs/` via the
+   docs bridge. Once archived, the change is out of bridge scope. So **before
+   moving**, offer to bridge — but only if the project actually uses docs-hero
+   (otherwise skip silently; never force a docs-hero dependency on spec-only users):
+
+   ```bash
+   # Gate condition: docs-hero venv + project meta both present
+   VENV="${HOME}/.claude/plugins/data/docs-hero/.venv"
+   if [ -d "$VENV" ] && [ -f "${PWD}/.docs-hero-meta.json" ]; then
+     echo "docs-hero in use → offer bridge (AskUserQuestion below)"
+   else
+     echo "docs-hero not set up → skip gate, archive directly"
+   fi
+   ```
+
+   If the gate condition holds, use **AskUserQuestion**:
+   "Change `<name>` sắp được archive. Bridge nội dung vào `docs/` trước không?
+   (sau khi archive, WHAT/WHY của change không vào được `docs/` nữa)"
+   - `Bridge trước (khuyến nghị)` → run `/morkit:docs-update --from-openspec <name>`
+     (preserves manual edits via the diff engine), then continue to the move.
+   - `Archive luôn` → skip the bridge, continue.
+   - `Hủy` → abort archive (do **not** move).
+
+   If the gate condition is false, skip this step entirely.
+
+4. **Move to archive**
 
    ```bash
    ROOT="${MORKIT_ROOT:-morkit/output/spec}"
@@ -42,7 +69,7 @@ Archive a completed change by moving it from `${MORKIT_ROOT:-morkit/output/spec}
    mv "$ROOT/<name>" "$ROOT/archive/<name>"
    ```
 
-4. **Update `.meta.json`**
+5. **Update `.meta.json`**
 
    ```bash
    META="$ROOT/archive/<name>/.meta.json"
@@ -52,7 +79,7 @@ Archive a completed change by moving it from `${MORKIT_ROOT:-morkit/output/spec}
       "$META" > "$tmp" && mv "$tmp" "$META"
    ```
 
-5. **Report**
+6. **Report**
 
    ```
    ✓ Archived <name>

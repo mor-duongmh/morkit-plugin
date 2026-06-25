@@ -320,8 +320,13 @@ def main():
     out_skills.mkdir(parents=True, exist_ok=True)
     out_commands.mkdir(parents=True, exist_ok=True)
 
-    # Discover slugs from filesystem (source of truth)
-    skill_slugs = sorted(p.name for p in SKILLS_DIR.iterdir() if p.is_dir())
+    # Discover slugs from filesystem (source of truth).
+    # Skip dot-directories (e.g. .pytest_cache, .venv) — they are tooling
+    # artifacts, never skills, and would otherwise render a spurious page.
+    skill_slugs = sorted(
+        p.name for p in SKILLS_DIR.iterdir()
+        if p.is_dir() and not p.name.startswith(".")
+    )
     command_slugs = sorted(p.stem for p in COMMANDS_DIR.glob("*.md"))
 
     written = 0

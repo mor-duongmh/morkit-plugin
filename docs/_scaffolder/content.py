@@ -36,12 +36,19 @@ GROUPS = {
         "skills":   ["deep-review"],
     },
     "doc-gen": {
-        "commands": ["setup", "init", "update-doc", "sync", "apply-sync", "doctor"],
+        "commands": ["setup", "init", "docs-update", "sync", "apply-sync", "doctor"],
         "skills": [
             "generate-srs", "generate-api-docs", "generate-db-design",
             "generate-system-architecture", "generate-code-standards",
             "generate-codebase-summary", "generate-design-guidelines",
             "docs-hero-orchestrator",
+        ],
+    },
+    "greenfield": {
+        "commands": ["greenfield"],
+        "skills": [
+            "greenfield-orchestrator", "build-project-model",
+            "generate-user-stories", "gap-risk-analysis", "clarification-loop",
         ],
     },
     "misc": {
@@ -55,6 +62,7 @@ GROUP_LABELS = {
     "plan-build":  "Plan & build",
     "code-review": "Code review",
     "doc-gen":     "Doc generation",
+    "greenfield":  "Greenfield pipeline",
     "misc":        "Khác",
 }
 
@@ -145,7 +153,7 @@ CURATED = {
             "Sau khi PR đã merge và feature đã chạy ổn trên môi trường thật",
         ],
         "example_args": "feat-dark-mode",
-        "example_note": "Không xoá file — chỉ chuyển sang thư mục archive/ để giữ phần active luôn sạch.",
+        "example_note": "Không xoá file — chỉ chuyển sang thư mục archive/. Nếu dự án dùng docs-hero, lệnh sẽ hỏi bridge change vào docs/ (qua /morkit:docs-update) TRƯỚC khi archive — sau khi archive, nội dung change không vào docs/ được nữa.",
     },
 
     # ====================================================================
@@ -442,7 +450,7 @@ CURATED = {
             "Khi cần sinh nguyên bộ tài liệu (SRS, API, DB, kiến trúc…) một lần",
             "Khi muốn các sub-skill phối hợp với nhau, ít xung đột nhất có thể",
         ],
-        "example_args": "(gọi qua /morkit:init hoặc /morkit:update-doc)",
+        "example_args": "(gọi qua /morkit:init hoặc /morkit:docs-update)",
         "example_note": "Theo các chuẩn quen thuộc: BrSE ITO Japan cho SRS, arc42-lite cho kiến trúc, MADR cho ADR.",
     },
     "skills.generate-srs": {
@@ -456,7 +464,7 @@ CURATED = {
             "Khi dự án cần SRS theo chuẩn của khách Nhật",
             "Khi yêu cầu thay đổi và cần làm mới SRS",
         ],
-        "example_args": "(gọi qua /morkit:init hoặc /morkit:update-doc)",
+        "example_args": "(gọi qua /morkit:init hoặc /morkit:docs-update)",
         "example_note": "Gồm 13 mục lớn và 2 phụ lục: Doc Control, tổng quan, luồng nghiệp vụ, FR/NFR, quyền, dữ liệu, UAT, traceability...",
     },
     "skills.generate-api-docs": {
@@ -471,7 +479,7 @@ CURATED = {
             "Khi cần tài liệu mô tả endpoint, request, response",
             "Khi route trong mã nguồn đã đổi và muốn đồng bộ lại tài liệu",
         ],
-        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:docs-update / /morkit:sync)",
         "example_note": "Chế độ init sinh từ ProjectModel; update áp dụng thay đổi; sync quét mã và đề xuất nội dung cần cập nhật.",
     },
     "skills.generate-db-design": {
@@ -486,7 +494,7 @@ CURATED = {
             "Khi cần tài liệu mô tả schema DB",
             "Khi muốn đồng bộ tài liệu với ORM model trong mã nguồn",
         ],
-        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:docs-update / /morkit:sync)",
         "example_note": "Sinh file database-design.md kèm ERD vẽ bằng Mermaid. Chế độ sync quét ORM và đề xuất Thêm/Sửa/Bỏ.",
     },
     "skills.generate-system-architecture": {
@@ -501,7 +509,7 @@ CURATED = {
             "Khi cần tài liệu kiến trúc cho dự án",
             "Khi muốn nhúng sơ đồ component vẽ bằng Mermaid",
         ],
-        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:docs-update / /morkit:sync)",
         "example_note": "Gồm 8 mục theo chuẩn arc42-lite. Sync quét services, packages, Docker, k8s và đồ thị import.",
     },
     "skills.generate-code-standards": {
@@ -517,7 +525,7 @@ CURATED = {
             "Khi dự án cần một tài liệu thống nhất về quy ước code",
             "Khi muốn rút quy ước từ các file cấu hình lint/format đang có",
         ],
-        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:docs-update / /morkit:sync)",
         "example_note": "Nếu đã có CONTRIBUTING.md, sẽ link sang chứ không nhân đôi nội dung.",
     },
     "skills.generate-codebase-summary": {
@@ -532,7 +540,7 @@ CURATED = {
             "Khi cần một bản tổng quan dự án dành cho người mới onboard",
             "Khi muốn ai đó hiểu nhanh dự án mà không cần đọc hết code",
         ],
-        "example_args": "(gọi qua /morkit:init / /morkit:update-doc / /morkit:sync)",
+        "example_args": "(gọi qua /morkit:init / /morkit:docs-update / /morkit:sync)",
         "example_note": "Liệt kê công nghệ, bố cục thư mục, các package, entry point và số dòng code theo ngôn ngữ.",
     },
     "skills.generate-design-guidelines": {
@@ -548,7 +556,7 @@ CURATED = {
             "Khi cần một tài liệu thống nhất về nguyên tắc thiết kế",
             "Khi muốn ghi lại các quyết định kiến trúc theo MADR format",
         ],
-        "example_args": "(gọi qua /morkit:init / /morkit:update-doc)",
+        "example_args": "(gọi qua /morkit:init / /morkit:docs-update)",
         "example_note": "Khi init, mỗi ADR sẽ có một file riêng tại docs/adr/NNN-slug.md. Skill này không hỗ trợ chế độ sync — guidelines do người viết.",
     },
 
@@ -559,17 +567,18 @@ CURATED = {
             "Sau khi đổi Python version và muốn dựng lại venv",
         ],
         "example_args": "",
-        "example_note": "Mất khoảng 30-60 giây. Lệnh idempotent — chạy lại không gây hại.",
+        "example_note": "Mất khoảng 30-60 giây. Lệnh idempotent — chạy lại không gây hại. Xong sẽ hỏi bạn có muốn chạy /morkit:init luôn không.",
     },
     "commands.init": {
-        "lede": "Sinh bộ tài liệu mới (SRS, API, DB...) từ một file ProjectModel JSON.",
+        "lede": "Cửa chính tạo docs — hỏi loại dự án rồi route: greenfield (từ tài liệu yêu cầu) hoặc brownfield (từ code/ProjectModel sẵn có).",
         "when_to_use": [
-            "Khi dự án chưa có tài liệu, muốn sinh lần đầu từ ProjectModel",
+            "Greenfield: có tài liệu khách hàng/yêu cầu — chạy pipeline BA G0→G7",
+            "Brownfield: đã có code và/hoặc ProjectModel — render thẳng + quét repo dò trạng thái",
         ],
         "example_args": "--lang VN",
-        "example_note": "Có menu chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra nằm ở thư mục docs/ của dự án. Chọn 1 ngôn ngữ: JP, EN hoặc VN.",
+        "example_note": "Hỏi greenfield/brownfield, rồi chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra ở docs/. Chọn 1 ngôn ngữ: JP, EN, VN. /morkit:greenfield là shortcut thẳng nhánh greenfield.",
     },
-    "commands.update-doc": {
+    "commands.docs-update": {
         "lede": "Áp dụng một change hoặc plan đã chốt vào tài liệu đang có — vẫn giữ phần bạn đã sửa tay.",
         "when_to_use": [
             "Khi một change đã merge và cần cập nhật vào tài liệu tương ứng",
@@ -579,13 +588,13 @@ CURATED = {
         "example_note": "Phần bạn đã sửa tay trong tài liệu sẽ được giữ nguyên nhờ diff engine.",
     },
     "commands.sync": {
-        "lede": "Đọc mã nguồn, đề xuất các nội dung nên cập nhật vào tài liệu. Chỉ đọc, không ghi.",
+        "lede": "Đọc mã nguồn, đề xuất nội dung cập nhật cho 5 tài liệu suy ra từ code (API / DB / codebase-summary / system-architecture / code-standards). Chỉ đọc, không ghi.",
         "when_to_use": [
-            "Khi schema hoặc route trong code đã đổi nhưng tài liệu chưa cập nhật",
-            "Khi muốn xem trước các thay đổi sẽ áp dụng trước khi quyết",
+            "Khi code (route / schema / cấu trúc / lint) đã đổi nhưng tài liệu chưa cập nhật",
+            "Khi muốn xem trước các thay đổi trước khi quyết",
         ],
-        "example_args": "",
-        "example_note": "Xuất file sync-proposal.md có checkbox để bạn tick các nội dung muốn áp dụng. Sau đó gõ /morkit:apply-sync.",
+        "example_args": "--codebase-paths src,api",
+        "example_note": "Xuất các *-sync-proposal.md có checkbox để bạn tick. Sau đó gõ /morkit:apply-sync cho từng proposal đã tick. SRS + design-guidelines không sync (không suy được từ code).",
     },
     "commands.apply-sync": {
         "lede": "Áp dụng các nội dung bạn đã tick trong sync-proposal.md vào tài liệu.",
@@ -598,7 +607,7 @@ CURATED = {
     "commands.doctor": {
         "lede": "Kiểm tra cài đặt docs-hero xem có ổn không (Python, venv, dependencies...).",
         "when_to_use": [
-            "Khi /morkit:init hoặc /morkit:update-doc báo lỗi cài đặt",
+            "Khi /morkit:init hoặc /morkit:docs-update báo lỗi cài đặt",
             "Sau khi cài lần đầu, muốn xác nhận môi trường đã sẵn sàng",
         ],
         "example_args": "",
@@ -623,5 +632,93 @@ CURATED = {
         ],
         "example_args": "(tự gọi)",
         "example_note": "Bắt buộc chạy ở đầu mỗi phiên. Đây là điều kiện để các skill khác hoạt động đúng.",
+    },
+
+    # ====================================================================
+    # NHÓM 6 — GREENFIELD PIPELINE (BA/BrSE từ tài liệu khách hàng → docs)
+    # ====================================================================
+    "commands.greenfield": {
+        "lede": "Pipeline tài liệu greenfield: từ tài liệu khách hàng + brainstorm → user story, gap/risk, ProjectModel đã validate, rồi bộ docs/ (SRS + design docs). Stateful, resume được (G0→G7, 3 cổng duyệt).",
+        "when_to_use": [
+            "Khi bắt đầu dự án mới chưa có code, chỉ có tài liệu khách hàng (PRD/spec/Excel)",
+            "Khi cần BA/BrSE deliverables (function list, gap analysis, risk register, SRS) theo chuẩn ITO Nhật",
+        ],
+        "example_args": "acme-portal --format brse --lang JP",
+        "example_note": "Tạo workspace morkit/output/greenfield/<proj>/ và đi qua G0→G7. Dừng ở 3 cổng (G3 BA, G4 clarify, G6 stakeholder). Kết quả cuối: docs/srs.md + design docs.",
+    },
+    "skills.greenfield-orchestrator": {
+        "lede": "Bộ điều phối mỏng cho /morkit:greenfield — đi qua G0→G7, gọi đúng skill mỗi stage, enforce 3 cổng, resume từ state.json. Không chứa business logic.",
+        "details": [
+            "Mỗi stage delegate cho skill sở hữu nó (brainstorming, generate-user-stories, gap-risk-analysis, clarification-loop, build-project-model, init)",
+            "3 cổng duyệt: <strong>G3</strong> BA Proceed/Adjust · <strong>G4</strong> đủ-câu-trả-lời/force-close · <strong>G6</strong> stakeholder duyệt SRS",
+            "State ghi atomic vào <code>state.json</code> — kill giữa chừng vẫn resume được",
+            "G6/G7 gọi <code>/morkit:init</code> để render SRS + design docs (không có code render mới)",
+        ],
+        "when_to_use": [
+            "Khi muốn chạy toàn bộ pipeline greenfield có gate và resume",
+            "Khi cần một guide stateful thay vì gọi từng skill thủ công",
+        ],
+        "example_args": "acme-portal --resume",
+        "example_note": "Đọc state.json, vào lại đúng stage đang dở. Mỗi cổng ghi quyết định vào state để lần sau resume biết đã duyệt tới đâu.",
+    },
+    "skills.build-project-model": {
+        "lede": "Skill cầu nối 🌉 — author một ProjectModel JSON hợp lệ (theo normalized_schema) từ input greenfield, rồi validate để /morkit:init render được docs/srs.md mà không cần viết JSON tay.",
+        "details": [
+            "Mắt xích còn thiếu giữa brainstorm và init — biến tài liệu khách hàng thành <code>project-model.json</code>",
+            "Reuse <code>parse_inputs.py</code> để đọc PDF/Excel/Docx (không parser mới)",
+            "Mọi entity seed đều trace về nguồn (<code>source</code>/<code>external_sources</code>) + <code>doc_status: Draft</code> — không bịa",
+            "Vòng validate: <code>validate_project_model.py</code> báo lỗi theo path → author lại đúng field",
+        ],
+        "when_to_use": [
+            "Stage G5 của pipeline greenfield",
+            "Khi cần tạo ProjectModel JSON từ tài liệu để init render docs",
+        ],
+        "example_args": "--workspace morkit/output/greenfield/acme --language JP",
+        "example_note": "Sinh project-model.json đã validate; init tiêu thụ nguyên vẹn để render docs/srs.md với FR truy vết được về tài liệu nguồn.",
+    },
+    "skills.generate-user-stories": {
+        "lede": "Biến brainstorm report thành user-story-list.md độc lập. Hai format qua --format brse|agile: brse = function list khớp SRS §3.1 (khách ITO Nhật); agile = As-a/I-want/So-that.",
+        "details": [
+            "Một item shape chung, hai renderer — format không drift",
+            "brse → cột khớp 1:1 SRS §3.1; agile → kèm acceptance criteria",
+            "ID ổn định (FUNC-001/US-001), re-run tái dùng ID cũ",
+            "Mỗi story mang Source + status Draft (greenfield — không bịa)",
+        ],
+        "when_to_use": [
+            "Stage G2 của pipeline greenfield",
+            "Khi cần danh sách chức năng/user story tách riêng khỏi SRS",
+        ],
+        "example_args": "--format brse --lang JP",
+        "example_note": "Sinh user-story-list.md; bridge map brse→FunctionalRequirement, agile→UseCase cho ProjectModel.",
+    },
+    "skills.gap-risk-analysis": {
+        "lede": "Đọc user-story list + brainstorm → sinh 2 file canonical: gap-analysis.md và risk-register.md, với chấm điểm rủi ro số (H/M/L→3/2/1, Score=P×I, High≥6 buộc có mitigation).",
+        "details": [
+            "Gap gắn tag <strong>new-requirement</strong> vs <strong>out-of-scope</strong>, link US/FR bị ảnh hưởng",
+            "Risk theo nhóm Technical · Business · Dependency · Gaps",
+            "<code>compute_risk_score.py</code> enforce: mọi risk High phải có mitigation",
+            "File canonical → sync vào ProjectModel → SRS §13/§12 render derived (một nguồn sự thật)",
+        ],
+        "when_to_use": [
+            "Stage G3 của pipeline greenfield (có cổng BA duyệt)",
+            "Khi cần phân tích gap và đăng ký rủi ro có chấm điểm cho dự án",
+        ],
+        "example_args": "--workspace morkit/output/greenfield/acme",
+        "example_note": "Sinh gap-analysis.md + risk-register.md từ template cố định; BA duyệt ở cổng G3 trước khi pipeline đi tiếp.",
+    },
+    "skills.clarification-loop": {
+        "lede": "Vòng hỏi-đáp human-in-the-loop (S4): AI sinh câu hỏi làm rõ theo từng user-story/gap vào clarification-log.md; BA trả lời inline hoặc forward; re-run AI nạp câu trả lời, cập nhật ProjectModel, điền <TBD>.",
+        "details": [
+            "Depth: <strong>template-only</strong> — state nằm trong chính file markdown, không cần tracker code",
+            "Async + đa phiên: resume từ file log, sống qua nhiều ngày",
+            "Câu hỏi trace về US/gap đã sinh ra nó; status open/answered/forwarded",
+            "Đóng vòng → Q&A đã trả lời render vào SRS §12",
+        ],
+        "when_to_use": [
+            "Stage G4 của pipeline greenfield (cổng đủ-câu-trả-lời / force-close)",
+            "Khi cần làm rõ requirement mơ hồ với stakeholder trước khi chốt ProjectModel",
+        ],
+        "example_args": "--workspace morkit/output/greenfield/acme",
+        "example_note": "Sinh/cập nhật clarification-log.md. Re-run trên cùng workspace tiếp tục đúng chỗ đang dở — không cần state store ngoài.",
     },
 }

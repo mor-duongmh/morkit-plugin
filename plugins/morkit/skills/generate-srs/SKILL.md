@@ -11,7 +11,7 @@ metadata:
 
 # Generate SRS Skill
 
-Sub-skill for generating SRS + per-screen design specs. Owns `morkit/output/docs/srs.md` and
+Sub-skill for generating SRS + per-screen design specs. Owns `docs/srs.md` and
 `docs/screen-specs/SCREEN-*.md`. Single-language output (JP / EN / VN).
 
 ## Environment (plugin context)
@@ -137,13 +137,16 @@ screens, then re-run `render_screen_spec.py` for those screens.
 ## File Ownership
 
 This skill owns:
-- `morkit/output/docs/srs.md`
+- `docs/srs.md`
 - `docs/screen-specs/SCREEN-*.md`
 - `assets/screens/*-annotated.png`
+- `docs/srs.html` — Mor-themed stakeholder view, rendered from `srs.md` by the
+  backend (`render_html.py`) during `init`. Presentation only (brand tokens +
+  sidebar nav); never changes SRS content.
 
 It does **not** modify:
-- `morkit/output/docs/api-docs.md`
-- `morkit/output/docs/database-design.md`
+- `docs/api-docs.md`
+- `docs/database-design.md`
 - Original mockup images at `assets/screens/SCREEN-*.{png,jpg,webp}`
 
 ## References
