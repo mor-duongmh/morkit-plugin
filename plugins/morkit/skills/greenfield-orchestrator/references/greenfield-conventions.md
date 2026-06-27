@@ -34,7 +34,7 @@ workspace. The workspace holds only intermediate/BA artifacts.
 | G3 | Analysis | `gap-risk-analysis` | **BA: Proceed/Adjust** | `gap-analysis.md`, `risk-register.md` |
 | G4 | Clarify | `clarification-loop` | **enough-answered/force-close** | `clarification-log.md` |
 | G5 | Bridge | `build-project-model` | — | `project-model.json` |
-| G6 | SRS+Visual | `init --outputs srs` + visualize | **stakeholder review** | `docs/srs.md`, `srs.html` |
+| G6 | SRS+Visual | `init --outputs srs` + visualize | **BrSE/BA review** | `docs/srs.md`, `srs.html` |
 | G7 | DesignDocs | `init --outputs arch,standards,summary,db` | — | `docs/*.md` |
 
 Stage order is fixed; gates persist their decision into `state.json` (§3). Stages

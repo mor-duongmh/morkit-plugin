@@ -17,3 +17,4 @@ plans/
 CLAUDE.md
 release-manifest.json
 .repomixignore
+.vscode

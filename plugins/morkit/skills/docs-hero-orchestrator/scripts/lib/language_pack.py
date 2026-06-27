@@ -47,10 +47,38 @@ HEADINGS: dict[str, dict[str, str]] = {
     },
     "stakeholders": {"JP": "ステークホルダー", "EN": "Stakeholders", "VN": "Bên liên quan"},
     "references": {"JP": "参考資料", "EN": "References", "VN": "Tài liệu tham khảo"},
+    # --- SRS template restructure (§1 purpose, terminology, actors; UC detail) ---
+    "document_purpose": {"JP": "ドキュメントの目的", "EN": "Document Purpose", "VN": "Mục đích tài liệu"},
+    "context_difficulties": {"JP": "背景・課題", "EN": "Context & Difficulties", "VN": "Bối cảnh & khó khăn"},
+    "system_strengths": {"JP": "システムの強み", "EN": "System Strengths", "VN": "Điểm mạnh của hệ thống"},
+    "development_phases": {
+        "JP": "開発フェーズ範囲",
+        "EN": "Development Scope by Phase",
+        "VN": "Phạm vi phát triển theo giai đoạn",
+    },
+    "terminology": {"JP": "用語・略語", "EN": "Terminology", "VN": "Thuật ngữ viết tắt"},
+    "system_actors": {"JP": "システム利用者", "EN": "System Actors", "VN": "Đối tượng sử dụng hệ thống"},
+    "uc_diagram": {"JP": "ユースケース図", "EN": "Use Case Diagram", "VN": "Sơ đồ Use Case"},
+    "flow_start": {"JP": "開始", "EN": "Start", "VN": "Bắt đầu"},
+    "flow_end": {"JP": "終了", "EN": "End", "VN": "Kết thúc"},
+    "flow_exception": {"JP": "例外", "EN": "Exception", "VN": "Ngoại lệ"},
+    "description": {"JP": "説明", "EN": "Description", "VN": "Mô tả"},
+    "basic_flow": {"JP": "基本フロー", "EN": "Basic Flow", "VN": "Luồng cơ bản"},
+    "related_screens": {"JP": "関連画面", "EN": "Related Screens", "VN": "Màn hình liên quan"},
+    # Column headers for the new single-language §1.5/§1.6 tables.
+    "seq_no": {"JP": "No.", "EN": "No.", "VN": "STT"},
+    "term_concept": {"JP": "用語", "EN": "Term", "VN": "Khái niệm/Thuật ngữ"},
+    "abbreviation": {"JP": "略語", "EN": "Abbr.", "VN": "Viết tắt"},
+    "actor_name": {"JP": "利用者", "EN": "Actor", "VN": "Tên đối tượng"},
     "current_business_flow": {
         "JP": "現状・業務フロー",
         "EN": "Current State & Business Flow",
         "VN": "Hiện trạng & Luồng nghiệp vụ",
+    },
+    "business_flow_section": {
+        "JP": "業務フロー",
+        "EN": "Business Flow",
+        "VN": "Luồng nghiệp vụ",
     },
     "current_process": {
         "JP": "現状業務",

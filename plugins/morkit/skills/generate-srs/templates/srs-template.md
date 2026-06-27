@@ -1,6 +1,23 @@
 <!--
 SRS Template — BrSE chuẩn cho ITO Nhật Bản
 Format: Markdown source template.
+
+REFERENCE ONLY — the actual SRS is rendered programmatically by
+`scripts/render_srs.py` (this file does not drive output). Keep it in sync with
+the renderer as a human-readable map of the structure.
+
+Restructured layout (2026-06):
+- §1 was "Overview" → now "Document Purpose": 1.1 Context & difficulties,
+  1.2 System strengths, 1.3 Development scope by phase, 1.4 References,
+  1.5 Terminology (single-language table with abbreviation), 1.6 System actors,
+  1.7 Stakeholders. (Target Release block removed.)
+- §2 is "Business Flow" (current-state/issues moved to §1.1): To-Be flow + UC
+  list + UC detail with an auto-generated Mermaid workflow + inline screen links.
+- §3 Functional Requirements is UNCHANGED (§3.1 FR list + §3.2 per-FR detail,
+  still section-anchored for the diff engine). The §2 use cases add a
+  workflow-oriented view on top; FR detail is intentionally kept as-is.
+- Appendix B Glossary removed — terminology lives in §1.5.
+
 Rendering rule:
 - Source template keeps JA / EN labels for BrSE readability.
 - Final customer-facing output must be rendered in ONE selected language: JP | EN | VN.
@@ -81,74 +98,65 @@ Related documents:
 
 ---
 
-## 1. 概要 / Overview
+## 1. ドキュメントの目的 / Document Purpose
 
-### 1.1 目的 / Purpose
 {{PROJECT_PURPOSE}}
 
-### 1.2 背景 / Background
+### 1.1 背景・課題 / Context & Difficulties
+Pain without the system / where the old system falls short. (Background + the
+current process + current issues — moved here from the old §2.)
+
 {{PROJECT_BACKGROUND}}
-
-### 1.3 対象リリース / Target Release
-
-| Item | Value |
-|---|---|
-| Release Name | {{RELEASE_NAME}} |
-| Target Date | {{TARGET_RELEASE_DATE}} |
-| Target Environment | Development / Staging / Production |
-| Target Users | {{TARGET_USERS}} |
-
-### 1.4 スコープ / Scope
-
-#### 1.4.1 今回対象範囲 / In-scope for This Release
-- {{IN_SCOPE_ITEM_1}}
-- {{IN_SCOPE_ITEM_2}}
-
-#### 1.4.2 対象外 / Out-of-scope
-- {{OUT_OF_SCOPE_ITEM_1}}
-- {{OUT_OF_SCOPE_ITEM_2}}
-
-#### 1.4.3 将来対応 / Future Scope
-- {{FUTURE_SCOPE_ITEM_1}}
-- {{FUTURE_SCOPE_ITEM_2}}
-
-#### 1.4.4 未確定・要確認 / Pending Confirmation
-
-| Q-ID | Topic | Description | Owner | Due Date | Status |
-|---|---|---|---|---|---|
-| Q-001 | {{TOPIC}} | {{QUESTION_OR_PENDING_ITEM}} | {{OWNER}} | {{DUE_DATE}} | Open / Answered / Closed |
-
-### 1.5 ステークホルダー / Stakeholders
-
-| ロール / Role | 名称 / Name | 所属 / Organization | 関心事 / Concern | 承認権限 / Approval Authority |
-|---|---|---|---|---|
-| お客様PM / Customer PM | {{CUSTOMER_PM}} | {{ORG}} | {{CONCERN}} | Yes / No |
-| 業務担当 / Business Owner | {{BUSINESS_OWNER}} | {{ORG}} | {{CONCERN}} | Yes / No |
-| エンドユーザー / End User | {{USER_ROLE}} | {{ORG}} | {{CONCERN}} | Yes / No |
-| BrSE | {{BRSE_NAME}} | {{ORG}} | 要件定義・橋渡し | Yes / No |
-| 開発リード / Dev Lead | {{DEV_LEAD}} | {{ORG}} | 実装・技術判断 | Yes / No |
-| QA Lead | {{QA_LEAD}} | {{ORG}} | テスト・品質保証 | Yes / No |
-
-### 1.6 参考資料 / References
-
-| Ref-ID | Document / Source | Version / Date | Owner | Notes |
-|---|---|---|---|---|
-| REF-001 | {{REFERENCE_DOC}} | {{VERSION_OR_DATE}} | {{OWNER}} | {{NOTES}} |
-
----
-
-## 2. 現状・業務フロー / Current State & Business Flow
-
-### 2.1 現状業務 / Current Business Process
-{{CURRENT_PROCESS_DESCRIPTION}}
-
-### 2.2 現状課題 / Current Issues
 
 | Issue-ID | Issue | Impact | Related Process | Owner |
 |---|---|---|---|---|
 | ISSUE-001 | {{ISSUE}} | High / Mid / Low | {{PROCESS}} | {{OWNER}} |
 
-### 2.3 To-Be 業務フロー / To-Be Business Flow
+### 1.2 システムの強み / System Strengths
+- {{STRENGTH_1}}
+- {{STRENGTH_2}}
+
+### 1.3 開発フェーズ範囲 / Development Scope by Phase
+
+**{{PHASE_1_NAME}}**
+- {{PHASE_1_ITEM_1}}
+
+**{{PHASE_2_NAME}}**
+- {{PHASE_2_ITEM_1}}
+
+### 1.4 参考資料 / References
+
+| Ref-ID | Document / Source | Version / Date | Owner | Notes |
+|---|---|---|---|---|
+| REF-001 | {{REFERENCE_DOC}} | {{VERSION_OR_DATE}} | {{OWNER}} | {{NOTES}} |
+
+### 1.5 用語・略語 / Terminology
+Single-language table (abbreviation column "Viết tắt"; STT auto-numbered).
+
+| STT | Khái niệm/Thuật ngữ | Viết tắt | Mô tả |
+|---|---|---|---|
+| 1 | {{TERM}} | {{ABBR}} | {{DEFINITION}} |
+
+### 1.6 システム利用者 / System Actors
+Business actors who operate the system (distinct from §1.7 stakeholders and
+§5 RBAC roles).
+
+| Tên đối tượng | Mô tả |
+|---|---|
+| {{ACTOR_NAME}} | {{ACTOR_DESCRIPTION}} |
+
+### 1.7 ステークホルダー / Stakeholders
+
+| ロール / Role | 名称 / Name | 所属 / Organization | 関心事 / Concern | 承認権限 / Approval Authority |
+|---|---|---|---|---|
+| お客様PM / Customer PM | {{CUSTOMER_PM}} | {{ORG}} | {{CONCERN}} | Yes / No |
+| BrSE | {{BRSE_NAME}} | {{ORG}} | 要件定義・橋渡し | Yes / No |
+
+---
+
+## 2. 業務フロー / Business Flow
+
+### 2.1 To-Be 業務フロー / To-Be Business Flow
 
 ```mermaid
 flowchart TD
@@ -158,34 +166,51 @@ flowchart TD
     C -->|"No"| E["{{ALT_STEP}}"]
 ```
 
-### 2.4 ユースケース一覧 / Use Case List
+### 2.2 ユースケース一覧 / Use Case List
 
 | UC-ID | ユースケース名 / Use Case | アクター / Actor | トリガー / Trigger | 主成功シナリオ / Main Success Scenario | 例外 / Exception | 関連FR / Related FR | 優先度 / Priority |
 |---|---|---|---|---|---|---|---|
 | UC-001 | {{USE_CASE}} | {{ACTOR}} | {{TRIGGER}} | {{MAIN_SUCCESS_SCENARIO}} | {{EXCEPTION}} | FR-001 | Must / Should / Could / Won't |
 
-### 2.5 ユースケース詳細 / Use Case Detail
+### 2.3 ユースケース詳細 / Use Case Detail
 
 #### UC-001: {{USE_CASE}}
 
+##### Use Case Diagram
+Auto-generated by the renderer from the main flow (start → steps → end, with actor):
+
+```mermaid
+flowchart TD
+    A["{{ACTOR}}"] --> S(["Start"])
+    S --> N1["{{STEP_1}}"]
+    N1 --> N2["{{STEP_2}}"]
+    N2 --> E(["End"])
+```
+
 | Field | Value |
 |---|---|
+| Description | {{UC_DESCRIPTION}} |
 | Actor | {{ACTOR}} |
-| Goal | {{USER_GOAL}} |
+| Priority | Must / Should / Could / Won't |
 | Trigger | {{TRIGGER}} |
 | Pre-condition | {{PRECONDITION}} |
 | Post-condition | {{POSTCONDITION}} |
-| Related FR | FR-001 |
-| Related Screen | SCREEN-001 |
 
-##### Main Success Scenario
+##### Basic Flow
 1. {{STEP_1}}
 2. {{STEP_2}}
-3. {{STEP_3}}
 
-##### Alternate / Exception Scenario
+##### Alternative Flow
 - AS-001: {{ALTERNATE_SCENARIO}}
+
+##### Exception Flow
 - ES-001: {{EXCEPTION_SCENARIO}}
+
+##### Business Rules
+- BR-001: {{BUSINESS_RULE}}
+
+##### Related Screens
+- [SCREEN-001 {{SCREEN_NAME}}](./screen-specs/SCREEN-001-{{slug}}.md)
 
 ---
 
@@ -478,15 +503,11 @@ Each screen spec should include:
 
 ---
 
-## Appendix B: 用語集 / Glossary
-
-| 用語 / Term (JA) | English | Tiếng Việt | 定義 / Definition |
-|---|---|---|---|
-| 要件定義書 | SRS | Tài liệu đặc tả yêu cầu | Software Requirements Specification |
-| 画面設計書 | Screen Design Spec | Tài liệu thiết kế màn hình | Per-screen UI / IO specification |
-| 業務フロー | Business Flow | Luồng nghiệp vụ | End-to-end business process |
-| 受入条件 | Acceptance Criteria | Điều kiện nghiệm thu | Criteria used to confirm whether a requirement is accepted |
-| トレーサビリティ | Traceability | Truy vết yêu cầu | Mapping between requirement, screen, data, interface, NFR, and test case |
+<!--
+Appendix B Glossary removed in the 2026-06 restructure.
+Terminology now lives in §1.5 (用語・略語 / Terminology) as a single-language
+table with an abbreviation column, rendered up front for readers.
+-->
 
 ---
 

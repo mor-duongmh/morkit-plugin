@@ -133,46 +133,103 @@ def _render_doc_control(lang: Language) -> str:
     return out
 
 
-# --- 1. Overview ---
+# --- 1. Document Purpose (was Overview) ---
 
 
-def _render_overview(model: ProjectModel, lang: Language) -> str:
-    ov = model.overview
-    out = _h(2, f"1. {t('overview', lang)}")
-    out += _h(3, f"1.1 {t('purpose', lang)}")
-    out += (ov.purpose or "_TBD_") + "\n\n"
-    out += _h(3, f"1.2 {t('background', lang)}")
-    out += (ov.background or "_TBD_") + "\n\n"
+def _glossary_term(g, lang: Language) -> str:
+    """Pick the glossary term for the selected output language, with fallback."""
+    by_lang = {Language.JP: g.term_jp, Language.EN: g.term_en, Language.VN: g.term_vn}
+    return by_lang.get(lang) or g.term_vn or g.term_en or g.term_jp or ""
 
-    out += _h(3, f"1.3 {t('target_release', lang)}")
-    tr = ov.target_release
-    out += "| Item | Value |\n|---|---|\n"
-    out += f"| Release Name | {_safe(tr.release_name if tr else None)} |\n"
-    out += f"| Target Date | {_safe(tr.target_date if tr else None)} |\n"
-    out += f"| Target Environment | {_safe(tr.target_environment if tr else None)} |\n"
-    out += f"| Target Users | {_safe(tr.target_users if tr else None)} |\n\n"
 
-    out += _h(3, f"1.4 {t('scope', lang)}")
-    out += _h(4, f"1.4.1 {t('in_scope', lang)}")
-    out += (_bullets(ov.in_scope) if ov.in_scope else "- _TBD_\n") + "\n"
-    out += _h(4, f"1.4.2 {t('out_of_scope', lang)}")
-    out += (_bullets(ov.out_of_scope) if ov.out_of_scope else "- _TBD_\n") + "\n"
-    out += _h(4, f"1.4.3 {t('future_scope', lang)}")
-    out += (_bullets(ov.future_scope) if ov.future_scope else "- _TBD_\n") + "\n"
-    out += _h(4, f"1.4.4 {t('pending_confirmation', lang)}")
-    out += "| Q-ID | Topic | Description | Owner | Due Date | Status |\n"
-    out += "|---|---|---|---|---|---|\n"
-    if ov.pending_questions:
-        for q in ov.pending_questions:
-            out += (
-                f"| {q.id} | {_safe(q.topic)} | {_safe(q.question)} | "
-                f"{_safe(q.owner)} | {_safe(q.due_date)} | {q.q_status} |\n"
-            )
+def _render_terminology(model: ProjectModel, lang: Language) -> str:
+    """§1.5 single-language terminology table (STT | Term | Abbr | Description)."""
+    out = _h(3, f"1.5 {t('terminology', lang)}")
+    out += (
+        f"| {t('seq_no', lang)} | {t('term_concept', lang)} | "
+        f"{t('abbreviation', lang)} | {t('description', lang)} |\n"
+    )
+    out += "|---|---|---|---|\n"
+    if model.glossary:
+        for n, g in enumerate(model.glossary, 1):
+            out += f"| {n} | {_safe(_glossary_term(g, lang))} | {_safe(g.abbreviation)} | {_safe(g.definition)} |\n"
     else:
-        out += "| Q-001 | _TBD_ | _TBD_ | _TBD_ | _TBD_ | Open |\n"
+        out += "| 1 | _TBD_ | _TBD_ | _TBD_ |\n"
+    out += "\n"
+    return out
+
+
+def _render_actors(model: ProjectModel, lang: Language) -> str:
+    """§1.6 system actors table (business operators who use the system)."""
+    out = _h(3, f"1.6 {t('system_actors', lang)}")
+    out += f"| {t('actor_name', lang)} | {t('description', lang)} |\n"
+    out += "|---|---|\n"
+    if model.system_actors:
+        for a in model.system_actors:
+            out += f"| {a.name} | {_safe(a.description)} |\n"
+    else:
+        out += "| _TBD_ | _TBD_ |\n"
+    out += "\n"
+    return out
+
+
+def _render_purpose(model: ProjectModel, lang: Language) -> str:
+    ov = model.overview
+    bf = model.business_flow
+    out = _h(2, f"1. {t('document_purpose', lang)}")
+    if ov.purpose:
+        out += ov.purpose + "\n\n"
+
+    # 1.1 Context & difficulties: background + current-state summary + issues.
+    # (Issue data lives on business_flow; §1.1 reads it here, §2 no longer renders it.)
+    out += _h(3, f"1.1 {t('context_difficulties', lang)}")
+    ctx_parts = [p for p in (ov.background, bf.current_process) if p]
+    out += ("\n\n".join(ctx_parts) if ctx_parts else "_TBD_") + "\n\n"
+    if bf.issue_records or bf.issues:
+        out += "| Issue-ID | Issue | Impact | Related Process | Owner |\n"
+        out += "|---|---|---|---|---|\n"
+        if bf.issue_records:
+            for i in bf.issue_records:
+                out += f"| {i.id} | {_safe(i.issue)} | {i.impact} | {_safe(i.related_process)} | {_safe(i.owner)} |\n"
+        else:
+            for n, txt in enumerate(bf.issues, 1):
+                out += f"| ISSUE-{n:03d} | {txt} | - | - | - |\n"
+        out += "\n"
+
+    # 1.2 System strengths.
+    out += _h(3, f"1.2 {t('system_strengths', lang)}")
+    out += (_bullets(ov.strengths) if ov.strengths else "- _TBD_\n") + "\n"
+
+    # 1.3 Development scope by phase.
+    out += _h(3, f"1.3 {t('development_phases', lang)}")
+    if ov.development_phases:
+        for dp in ov.development_phases:
+            out += f"**{dp.phase}**\n\n"
+            out += (_bullets(dp.items) if dp.items else "- _TBD_\n") + "\n"
+    else:
+        # Fallback: in_scope = first stage, future_scope = later stages.
+        out += f"**{t('in_scope', lang)}**\n\n"
+        out += (_bullets(ov.in_scope) if ov.in_scope else "- _TBD_\n") + "\n"
+        out += f"**{t('future_scope', lang)}**\n\n"
+        out += (_bullets(ov.future_scope) if ov.future_scope else "- _TBD_\n") + "\n"
+
+    # 1.4 References.
+    out += _h(3, f"1.4 {t('references', lang)}")
+    out += "| Ref-ID | Document / Source | Version / Date | Owner | Notes |\n"
+    out += "|---|---|---|---|---|\n"
+    if ov.references:
+        for r in ov.references:
+            out += f"| {r.id} | {_safe(r.document)} | {_safe(r.version_or_date)} | {_safe(r.owner)} | {_safe(r.notes)} |\n"
+    else:
+        out += "| REF-001 | _TBD_ | _TBD_ | _TBD_ | _TBD_ |\n"
     out += "\n"
 
-    out += _h(3, f"1.5 {t('stakeholders', lang)}")
+    # 1.5 Terminology · 1.6 System actors.
+    out += _render_terminology(model, lang)
+    out += _render_actors(model, lang)
+
+    # 1.7 Stakeholders (who approves / is concerned).
+    out += _h(3, f"1.7 {t('stakeholders', lang)}")
     out += "| Role | Name | Organization | Concern | Approval Authority |\n"
     out += "|---|---|---|---|---|\n"
     if ov.stakeholders:
@@ -182,47 +239,132 @@ def _render_overview(model: ProjectModel, lang: Language) -> str:
     else:
         out += "| _TBD_ | _TBD_ | _TBD_ | _TBD_ | - |\n"
     out += "\n"
-
-    out += _h(3, f"1.6 {t('references', lang)}")
-    out += "| Ref-ID | Document / Source | Version / Date | Owner | Notes |\n"
-    out += "|---|---|---|---|---|\n"
-    if ov.references:
-        for r in ov.references:
-            out += f"| {r.id} | {_safe(r.document)} | {_safe(r.version_or_date)} | {_safe(r.owner)} | {_safe(r.notes)} |\n"
-    else:
-        out += "| REF-001 | _TBD_ | _TBD_ | _TBD_ | _TBD_ |\n"
-    out += "\n"
     return out
 
 
-# --- 2. Current State & Business Flow ---
+# --- 2. Business Flow ---
+
+
+def _mermaid_label(text: str) -> str:
+    """Sanitize a string so it is safe inside a double-quoted Mermaid node label.
+
+    `&` must be escaped first (it would otherwise re-process the `&lt;`/`&gt;`
+    entities). `<`/`>`/`&` are the documented Mermaid label hazards; the rest are
+    bracket/pipe chars that confuse the flowchart parser.
+    """
+    s = str(text)
+    for bad, good in (
+        ("&", "&amp;"), ("<", "&lt;"), (">", "&gt;"),
+        ('"', "'"), ("[", "("), ("]", ")"), ("{", "("), ("}", ")"), ("|", "/"),
+    ):
+        s = s.replace(bad, good)
+    return " ".join(s.split()) or "?"
+
+
+def _uc_workflow_mermaid(uc, lang: Language) -> str:
+    """Auto-generate a start -> main-flow steps -> end flowchart for a use case.
+
+    Actor is shown as the entry node. Exception steps branch off the last main
+    step toward the end node (best-effort). Returns "" when there is no main flow.
+    """
+    steps = uc.main_success_scenario
+    if not steps:
+        return ""
+    start = _mermaid_label(t("flow_start", lang))
+    end = _mermaid_label(t("flow_end", lang))
+    lines = ["```mermaid", "flowchart TD"]
+    if uc.actor:
+        lines.append(f'    A["{_mermaid_label(uc.actor)}"] --> S(["{start}"])')
+    else:
+        lines.append(f'    S(["{start}"])')
+    prev = "S"
+    for i, step in enumerate(steps, 1):
+        nid = f"N{i}"
+        lines.append(f'    {prev} --> {nid}["{_mermaid_label(step)}"]')
+        prev = nid
+    last_step = prev
+    lines.append(f'    {last_step} --> E(["{end}"])')
+    exc_label = _mermaid_label(t("flow_exception", lang))
+    for j, ex in enumerate(uc.exception_scenarios, 1):
+        xid = f"X{j}"
+        lines.append(f'    {last_step} -.->|{exc_label}| {xid}["{_mermaid_label(ex)}"]')
+        lines.append(f"    {xid} --> E")
+    lines.append("```")
+    return "\n".join(lines) + "\n\n"
+
+
+def _uc_related_screens(uc) -> list[str]:
+    """Screens linked to a UC; prefers related_screens, falls back to related_screen."""
+    if uc.related_screens:
+        ids = list(uc.related_screens)
+    elif uc.related_screen:
+        ids = [uc.related_screen]
+    else:
+        ids = []
+    return [sid for sid in ids if sid]
+
+
+def _render_uc_detail(uc, model: ProjectModel, lang: Language) -> str:
+    """§2.3 single use-case detail block (diagram + fields + flows + screens)."""
+    by_id = {s.id: s for s in model.screens}
+    out = _h(4, f"{uc.id}: {uc.name}")
+
+    diagram = _uc_workflow_mermaid(uc, lang)
+    if diagram:
+        out += f"##### {t('uc_diagram', lang)}\n"
+        out += diagram
+
+    out += "| Field | Value |\n|---|---|\n"
+    out += f"| {t('description', lang)} | {_safe(uc.description or uc.summary)} |\n"
+    out += f"| Actor | {uc.actor} |\n"
+    out += f"| Priority | {uc.priority.value} |\n"
+    out += f"| {t('trigger', lang)} | {_safe(uc.trigger)} |\n"
+    out += f"| {t('precondition', lang)} | {_safe(uc.precondition)} |\n"
+    out += f"| {t('postcondition', lang)} | {_safe(uc.postcondition)} |\n"
+    out += f"| Related FR | {', '.join(uc.related_fr) or '-'} |\n\n"
+
+    if uc.main_success_scenario:
+        out += f"##### {t('basic_flow', lang)}\n"
+        for n, step in enumerate(uc.main_success_scenario, 1):
+            out += f"{n}. {step}\n"
+        out += "\n"
+    if uc.alternate_scenarios:
+        out += f"##### {t('alt_flow', lang)}\n"
+        for n, s in enumerate(uc.alternate_scenarios, 1):
+            out += f"- AS-{n:03d}: {s}\n"
+        out += "\n"
+    if uc.exception_scenarios:
+        out += f"##### {t('exception_flow', lang)}\n"
+        for n, s in enumerate(uc.exception_scenarios, 1):
+            out += f"- ES-{n:03d}: {s}\n"
+        out += "\n"
+    if uc.business_rules:
+        out += f"##### {t('business_rules', lang)}\n"
+        out += _bullets(uc.business_rules) + "\n"
+
+    screens = _uc_related_screens(uc)
+    if screens:
+        out += f"##### {t('related_screens', lang)}\n"
+        for sid in screens:
+            sc = by_id.get(sid)
+            if sc is not None:
+                out += f"- [{sid} {sc.name}](./screen-specs/{sc.id}-{sc.slug}.md)\n"
+            else:
+                out += f"- {sid}\n"
+        out += "\n"
+    return out
 
 
 def _render_business_flow(model: ProjectModel, lang: Language) -> str:
     bf = model.business_flow
-    out = _h(2, f"2. {t('current_business_flow', lang)}")
-    out += _h(3, f"2.1 {t('current_process', lang)}")
-    out += (bf.current_process or "_TBD_") + "\n\n"
-
-    out += _h(3, f"2.2 {t('issues', lang)}")
-    out += "| Issue-ID | Issue | Impact | Related Process | Owner |\n"
-    out += "|---|---|---|---|---|\n"
-    if bf.issue_records:
-        for i in bf.issue_records:
-            out += f"| {i.id} | {_safe(i.issue)} | {i.impact} | {_safe(i.related_process)} | {_safe(i.owner)} |\n"
-    elif bf.issues:
-        # Backwards compat: legacy free-text issues -> auto-numbered.
-        for n, txt in enumerate(bf.issues, 1):
-            out += f"| ISSUE-{n:03d} | {txt} | - | - | - |\n"
-    else:
-        out += "| ISSUE-001 | _TBD_ | - | - | - |\n"
-    out += "\n"
+    # §2 header is now just "Business Flow"; current-state + issues moved to §1.1.
+    out = _h(2, f"2. {t('business_flow_section', lang)}")
 
     if bf.to_be_mermaid:
-        out += _h(3, f"2.3 {t('to_be_flow', lang)}")
+        out += _h(3, f"2.1 {t('to_be_flow', lang)}")
         out += "```mermaid\n" + bf.to_be_mermaid.strip() + "\n```\n\n"
 
-    out += _h(3, f"2.4 {t('use_cases', lang)}")
+    out += _h(3, f"2.2 {t('use_cases', lang)}")
     out += (
         "| UC-ID | Use Case | Actor | Trigger | Main Success Scenario | Exception | Related FR | Priority |\n"
         "|---|---|---|---|---|---|---|---|\n"
@@ -240,33 +382,42 @@ def _render_business_flow(model: ProjectModel, lang: Language) -> str:
     out += "\n"
 
     if bf.use_cases:
-        out += _h(3, f"2.5 {t('use_case_detail', lang)}")
+        out += _h(3, f"2.3 {t('use_case_detail', lang)}")
         for uc in bf.use_cases:
-            out += _h(4, f"{uc.id}: {uc.name}")
-            out += "| Field | Value |\n|---|---|\n"
-            out += f"| Actor | {uc.actor} |\n"
-            out += f"| Goal | {_safe(uc.goal)} |\n"
-            out += f"| Trigger | {_safe(uc.trigger)} |\n"
-            out += f"| Pre-condition | {_safe(uc.precondition)} |\n"
-            out += f"| Post-condition | {_safe(uc.postcondition)} |\n"
-            out += f"| Related FR | {', '.join(uc.related_fr) or '-'} |\n"
-            out += f"| Related Screen | {_safe(uc.related_screen)} |\n\n"
-            if uc.main_success_scenario:
-                out += f"##### {t('main_flow', lang)}\n"
-                for n, step in enumerate(uc.main_success_scenario, 1):
-                    out += f"{n}. {step}\n"
-                out += "\n"
-            if uc.alternate_scenarios or uc.exception_scenarios:
-                out += "##### Alternate / Exception Scenario\n"
-                for n, s in enumerate(uc.alternate_scenarios, 1):
-                    out += f"- AS-{n:03d}: {s}\n"
-                for n, s in enumerate(uc.exception_scenarios, 1):
-                    out += f"- ES-{n:03d}: {s}\n"
-                out += "\n"
+            out += _render_uc_detail(uc, model, lang)
     return out
 
 
 # --- 3. Functional Requirements ---
+
+
+def _render_impl_dashboard(items: list[FunctionalRequirement]) -> str:
+    """Implementation Status snapshot table (counts + percentage by ImplStatus).
+
+    Rendered above the FR list so BrSE/PM see at-a-glance progress without
+    scanning every FR row.
+    """
+    if not items:
+        return ""
+    total = len(items)
+    counts: dict[ImplStatus, int] = dict.fromkeys(ImplStatus, 0)
+    for fr in items:
+        counts[fr.impl_status or ImplStatus.NOT_STARTED] += 1
+
+    out = "> **Implementation Status Snapshot** (auto-derived from openspec/, codebase scan, and manual overrides)\n\n"
+    out += "| Status | Count | % |\n|---|---|---|\n"
+    for status in (
+        ImplStatus.VERIFIED,
+        ImplStatus.DONE,
+        ImplStatus.IN_PROGRESS,
+        ImplStatus.BLOCKED,
+        ImplStatus.NOT_STARTED,
+    ):
+        c = counts[status]
+        pct = (c * 100 // total) if total else 0
+        out += f"| {_IMPL_BADGE[status]} | {c} | {pct}% |\n"
+    out += f"| **Total** | **{total}** | **100%** |\n\n"
+    return out
 
 
 def _render_fr_detail(fr: FunctionalRequirement, lang: Language) -> str:
@@ -371,35 +522,6 @@ def _render_fr_detail(fr: FunctionalRequirement, lang: Language) -> str:
         for n in fr.notes:
             out += f"- {n}\n"
         out += "\n"
-    return out
-
-
-def _render_impl_dashboard(items: list[FunctionalRequirement]) -> str:
-    """Implementation Status snapshot table (counts + percentage by ImplStatus).
-
-    Rendered above the FR list so BrSE/PM see at-a-glance progress without
-    scanning every FR row.
-    """
-    if not items:
-        return ""
-    total = len(items)
-    counts: dict[ImplStatus, int] = dict.fromkeys(ImplStatus, 0)
-    for fr in items:
-        counts[fr.impl_status or ImplStatus.NOT_STARTED] += 1
-
-    out = "> **Implementation Status Snapshot** (auto-derived from openspec/, codebase scan, and manual overrides)\n\n"
-    out += "| Status | Count | % |\n|---|---|---|\n"
-    for status in (
-        ImplStatus.VERIFIED,
-        ImplStatus.DONE,
-        ImplStatus.IN_PROGRESS,
-        ImplStatus.BLOCKED,
-        ImplStatus.NOT_STARTED,
-    ):
-        c = counts[status]
-        pct = (c * 100 // total) if total else 0
-        out += f"| {_IMPL_BADGE[status]} | {c} | {pct}% |\n"
-    out += f"| **Total** | **{total}** | **100%** |\n\n"
     return out
 
 
@@ -886,21 +1008,6 @@ def _render_screen_index(screens: list[Screen], lang: Language) -> str:
     return out
 
 
-# --- Appendix B: Glossary ---
-
-
-def _render_glossary(model: ProjectModel, lang: Language) -> str:
-    out = _h(2, f"Appendix B: {t('glossary', lang)}")
-    out += "| JP | EN | VN | Definition |\n|---|---|---|---|\n"
-    if model.glossary:
-        for g in model.glossary:
-            out += f"| {_safe(g.term_jp)} | {_safe(g.term_en)} | {_safe(g.term_vn)} | {g.definition} |\n"
-    else:
-        out += "| _TBD_ | _TBD_ | _TBD_ | _TBD_ |\n"
-    out += "\n"
-    return out
-
-
 # --- Top-level orchestrator ---
 
 
@@ -910,7 +1017,7 @@ def render_srs(model: ProjectModel, lang: Language) -> str:
         _render_meta(model, lang),
         _render_revision_history(model, lang),
         _render_doc_control(lang),
-        _render_overview(model, lang),
+        _render_purpose(model, lang),
         _render_business_flow(model, lang),
         _render_fr_section(model.functional_requirements, lang),
         _render_business_rules(model.business_rules, lang),
@@ -924,7 +1031,7 @@ def render_srs(model: ProjectModel, lang: Language) -> str:
         _render_open_qa(model, lang),
         _render_constraints_risks(model, lang),
         _render_screen_index(model.screens, lang),
-        _render_glossary(model, lang),
+        # Appendix B Glossary removed — terminology now lives in §1.5.
     ]
     return "".join(parts)
 
