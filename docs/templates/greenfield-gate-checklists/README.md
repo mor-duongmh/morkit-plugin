@@ -1,46 +1,37 @@
-# Greenfield Human-Gate Checklists (thủ công)
+# Greenfield Human-Gate Checklists — đã chuyển vào skill
 
-Bộ checklist **thủ công** cho các human gate của luồng `/morkit:greenfield`.
-Dành cho **team dự án tick tay** — KHÔNG nối vào workflow/orchestrator/hook.
+> **Canonical đã move** sang skill để orchestrator đọc được runtime ở mọi project:
+> `plugins/morkit/skills/greenfield-orchestrator/references/gate-checklists/`
+> Các file ở thư mục này giờ chỉ là **con trỏ** về canonical (chống trùng/lệch — DRY).
 
-## Khi nào dùng
-Mỗi khi luồng greenfield chạy tới một gate cần người duyệt (**G2, G3, G4, G6**),
-mở checklist tương ứng, soát artifact, tick, rồi ký duyệt.
+Bộ checklist cho các human gate của luồng `/morkit:greenfield` (**G2, G3, G4, G6**).
+Trước đây tách rời thủ công; nay **nối thẳng vào workflow**: orchestrator đọc front-matter
+`required` của mỗi checklist, render mục bắt buộc vào gate, và `state_manager.advance`
+**chặn cứng** tới khi `decision==proceed` + đủ `required` confirmed (G4 `force-close` kèm note).
 
-## Cách dùng
-1. Copy cả folder này vào workspace dự án, ví dụ:
-   `morkit/output/greenfield/<proj-slug>/checklists/`
-2. Mở file gate đang tới, điền phần **Thông tin**.
-3. Soát artifact, tick từng mục — **chỉ tick khi thỏa dòng `Tiêu chí:`**.
-4. Điền **block ký duyệt** ở cuối: chọn quyết định + người duyệt + ngày.
-5. (Tùy chọn) nhập lại quyết định vào `state.json` để đồng bộ — xem mapping bên dưới.
+## Cách hoạt động (tích hợp)
+1. Orchestrator: `checklist_loader.py show --gate Gx` → lấy `required` + tiêu đề mục.
+2. Render mục bắt buộc + `Tiêu chí:` → `AskUserQuestion` (multiSelect "đã đạt?") + câu quyết định.
+3. `state_manager set-gate … --checklist-required … --checklist-confirmed …`.
+4. `advance` → thiếu required hoặc chưa proceed ⇒ raise, ở lại gate.
 
-## Danh sách file
-| File | Gate | Vai trò soát | Artifact |
+## Tick tay offline (fallback)
+Chạy ngoài orchestrator vẫn được: mở bản **canonical** trong skill, điền **Thông tin**,
+soát artifact, **chỉ tick khi thỏa dòng `Tiêu chí:`** (chống tick mù), rồi ký block cuối.
+
+## Danh sách (trỏ về canonical trong skill)
+| Gate | Vai trò | Artifact | Canonical |
 |---|---|---|---|
-| `g2-requirement-decomposition-checklist.md` | G2 Phân rã yêu cầu | BrSE | `user-story-list.md` (Function List/User Story) |
-| `g3-analysis-checklist.md` | G3 Analysis | BA | `gap-analysis.md`, `risk-register.md` |
-| `g4-clarify-checklist.md` | G4 Clarify | BrSE/BA | `clarification-log.md` |
-| `g6-srs-review-checklist.md` | G6 SRS | BrSE/BA | `docs/srs.md`, `docs/srs.html` |
+| G2 Phân rã yêu cầu | BrSE | `user-story-list.md` | `…/gate-checklists/g2-requirement-decomposition-checklist.md` |
+| G3 Analysis | BA | `gap-analysis.md`, `risk-register.md` | `…/gate-checklists/g3-analysis-checklist.md` |
+| G4 Clarify | BrSE/BA | `clarification-log.md` | `…/gate-checklists/g4-clarify-checklist.md` |
+| G6 SRS | BrSE/BA | `docs/srs.md`, `docs/srs.html` | `…/gate-checklists/g6-srs-review-checklist.md` |
 
 ## Nguyên tắc
-- **Trỏ về nguồn chân lý, không chép luật.** Định nghĩa gate gốc nằm ở
-  `plugins/morkit/skills/greenfield-orchestrator/references/greenfield-conventions.md` (§2–3).
-  Nếu gate/enum đổi, cập nhật checklist theo.
-- **Chống tick mù.** Chỉ tick khi thỏa dòng `Tiêu chí:`.
-- **No-fiction.** Không có gì được "bịa" — thiếu nguồn thì là `<TBD>`/OpenQuestion.
+- **1 nguồn chân lý:** chỉ sửa bản canonical trong skill. File ở đây chỉ trỏ đường.
+- **Chống tick mù:** chỉ tick khi thỏa dòng `Tiêu chí:`. `required` là subset bắt buộc chặn gate.
+- **No-fiction:** thiếu nguồn → `<TBD>`/OpenQuestion, không bịa.
 
-## Mapping quyết định → `state.json` (nếu muốn đồng bộ)
-`state.json` dùng enum: `proceed` | `adjust` | `force-close` (Abort = dừng, không lưu).
-
-| Gate | Nhãn trên checklist → enum |
-|---|---|
-| G2 | Proceed→`proceed` · Another round→`adjust` · Abort→dừng |
-| G3 | Proceed→`proceed` · Adjust→`adjust` · Abort→dừng |
-| G4 | Close loop→`proceed` · Another round→`adjust` · Force-close→`force-close` |
-| G6 | Proceed→`proceed` · Revise→`adjust` · Abort→dừng |
-
-## Ngoài phạm vi (chưa có ở đây)
-- **QA gate sau G7** (`docs-reviewer`) — là checkpoint người-thật nhưng chưa làm checklist.
-- **Gate G7 "Architecture"** — đã duyệt brainstorm nhưng chưa implement; thêm
-  `g7-architecture-checklist.md` khi nào gate đó vào code.
+## Mapping quyết định → `state.json`
+`proceed` | `adjust` | `force-close` (Abort = dừng, không lưu). Mapping nhãn→enum nằm ở
+front-matter `decisions` của từng checklist canonical.

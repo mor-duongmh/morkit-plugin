@@ -29,6 +29,7 @@ PY="${HOME}/.claude/plugins/data/docs-hero/.venv/bin/python3"
 test -d "${HOME}/.claude/plugins/data/docs-hero/.venv" || {
   echo "ERROR: venv not initialized. Run /morkit:setup first." >&2; exit 1; }
 SM="${CLAUDE_PLUGIN_ROOT:?}/skills/greenfield-orchestrator/scripts/state_manager.py"
+CL="${CLAUDE_PLUGIN_ROOT:?}/skills/greenfield-orchestrator/scripts/checklist_loader.py"
 WS="morkit/output/greenfield/<proj-slug>"
 ```
 
@@ -59,26 +60,43 @@ writes are atomic (`state_manager.py`), so a kill mid-pipeline never corrupts it
 | **G7** DesignDocs | `init --outputs arch,standards,summary,db` (+ `api`,`guidelines` if selected) → QA via `docs-reviewer` | — | mark `done` |
 
 Per stage: run the action → on success `state_manager set-stage <Gx> done <artifact>`
-→ for gated stages evaluate the gate → `advance`.
+→ for gated stages run the checklist-driven gate (below) → `advance` (which hard-blocks
+until the gate clears).
 
 ## The 4 gates (focused — value over count)
 
-Each uses `AskUserQuestion` and persists via `state_manager set-gate`:
+Each gate is **checklist-driven and hard-blocked**. The per-gate must-pass
+subset lives in the canonical checklist
+([`references/gate-checklists/`](references/gate-checklists/), front-matter
+`required`). `advance` **refuses to leave a gated stage** until its gate is
+`proceed` with every `required` item confirmed (G4 `force-close` may leave with
+a note) — so a gate can't be rubber-stamped past.
 
-- **G2 — story confirm (foundational doc):** `Proceed` (accept list) / `Another round`
-  (re-run G2 scoped Q&A — decision `adjust`) / `Abort`. The function list is what every
-  downstream stage is built on, so it gets its own gate. This *cleans* G3/G4 (they now run
-  on a human-validated list) — net friction stays ~flat despite the extra gate. The gate is
-  cheap because `generate-user-stories` surfaces a review-aid (low-confidence stories,
-  zero-coverage areas) for the BrSE to react to, not a blank "approve?".
+**Gate procedure (every gated stage `Gx`):**
+1. Load the must-pass subset: `"$PY" "$CL" show --gate Gx` → read `required` + item titles.
+2. Render those items (title + `Tiêu chí:`) in visible text, then `AskUserQuestion`:
+   one multiSelect "Mục bắt buộc nào đã ĐẠT?" (options = the required items) + the decision question.
+3. Persist with the confirmed ids: `set-gate --decision <enum> --checklist-required <all> --checklist-confirmed <met>`.
+4. `advance`. If required ids are missing (or decision isn't a pass) it raises — report
+   "gate chưa đủ điều kiện, ở lại Gx" and re-run the stage; never fabricate a pass.
+
+Decision enums per gate (label → enum, from each checklist's `decisions`):
+
+- **G2 — story confirm (foundational doc):** `Proceed` (accept list, `proceed`) / `Another round`
+  (re-run G2 scoped Q&A, `adjust`) / `Abort`. The function list is what every downstream stage
+  is built on, so it gets its own gate. `generate-user-stories` surfaces a review-aid
+  (low-confidence stories, zero-coverage areas) for the BrSE to react to, not a blank "approve?".
 - **G3 — BA review:** `Proceed` / `Adjust` (revise gap/risk rows, re-run G3) / `Abort`.
-- **G4 — clarification:** `Close loop` (enough answered) / `Another round` / `Force-close`.
-- **G6 — stakeholder SRS review:** `Proceed` / `Revise` / `Abort`.
+- **G4 — clarification:** `Close loop` (`proceed`) / `Another round` (`adjust`) / `Force-close`
+  (`force-close` — leaves the gate with a logged reason despite open questions).
+- **G6 — stakeholder SRS review:** `Proceed` / `Revise` (`adjust`) / `Abort`.
 
 ```bash
-"$PY" "$SM" set-gate --state "$WS/state.json" --stage G2 --decision proceed --note "BrSE confirmed function list"
-"$PY" "$SM" set-gate --state "$WS/state.json" --stage G3 --decision proceed --note "BA approved"
-"$PY" "$SM" advance  --state "$WS/state.json"
+# G2 — confirm the must-pass subset surfaced from the checklist, then advance:
+REQ=$("$PY" "$CL" show --gate G2 | "$PY" -c 'import json,sys;print(",".join(json.load(sys.stdin)["required"]))')
+"$PY" "$SM" set-gate --state "$WS/state.json" --stage G2 --decision proceed \
+  --note "BrSE confirmed function list" --checklist-required "$REQ" --checklist-confirmed "$REQ"
+"$PY" "$SM" advance  --state "$WS/state.json"   # raises if any required id is unconfirmed
 ```
 
 ## G6 / G7 — delegate to the render backend (no new render code)

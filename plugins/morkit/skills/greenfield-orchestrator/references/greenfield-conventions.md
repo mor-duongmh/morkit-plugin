@@ -68,8 +68,11 @@ alone. Schema: [`schemas/state.schema.json`](../schemas/state.schema.json).
 - `format` — `brse` | `agile` (user-story render format; default `brse`).
 - `lang` — `JP` | `EN` | `VN` (matches `normalized_schema.Language`).
 - `stages.<Gx>.status` — `pending` | `in_progress` | `done` | `blocked`.
-- `stages.<Gx>.gate` (gated stages **G2, G3, G4, G6**) — `{ decision: pending|proceed|adjust|force-close, note }`.
+- `stages.<Gx>.gate` (gated stages **G2, G3, G4, G6**) — `{ decision: pending|proceed|adjust|force-close, note, checklist? }`.
   G2 uses `proceed` (confirm function list) / `adjust` (run another G2 scoped-Q&A round); `Abort` halts (not persisted), same as G3/G6.
+  Optional `checklist: { required:[id], confirmed:[id] }` records the must-pass subset
+  from the gate checklist ([`gate-checklists/`](gate-checklists/)); `advance` **hard-blocks**
+  until `decision==proceed` and `required ⊆ confirmed` (G4 `force-close` leaves with a note).
 
 Validated by [`scripts/validate_state.py`](../scripts/validate_state.py) on every load.
 
