@@ -7,7 +7,17 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 
 **IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create morkit artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing.
 
-**This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore.
+**This is a stance, not a workflow.** There are no fixed steps or mandatory outputs — with **one exception**: when the topic touches the codebase, ground yourself in the code first (see **Scout Phase** below). Beyond that, you're a thinking partner; follow the conversation wherever it goes.
+
+---
+
+## Scout Phase (start here)
+
+When the discussion touches existing code, **begin by grounding yourself in the codebase before theorizing** — invoke the `scout` skill to discover the relevant files and patterns in parallel, and read relevant docs under `docs/`. Explore before you opine.
+
+- Scout finds the **code**; the context tiers in "Read project context files at session start" (below) find the **rules and shape**. Do both at the start of a code-relevant session.
+- For a trivial or already-known scope, a quick Grep/Glob is enough — scout earns its keep when the area is broad or you don't yet know where things live.
+- Purely abstract topics (no existing code involved) may skip this.
 
 ---
 
@@ -33,6 +43,7 @@ Depending on what the user brings, you might:
 - Find analogies
 
 **Investigate the codebase**
+- Use the `scout` skill to discover relevant files in parallel (see **Scout Phase**)
 - Map existing architecture relevant to the discussion
 - Find integration points
 - Identify patterns already in use
