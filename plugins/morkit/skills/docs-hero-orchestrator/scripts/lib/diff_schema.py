@@ -36,11 +36,27 @@ class DocMeta(_Base):
     deprecated: list[str] = Field(default_factory=list)
 
 
+class ReviewState(_Base):
+    """Per-doc human-review-gate state, stored alongside section_hashes.
+
+    `baseline_hashes`/`baseline_order` capture the PRE-edit render so review-time
+    edits register as `manual_edit` and survive later update/sync. On promote the
+    baseline is copied into DocMeta.section_hashes and `status` flips to approved.
+    """
+
+    status: Literal["pending", "approved"] = "pending"
+    baseline_hashes: dict[str, str] = Field(default_factory=dict)
+    baseline_order: list[str] = Field(default_factory=list)
+    snapshot_at: str = ""
+    promoted_at: str = ""
+
+
 class MetaSidecar(_Base):
     schema_version: str = "1.0"
     generated_at: str = ""
     generator: str = "docs-hero@1.0.0"
     docs: dict[str, DocMeta] = Field(default_factory=dict)
+    review: dict[str, ReviewState] = Field(default_factory=dict)
 
 
 # --- Manual edit detection ---

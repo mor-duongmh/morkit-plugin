@@ -21,7 +21,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from lib.canonicalize import compute_hash  # noqa: E402
-from lib.diff_schema import DocMeta, MetaSidecar, now_iso, save_meta  # noqa: E402
+from lib.diff_schema import (  # noqa: E402
+    DocMeta,
+    MetaSidecar,
+    ReviewState,
+    load_meta,
+    now_iso,
+    save_meta,
+)
 from lib.markdown_ast import parse_doc  # noqa: E402
 
 # Detect doc version from a revision history row like:
@@ -105,6 +112,44 @@ def reset_doc(meta: MetaSidecar, doc_relpath: str) -> MetaSidecar:
     """Remove a doc entry (forces rebuild on next run)."""
     meta.docs.pop(doc_relpath, None)
     return meta
+
+
+# --- Review-gate state (per-doc human review loop + resume) ---
+
+
+def get_review_state(meta_path: str | Path, doc_name: str) -> str | None:
+    """Return review status ('pending'|'approved') for a doc, or None if absent."""
+    meta = load_meta(meta_path)
+    state = meta.review.get(doc_name)
+    return state.status if state else None
+
+
+def set_review_state(
+    meta_path: str | Path, doc_name: str, status: str
+) -> MetaSidecar:
+    """Set review status for a doc, preserving any existing snapshot baseline."""
+    if status not in ("pending", "approved"):
+        # Fail fast on the write rather than corrupting the meta file (a bad
+        # value would crash the NEXT load_meta with a pydantic ValidationError).
+        raise ValueError(f"invalid review status: {status!r} (pending|approved)")
+    meta = load_meta(meta_path)
+    state = meta.review.get(doc_name) or ReviewState()
+    state.status = status  # type: ignore[assignment]
+    if status == "approved":
+        state.promoted_at = now_iso()
+    meta.review[doc_name] = state
+    save_meta(meta, meta_path)
+    return meta
+
+
+def list_pending(meta_path: str | Path, doc_names: list[str]) -> list[str]:
+    """Return docs not yet approved — drives resume (approved docs are skipped)."""
+    meta = load_meta(meta_path)
+    return [
+        name
+        for name in doc_names
+        if (meta.review.get(name).status if meta.review.get(name) else None) != "approved"
+    ]
 
 
 def main() -> int:

@@ -153,15 +153,36 @@ mkdir -p "$PROJECT_TMP"
 #     decisions the assumption is written into the entity's
 #     description prefixed with "[ASSUMPTION] ".
 
-# 3. Dispatch to sub-skills (CLAUDE_PLUGIN_ROOT inherited from env)
-#    $OUTPUTS = user-selected subset, e.g. "srs,api" or "srs,api,db"
+# 3. Dispatch to sub-skills (CLAUDE_PLUGIN_ROOT inherited from env).
+#    Split the selected outputs by review policy:
+#      DIRECT_OUTPUTS  = selected ∩ {srs, guidelines}  → render straight to docs/
+#                        (srs is out of the review-gate scope; guidelines gets a
+#                         light post-render confirm in step 3b).
+#      STAGED_OUTPUTS  = selected ∩ {api, db, arch, standards, summary}
+#                        → render to a staging dir, then per-doc Review Gate loop.
+STAGING="$PROJECT_TMP/staged"
+mkdir -p "$STAGING"
+
+# 3a. Direct render (srs + guidelines, whichever are selected)
 "$PY" "$ORCH_SCRIPTS/dispatch_coordinator.py" init \
   --project-model "$PROJECT_TMP/project-model.json" \
   --language EN \
-  --outputs "$OUTPUTS" \
+  --outputs "$DIRECT_OUTPUTS" \
   --docs-dir "$PROJECT_DOCS_DIR"
 
-# 4. Aggregate report
+# 3b. Staged render for the 5 code-derived docs (renderer unchanged — only the
+#     target dir differs). Then run the Review Gate (per-doc loop) below.
+"$PY" "$ORCH_SCRIPTS/dispatch_coordinator.py" init \
+  --project-model "$PROJECT_TMP/project-model.json" \
+  --language EN \
+  --outputs "$STAGED_OUTPUTS" \
+  --docs-dir "$STAGING"
+
+# 3c. Review Gate (per-doc loop) — see "## Review Gate (per-doc loop)" below.
+#     For each staged doc: snapshot baseline → surface → [Approve | Sửa tiếp] →
+#     promote into docs/. Then a light confirm for design-guidelines.
+
+# 4. Aggregate report (over the PROMOTED docs only)
 "$PY" "$ORCH_SCRIPTS/aggregate_report.py" \
   --docs-dir "$PROJECT_DOCS_DIR" \
   --output "$PROJECT_TMP/init-report.md"
@@ -176,6 +197,75 @@ mkdir -p "$PROJECT_TMP"
 #    from docs-plan.md is either resolved in the rendered docs or
 #    explicitly carried forward as a <TBD: ...> placeholder.
 ```
+
+## Review Gate (per-doc loop)
+
+A **human review gate** sits between staged render and `docs/`. It is the single
+source of truth for the loop — brownfield `init` (step 3c above) and greenfield
+`G7` both reference this section instead of duplicating it.
+
+**Scope:** the 5 code-derived docs — `api`, `db`, `arch`, `standards`, `summary`.
+`srs` renders directly (out of scope; greenfield G6 already gates requirements).
+`design-guidelines` gets the light confirm at the end, not the full loop.
+
+**Policy: warn-only.** Skipping review never blocks coding — an un-approved doc
+simply is not promoted into `docs/`, and the run ends with a warning. There is
+NO `PreToolUse` hook and no hard block.
+
+**State + baseline live in `.docs-hero-meta.json`** (same sidecar as
+`section_hashes`): `review.<doc> = {status, baseline_hashes, baseline_order}`.
+This is what makes the loop resumable and edit-preserving.
+
+The `review_gate.py` mechanics (each runs against the staging dir):
+
+```bash
+RG="$ORCH_SCRIPTS/review_gate.py"
+STAGING="$PROJECT_TMP/staged"
+
+# Record the PRE-edit baseline right after render (must precede any edit).
+"$PY" "$RG" snapshot --staged "$STAGING/<doc>" --doc-name "<doc>" --meta "$PROJECT_META"
+
+# Build the review surface (section list + ID-section diff vs docs/<doc>) as JSON.
+"$PY" "$RG" surface  --staged "$STAGING/<doc>" --doc-name "<doc>" --docs-dir "$PROJECT_DOCS_DIR"
+
+# Promote the (possibly reviewer-edited) staged doc into docs/ + mark approved.
+"$PY" "$RG" promote  --staged "$STAGING/<doc>" --doc-name "<doc>" \
+  --docs-dir "$PROJECT_DOCS_DIR" --meta "$PROJECT_META"
+```
+
+**Keystone:** `snapshot` records the hash of the **pre-edit render**, and
+`promote` writes that pre-edit hash into `section_hashes`. So any section the
+reviewer edits while reviewing registers as `manual_edit` and survives later
+`update`/`sync` (locked by `tests/test_review_edit_preservation.py`). NEVER
+snapshot after the reviewer edits.
+
+**LLM-driven loop** (Claude orchestrates; Python only does the mechanics):
+
+```
+pending = meta_manager.list_pending(PROJECT_META, STAGED_OUTPUTS_FILES)  # resume-aware
+for doc in pending:                      # approved docs from a prior run are skipped
+    review_gate snapshot <doc>           # pre-edit baseline
+    loop:
+        surface <doc>  →  present sections + ⚠ flags via AskUserQuestion [Approve | Sửa tiếp]
+          Approve  → review_gate promote <doc>  → next doc
+          Sửa tiếp → reviewer edits $STAGING/<doc> and saves, OR gives feedback
+                     → re-render that one doc into staging → snapshot again → surface again
+```
+
+- **⚠ low-confidence flags:** when `surface` returns an empty diff (doc has no
+  ID-anchored sections) or large churn, Claude flags it ⚠ in the question so the
+  reviewer looks closer.
+- **Anchorless-doc caveat:** prose-only docs with no ID-anchored sections (e.g.
+  `codebase-summary.md`) have an empty section-hash baseline, so a review-time
+  prose edit is NOT auto-flagged as `manual_edit` by `update`/`sync`. For those
+  docs the ⚠ flag + reviewer judgement is the protection, not the diff engine.
+- **design-guidelines confirm (light):** after its direct render, ask ONE
+  AskUserQuestion `[OK | Sửa | Bỏ]`. `OK` keeps it; `Sửa` → reviewer edits
+  `docs/design-guidelines.md` directly; `Bỏ` → note it was skipped. No per-section loop.
+- **Warn-only summary (end of run):** after the loop, report any doc still
+  `pending` — `"N docs chưa review (chưa promote vào docs/): …"`. Coding is NOT blocked.
+- **Resume:** re-running `init` calls `list_pending` first, so already-approved
+  docs are skipped and only un-approved docs re-enter the loop.
 
 ## Update Flow
 

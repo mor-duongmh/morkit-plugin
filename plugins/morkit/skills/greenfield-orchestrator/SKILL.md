@@ -57,7 +57,7 @@ writes are atomic (`state_manager.py`), so a kill mid-pipeline never corrupts it
 | **G4** Clarify | `clarification-loop` → `clarification-log.md` | **enough-answered / force-close** | gate → `advance` → G5 |
 | **G5** Bridge | `build-project-model` → `project-model.json` (validated) | — | `advance` → G6 |
 | **G6** SRS+Visual | `init --outputs srs` + visualize | **stakeholder review** | gate `proceed` → `advance` → G7 |
-| **G7** DesignDocs | `init --outputs arch,standards,summary,db` (+ `api`,`guidelines` if selected) → QA via `docs-reviewer` | — | mark `done` |
+| **G7** DesignDocs | `init --outputs arch,standards,summary,db` (+ `api`,`guidelines` if selected) → **per-doc Review Gate (warn-only soft gate)** → promote → QA via `docs-reviewer` | review-loop (warn-only) | mark `done` |
 
 Per stage: run the action → on success `state_manager set-stage <Gx> done <artifact>`
 → for gated stages run the checklist-driven gate (below) → `advance` (which hard-blocks
@@ -108,24 +108,44 @@ re-asked. The validated `project-model.json` is consumed unchanged:
 
 ```bash
 ORCH="${CLAUDE_PLUGIN_ROOT:?}/skills/docs-hero-orchestrator/scripts"
-# G6: SRS
+STAGING="$PWD/.tmp/staged"; mkdir -p "$STAGING"
+# G6: SRS (no review gate — G6's stakeholder gate already covers requirements)
 "$PY" "$ORCH/dispatch_coordinator.py" init \
   --project-model "$WS/project-model.json" --language "$LANG" \
   --outputs srs --docs-dir "$PWD/docs"
-# G7: design docs (outputs resolved from the user's selection)
+# G7: design docs. The 5 code-derived docs render to STAGING and pass through the
+#     per-doc Review Gate before promotion; guidelines renders direct + light confirm.
 "$PY" "$ORCH/dispatch_coordinator.py" init \
   --project-model "$WS/project-model.json" --language "$LANG" \
-  --outputs arch,standards,summary,db --docs-dir "$PWD/docs"
+  --outputs arch,standards,summary,db --docs-dir "$STAGING"
+# (+ api to STAGING, + guidelines direct to docs/, when the user selected them)
 ```
 
-## QA gate (after G7 render — reuses /morkit:init's gate)
+**G7 Review Gate (per-doc loop):** for each staged design doc, run the loop
+defined once in `docs-hero-orchestrator/SKILL.md` → "Review Gate (per-doc loop)"
+(`review_gate.py` snapshot → surface → AskUserQuestion `[Approve | Sửa tiếp]` →
+promote; `--meta "$PWD/docs/.docs-hero-meta.json"`). `design-guidelines` gets the
+light `[OK | Sửa | Bỏ]` confirm. **Do NOT copy the loop here — reference it**, so
+brownfield and greenfield stay in sync.
 
-Once all docs are rendered, spawn the `docs-reviewer` agent (Task tool,
-`subagent_type: docs-reviewer`) to validate the full `docs/` set
-(cross-references + BrSE quality + Mermaid). This is the same QA agent
+> **Convention — G7 is a warn-only soft gate (divergence, by design).** Unlike
+> G2/G3/G4/G6, G7 is **NOT** wired into the `advance()`-guard / `set-gate`
+> checklist engine. Skipping a doc's review never hard-blocks: the doc is just
+> not promoted and is reported in the warn-only summary. This is the user-chosen
+> trade-off (per the plan's Open Question #1) so doc review can't stall a
+> greenfield run. **Do not "fix" this into a hard block** without re-confirming
+> with the user. *(v2 hook: a review-checklist per doc-type could reuse
+> `references/gate-checklists/` to upgrade this to a real gate.)*
+
+## QA gate (after G7 promote — reuses /morkit:init's gate)
+
+Once the reviewed docs are **promoted** into `docs/`, spawn the `docs-reviewer`
+agent (Task tool, `subagent_type: docs-reviewer`) to validate the full `docs/`
+set (cross-references + BrSE quality + Mermaid). This is the same QA agent
 `/morkit:init` runs at its final step — greenfield reuses it so
 greenfield-generated docs get an identical gate. Surface the report path to the
-user, then `state_manager set-stage G7 done "$PWD/docs"`.
+user (including any docs left un-promoted by the warn-only review gate), then
+`state_manager set-stage G7 done "$PWD/docs"`.
 
 ## Visualize (G6, stakeholder-facing)
 

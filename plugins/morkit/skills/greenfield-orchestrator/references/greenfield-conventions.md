@@ -35,7 +35,12 @@ workspace. The workspace holds only intermediate/BA artifacts.
 | G4 | Clarify | `clarification-loop` | **enough-answered/force-close** | `clarification-log.md` |
 | G5 | Bridge | `build-project-model` | — | `project-model.json` |
 | G6 | SRS+Visual | `init --outputs srs` + visualize | **BrSE/BA review** | `docs/srs.md`, `srs.html` |
-| G7 | DesignDocs | `init --outputs arch,standards,summary,db` | — | `docs/*.md` |
+| G7 | DesignDocs | `init --outputs arch,standards,summary,db` | _review-loop (warn-only soft gate)_ | `docs/*.md` |
+
+The G7 gate is **warn-only**: it is the per-doc Review Gate (staged render →
+`[Approve | Sửa tiếp]` → promote), NOT the `set-gate`/`advance()` checklist engine
+that hard-blocks G2/G3/G4/G6. Skipping review never blocks the run — see
+`docs-hero-orchestrator/SKILL.md` → "Review Gate (per-doc loop)".
 
 Stage order is fixed; gates persist their decision into `state.json` (§3). Stages
 align with `init`'s existing `docs-plan.md` §0–§5 gap/risk flow (reference, don't fork).
