@@ -8,9 +8,9 @@ required: [G2-A1, G2-A2, G2-C1]
 
 # [G2] Checklist Human Gate — Phân rã yêu cầu (Requirement Decomposition)
 
-> Nguồn gate cho `/morkit:greenfield`. Orchestrator đọc `required` (front-matter)
-> để render mục bắt buộc vào gate và chặn `advance` tới khi đủ. Vẫn tick tay được
-> khi chạy offline ngoài orchestrator.
+> Nguồn gate cho `/morkit:greenfield`. Orchestrator ghi bản tick được của checklist này
+> vào workspace; người soát tick `- [x]`; Approve đọc lại `required` (front-matter) đã tick
+> để chặn `advance` tới khi đủ. Vẫn tick tay được khi chạy offline ngoài orchestrator.
 > Gate gốc: `../greenfield-conventions.md` §2–3 · Vai trò: **BrSE**
 > Mục đích: soát chất lượng **phân rã yêu cầu** từ tài liệu khách thành danh sách có cấu trúc.
 > Artifact: `morkit/output/greenfield/<proj>/user-story-list.md` — dạng

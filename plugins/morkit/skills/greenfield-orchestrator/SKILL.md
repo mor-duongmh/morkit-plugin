@@ -30,6 +30,7 @@ test -d "${HOME}/.claude/plugins/data/docs-hero/.venv" || {
   echo "ERROR: venv not initialized. Run /morkit:setup first." >&2; exit 1; }
 SM="${CLAUDE_PLUGIN_ROOT:?}/skills/greenfield-orchestrator/scripts/state_manager.py"
 CL="${CLAUDE_PLUGIN_ROOT:?}/skills/greenfield-orchestrator/scripts/checklist_loader.py"
+GR="${CLAUDE_PLUGIN_ROOT:?}/skills/greenfield-orchestrator/scripts/gate_review.py"
 WS="morkit/output/greenfield/<proj-slug>"
 ```
 
@@ -72,13 +73,13 @@ subset lives in the canonical checklist
 `proceed` with every `required` item confirmed (G4 `force-close` may leave with
 a note) — so a gate can't be rubber-stamped past.
 
-**Gate procedure (every gated stage `Gx`):**
-1. Load the must-pass subset: `"$PY" "$CL" show --gate Gx` → read `required` + item titles.
-2. Render those items (title + `Tiêu chí:`) in visible text, then `AskUserQuestion`:
-   one multiSelect "Mục bắt buộc nào đã ĐẠT?" (options = the required items) + the decision question.
-3. Persist with the confirmed ids: `set-gate --decision <enum> --checklist-required <all> --checklist-confirmed <met>`.
-4. `advance`. If required ids are missing (or decision isn't a pass) it raises — report
-   "gate chưa đủ điều kiện, ở lại Gx" and re-run the stage; never fabricate a pass.
+**Gate procedure (every gated stage `Gx`) — file-based (KHÔNG dùng multiSelect-of-required):**
+1. **Ghi bản tick được:** `"$PY" "$GR" write --gate Gx --dest "$WS/gate-Gx-checklist.md"` (idempotent — giữ tick nếu file đã tồn tại). In đường dẫn cho người soát.
+2. **Người soát mở file**, tick `- [x]` mọi mục đã đạt — đọc cả mục KHÔNG bắt buộc (B-items) như tiêu chí chất lượng — rồi lưu. Toàn bộ checklist hiện trong file, không mục nào bị giấu.
+3. `AskUserQuestion` **[Approve | Update docs | <escape>]** — escape = **Abort** (G2/G3/G6) hoặc **Force-close** (G4):
+   - **Approve → Verify:** đọc required đã tick từ file (`gate_review confirmed`) → `set-gate proceed` → `advance`. Required nào chưa tick → `advance` raise → báo *"tick nốt mục bắt buộc trong `$WS/gate-Gx-checklist.md` rồi Approve lại"*. KHÔNG bịa pass.
+   - **Update docs →** xem "§ Update docs → brainstorm" bên dưới (ghi note → `adjust` → handoff brainstorm).
+   - **Abort / Force-close:** `set-gate` `null` / `force-close` (+ note bắt buộc cho G4).
 
 Decision enums per gate (label → enum, from each checklist's `decisions`):
 
@@ -92,12 +93,26 @@ Decision enums per gate (label → enum, from each checklist's `decisions`):
 - **G6 — stakeholder SRS review:** `Proceed` / `Revise` (`adjust`) / `Abort`.
 
 ```bash
-# G2 — confirm the must-pass subset surfaced from the checklist, then advance:
+# Gate Gx (vd G2) — file-based: write copy → reviewer tick file → Approve verify → advance.
+"$PY" "$GR" write --gate G2 --dest "$WS/gate-G2-checklist.md"   # idempotent; in path cho reviewer
+# → reviewer mở "$WS/gate-G2-checklist.md", tick `- [x]` mục đã đạt, lưu; AskUserQuestion → Approve:
 REQ=$("$PY" "$CL" show --gate G2 | "$PY" -c 'import json,sys;print(",".join(json.load(sys.stdin)["required"]))')
+CONF=$("$PY" "$GR" confirmed --path "$WS/gate-G2-checklist.md" | "$PY" -c 'import json,sys;print(",".join(json.load(sys.stdin)))')
 "$PY" "$SM" set-gate --state "$WS/state.json" --stage G2 --decision proceed \
-  --note "BrSE confirmed function list" --checklist-required "$REQ" --checklist-confirmed "$REQ"
-"$PY" "$SM" advance  --state "$WS/state.json"   # raises if any required id is unconfirmed
+  --note "BrSE confirmed function list" --checklist-required "$REQ" --checklist-confirmed "$CONF"
+"$PY" "$SM" advance  --state "$WS/state.json"   # raises nếu required nào chưa tick → "tick nốt rồi Approve lại"
 ```
+
+### Update docs → brainstorm (nhánh `adjust` của mọi gate)
+
+Khi người soát chọn **Update docs** ở bất kỳ gate Gx (gồm cả G4 — thay vai "another round" cũ):
+
+1. **Bắt free-text** "phần cần update" (qua `AskUserQuestion`/prompt) → ghi `"$WS/gate-Gx-update-notes.md"`.
+2. **Persist:** `"$PY" "$SM" set-gate --state "$WS/state.json" --stage Gx --decision adjust --note "<tóm tắt>"` (gate KHÔNG advance — `advance` raise, stage ở lại Gx → run resumable).
+3. **Xóa workspace copy** `"$WS/gate-Gx-checklist.md"` để lần render sau tạo bản mới sạch từ canonical (tick cũ không dính sang artifact đã sửa).
+4. **Handoff `/morkit:brainstorm`** với context = {`gate-Gx-update-notes.md`, artifact đang gate, checklist canonical}. Sau khi brainstorm chốt, **người dùng re-run stage Gx thủ công** (orchestrator in lệnh resume) → artifact re-render → gate ghi copy mới → soát lại.
+
+> **CHỐNG RE-ENTRANCY (bắt buộc):** KHÔNG invoke `/morkit:brainstorm` đệ quy đồng bộ từ trong gate. Đây là **handoff qua `state.json`**: gate ghi `adjust` rồi *kết thúc lượt*; brainstorm là phiên độc lập; re-run stage là bước tuần tự sau đó. Greenfield run resumable nên không có call lồng nhau / vòng lặp.
 
 ## G6 / G7 — delegate to the render backend (no new render code)
 

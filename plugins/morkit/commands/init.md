@@ -35,22 +35,30 @@ Route on the answer:
 
 **Ask the user which doc types to generate (BEFORE invoking the orchestrator):**
 
-If the user did NOT pass `--outputs` on the command line, you MUST call **AskUserQuestion** with `multiSelect: true` to let them pick which documents to generate. Do not assume — always ask.
+If the user did NOT pass `--outputs` on the command line, you MUST call **AskUserQuestion** to let them pick which documents to generate. Do not assume — always ask.
 
-Question template:
-- question: "Bạn muốn generate những loại tài liệu nào?"
-- header: "Doc types"
+There are 7 doc types but `AskUserQuestion` allows at most **4 options per question**. Send BOTH questions below in a **single AskUserQuestion call** (the `questions` array holds both), each with `multiSelect: true`. Then take the **union** of the two answers as the full selection.
+
+Question 1 — spec & structure docs:
+- question: "Tài liệu spec & cấu trúc nào?"
+- header: "Spec docs"
 - multiSelect: true
 - options:
   - label: "SRS", description: "Software Requirements Specification (BrSE template, 13 sections + screen specs)"
   - label: "API docs", description: "REST endpoints + cURL samples + error codes"
   - label: "DB design", description: "Tables, indexes, Mermaid ERD"
   - label: "System Architecture", description: "arc42-lite (8 sections) + Mermaid component diagram"
+
+Question 2 — standards & design docs:
+- question: "Tài liệu chuẩn & thiết kế nào?"
+- header: "Standards docs"
+- multiSelect: true
+- options:
   - label: "Code Standards", description: "Conventional Commits + auto-extracted lint/format rules"
   - label: "Codebase Summary", description: "README-style: tech stack, repo layout, packages, entry points, LOC by language"
   - label: "Design Guidelines", description: "Design Principles + Patterns + ADRs (MADR format)"
 
-Map the user's selection to the `--outputs` flag:
+Map the user's combined selection (union of both questions) to the `--outputs` flag:
 - SRS → `srs`
 - API docs → `api`
 - DB design → `db`

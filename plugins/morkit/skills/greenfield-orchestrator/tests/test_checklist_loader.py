@@ -52,6 +52,24 @@ def test_parse_fixture(tmp_path):
     assert by_id["G6-A1"]["title"] == "First item"
 
 
+def test_parse_captures_checkbox_state(tmp_path):
+    """Loader reports per-item `checked` bool from `- [x]` vs `- [ ]`."""
+    ticked = FIXTURE.replace("- [ ] [G6-A1]", "- [x] [G6-A1]")
+    data = cl.load(_write(tmp_path, "g6-x.md", ticked))
+    by_id = {it["id"]: it for it in data["items"]}
+    assert by_id["G6-A1"]["checked"] is True
+    assert by_id["G6-A2"]["checked"] is False
+    assert by_id["G6-C1"]["checked"] is False
+
+
+def test_parse_captures_uppercase_checkbox(tmp_path):
+    """`[X]` (uppercase) counts as checked too."""
+    ticked = FIXTURE.replace("- [ ] [G6-C1]", "- [X] [G6-C1]")
+    data = cl.load(_write(tmp_path, "g6-x.md", ticked))
+    by_id = {it["id"]: it for it in data["items"]}
+    assert by_id["G6-C1"]["checked"] is True
+
+
 def test_dangling_required_raises(tmp_path):
     bad = FIXTURE.replace("required: [G6-A1, G6-C1]", "required: [G6-A1, G6-ZZ]")
     with pytest.raises(ValueError, match="not found"):
@@ -87,6 +105,8 @@ def test_real_checklist_required_subset(gate):
     path = cl.find_gate(gate, CANONICAL_DIR)
     data = cl.load(path)
     assert data["gate"] == gate
+    # Sanity bound only — the file-based gate no longer renders required as
+    # AskUserQuestion options, so the old 4-option cap no longer constrains this.
     assert 1 <= len(data["required"]) <= 5, f"{gate}: required must be a small subset"
     ids = {it["id"] for it in data["items"]}
     assert set(data["required"]) <= ids, f"{gate}: dangling required ids"

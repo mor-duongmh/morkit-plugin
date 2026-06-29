@@ -8,9 +8,9 @@ required: [G6-A3, G6-A4, G6-C1]
 
 # [G6] Checklist Human Gate — SRS Review (BrSE/BA soát SRS)
 
-> Nguồn gate cho `/morkit:greenfield`. Orchestrator đọc `required` (front-matter)
-> để render mục bắt buộc vào gate và chặn `advance` tới khi đủ. Vẫn tick tay được
-> khi chạy offline ngoài orchestrator.
+> Nguồn gate cho `/morkit:greenfield`. Orchestrator ghi bản tick được của checklist này
+> vào workspace; người soát tick `- [x]`; Approve đọc lại `required` (front-matter) đã tick
+> để chặn `advance` tới khi đủ. Vẫn tick tay được khi chạy offline ngoài orchestrator.
 > Gate gốc: `../greenfield-conventions.md` §2–3 · Vai trò: **BrSE/BA**
 > Artifact soát: `docs/srs.md`, `docs/srs.html` (render từ `project-model.json`)
 

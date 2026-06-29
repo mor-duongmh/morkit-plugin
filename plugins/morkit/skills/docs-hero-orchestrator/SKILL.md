@@ -87,7 +87,7 @@ Parse first arg:
 - `sync` → fan out to sub-skills' `*_sync_propose.py` for `api`/`db`/`arch`/`standards`/`summary` (no doc mutation; `srs` and `guidelines` skip)
 - `apply-sync` → call sub-skill's `*_sync_apply.py` to convert proposal → Delta → run update
 - `rebuild-meta` → meta-manager rebuild
-- empty → AskUserQuestion (5 operations)
+- empty → AskUserQuestion to pick one operation. `AskUserQuestion` caps at **4 options/question**, so present the 4 primary ops (`init` / `update` / `sync` / `apply-sync`); `rebuild-meta` is a maintenance op reachable via the Other field or by invoking it explicitly.
 
 Allowed `--outputs` values: `srs`, `api`, `db`, `arch`, `standards`, `summary`, `guidelines` (comma-separated, multi-select).
 
@@ -95,10 +95,11 @@ Allowed `--outputs` values: `srs`, `api`, `db`, `arch`, `standards`, `summary`, 
 
 **Doc-type selection (REQUIRED before dispatch):** when invoked via `/docs-hero:init`
 without an explicit `--outputs` flag, the caller (slash command) MUST ask the user
-via AskUserQuestion which doc types to generate (multi-select: SRS / API docs /
-DB design) and pass the resolved comma-separated list as `--outputs`. Never
-default silently to all three — the user picks. See `commands/init.md` for the
-exact question template.
+via AskUserQuestion which of the 7 doc types to generate and pass the resolved
+comma-separated list as `--outputs`. Because `AskUserQuestion` caps at 4
+options/question, the 7 types are split across **two `multiSelect` questions** sent
+in one call (spec docs / standards docs) and the answers are unioned. Never default
+silently — the user picks. See `commands/init.md` for the exact question template.
 
 ```bash
 # Pre-flight

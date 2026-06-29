@@ -30,9 +30,9 @@ from pathlib import Path
 VALID_DECISIONS = {"proceed", "adjust", "force-close", None}
 GATES = {"G2", "G3", "G4", "G6"}
 
-# `- [ ] [G6-A3] **Title** ...`  (checkbox state ignored; id captured, title parsed below).
+# `- [ ] [G6-A3] **Title** ...`  (checkbox state captured as `state`; id + title parsed below).
 # Bold title is optional so a well-formed `- [ ] [ID] ...` item is never silently dropped.
-_ITEM_RE = re.compile(r"^- \[[ xX]\]\s+\[(?P<id>[A-Z0-9-]+)\]\s+(?P<rest>.+)$")
+_ITEM_RE = re.compile(r"^- \[(?P<state>[ xX])\]\s+\[(?P<id>[A-Z0-9-]+)\]\s+(?P<rest>.+)$")
 _BOLD_RE = re.compile(r"\*\*(.+?)\*\*")
 
 
@@ -122,7 +122,8 @@ def parse_items(body: str) -> "list[dict]":
         rest = m.group("rest").strip()
         bold = _BOLD_RE.search(rest)
         title = bold.group(1).strip() if bold else rest
-        items.append({"id": m.group("id"), "title": title})
+        checked = m.group("state").lower() == "x"
+        items.append({"id": m.group("id"), "title": title, "checked": checked})
     return items
 
 

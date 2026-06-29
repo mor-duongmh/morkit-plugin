@@ -8,9 +8,9 @@ required: [G3-A2, G3-A5, G3-B2]
 
 # [G3] Checklist Human Gate — Phân tích Gap & Risk (BA soát)
 
-> Nguồn gate cho `/morkit:greenfield`. Orchestrator đọc `required` (front-matter)
-> để render mục bắt buộc vào gate và chặn `advance` tới khi đủ. Vẫn tick tay được
-> khi chạy offline ngoài orchestrator.
+> Nguồn gate cho `/morkit:greenfield`. Orchestrator ghi bản tick được của checklist này
+> vào workspace; người soát tick `- [x]`; Approve đọc lại `required` (front-matter) đã tick
+> để chặn `advance` tới khi đủ. Vẫn tick tay được khi chạy offline ngoài orchestrator.
 > Gate gốc: `../greenfield-conventions.md` §2–3, §6 · Vai trò: **BA**
 > Mục đích: BA soát Gap Analysis + Risk Register trước khi dựng SRS.
 > Artifact: `morkit/output/greenfield/<proj>/gap-analysis.md`, `risk-register.md`
