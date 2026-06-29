@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "morkit:generate-test-cases/cases.json",
+  "title": "Test cases input for the openpyxl writer",
+  "description": "Contract between the SKILL.md agent (producer) and write_test_cases.py (consumer). The agent emits this after the scope gate is approved. The writer NEVER invents content beyond what is here.",
+  "type": "object",
+  "required": ["feature", "language", "sections"],
+  "additionalProperties": false,
+  "properties": {
+    "feature": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Feature/module display name. Written to sheet C1, used to rename the sheet tab (sanitized, <=31 chars, unique), and shown as the Test Report module-code cell. The writer rewrites Test Report formula refs to the renamed tab, so renaming is safe."
+    },
+    "language": {
+      "type": "string",
+      "enum": ["en", "vi", "ja"],
+      "description": "Output language of the B/C/D/E cell text (test-case writing language, asked per run at Step 6). Distinct from the session communication language."
+    },
+    "environment": {
+      "type": "string",
+      "description": "Optional. Test Report Environment value (e.g. 'Web: Chrome, Safari'). Omit to leave blank for the human."
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Ordered sections. Each becomes a standalone B-only header row, followed by its case rows.",
+      "items": {
+        "type": "object",
+        "required": ["name", "cases"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Section header text, written to column B on its own row (e.g. 'General interface', 'Image tab')."
+          },
+          "cases": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/definitions/case" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "case": {
+      "type": "object",
+      "required": ["description", "rows"],
+      "additionalProperties": false,
+      "description": "One logical test item. The first row carries the description (column B); subsequent rows leave B blank (continuation rows that vary precondition/procedure/expected).",
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Test Case Description (column B). Terse imperative, e.g. 'Check \"Image\" tab'. Written only on the FIRST row of this case."
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "description": "One or more rows under this description. rows[0] pairs with the description; rows[1..] are continuation rows (blank B).",
+          "items": { "$ref": "#/definitions/row" }
+        },
+        "viewpoint": {
+          "type": "string",
+          "description": "METADATA ONLY — not written to Excel (template has no viewpoint column). Test viewpoint, e.g. function/performance/security/boundary. Lives in scope.md for coverage tracking."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["normal", "abnormal", "semi-abnormal"],
+          "description": "METADATA ONLY — not written to Excel. Normal vs abnormal classification for coverage tracking."
+        }
+      }
+    },
+    "row": {
+      "type": "object",
+      "required": ["procedure", "expected"],
+      "additionalProperties": false,
+      "properties": {
+        "precondition": {
+          "type": "string",
+          "description": "Pre-Condition (column C). Sparse; often blank. Data-state variants like 'No data' / 'Have data'. Omit or empty string for blank."
+        },
+        "procedure": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Test Case Procedure (column D). Numbered '1. ... \\n 2. ...' or freeform ('Check UI'). Use literal \\n for line breaks; writer enables wrap-text."
+        },
+        "expected": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Expected Output (column E). Multiline, bulleted/numbered, concrete values. Use literal \\n for line breaks. NOTE: column A auto-ID counts rows where E is non-empty, so every written row MUST have a non-empty expected."
+        }
+      }
+    }
+  }
+}
