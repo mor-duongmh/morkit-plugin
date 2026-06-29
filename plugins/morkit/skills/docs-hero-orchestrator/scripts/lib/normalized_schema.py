@@ -192,7 +192,6 @@ class Overview(_Base):
     # §1.3 phased development scope. When empty, renderer falls back to
     # in_scope (first stage) / future_scope (later stages).
     development_phases: list[DevelopmentPhase] = Field(default_factory=list)
-    pending_questions: list[OpenQuestion] = Field(default_factory=list)
     stakeholders: list[Stakeholder] = Field(default_factory=list)
     references: list[Reference] = Field(default_factory=list)
 

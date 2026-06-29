@@ -40,11 +40,6 @@ HEADINGS: dict[str, dict[str, str]] = {
     "in_scope": {"JP": "今回対象範囲", "EN": "In-scope for This Release", "VN": "Trong phạm vi"},
     "out_of_scope": {"JP": "対象外", "EN": "Out-of-scope", "VN": "Ngoài phạm vi"},
     "future_scope": {"JP": "将来対応", "EN": "Future Scope", "VN": "Phạm vi tương lai"},
-    "pending_confirmation": {
-        "JP": "未確定・要確認",
-        "EN": "Pending Confirmation",
-        "VN": "Chờ xác nhận",
-    },
     "stakeholders": {"JP": "ステークホルダー", "EN": "Stakeholders", "VN": "Bên liên quan"},
     "references": {"JP": "参考資料", "EN": "References", "VN": "Tài liệu tham khảo"},
     # --- SRS template restructure (§1 purpose, terminology, actors; UC detail) ---

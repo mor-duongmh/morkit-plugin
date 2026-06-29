@@ -315,7 +315,7 @@ def _render_uc_detail(uc, model: ProjectModel, lang: Language) -> str:
         out += diagram
 
     out += "| Field | Value |\n|---|---|\n"
-    out += f"| {t('description', lang)} | {_safe(uc.description or uc.summary)} |\n"
+    out += f"| {t('description', lang)} | {_safe(uc.description or uc.summary or uc.goal)} |\n"
     out += f"| Actor | {uc.actor} |\n"
     out += f"| Priority | {uc.priority.value} |\n"
     out += f"| {t('trigger', lang)} | {_safe(uc.trigger)} |\n"
