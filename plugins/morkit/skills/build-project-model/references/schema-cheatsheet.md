@@ -46,7 +46,7 @@ empty-inputs path). Everything else defaults to empty lists.
 
 ### Overview (`overview`)
 ⬜ `purpose`, `background`, `in_scope: [str]`, `out_of_scope: [str]`,
-`future_scope: [str]`, `pending_questions: [OpenQuestion]`, `stakeholders`, `references`.
+`future_scope: [str]`, `stakeholders`, `references`.
 
 ### FunctionalRequirement (`functional_requirements[]`)
 ⬛ `id` (regex `^FR-[A-Z0-9_-]+$`, e.g. `FR-001`), `name`.

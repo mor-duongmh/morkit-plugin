@@ -127,8 +127,20 @@ class Stakeholder(_Base):
     approval_authority: Optional[bool] = None
 
 
+class SystemActor(_Base):
+    """SRS §1.6 business actor that uses the system (e.g. NVTN, KH).
+
+    Distinct from Stakeholder (§1.7 = who approves / is concerned) and
+    Role (§5 = access-control / permissions). This is the early
+    "who operates the system" list in business terms.
+    """
+
+    name: str  # e.g. "NVTN", "KH"
+    description: str = ""
+
+
 class Reference(_Base):
-    """SRS §1.6 reference document entry (REF-001)."""
+    """SRS §1.4 reference document entry (REF-001)."""
 
     id: str  # REF-001
     document: str = ""
@@ -147,7 +159,7 @@ class TargetRelease(_Base):
 
 
 class OpenQuestion(_Base):
-    """SRS §1.4.4 / §12 open question (Q-001)."""
+    """SRS §12 open question (Q-001). (The §1.4.4 pending block was removed.)"""
 
     id: str  # Q-001
     date: Optional[str] = None
@@ -161,6 +173,13 @@ class OpenQuestion(_Base):
     related_id: Optional[str] = None
 
 
+class DevelopmentPhase(_Base):
+    """SRS §1.3 a development stage with the features planned for it."""
+
+    phase: str  # e.g. "Giai đoạn 1", "Giai đoạn 2"
+    items: list[str] = Field(default_factory=list)
+
+
 class Overview(_Base):
     purpose: str = ""
     background: str = ""
@@ -168,7 +187,11 @@ class Overview(_Base):
     in_scope: list[str] = Field(default_factory=list)
     out_of_scope: list[str] = Field(default_factory=list)
     future_scope: list[str] = Field(default_factory=list)
-    pending_questions: list[OpenQuestion] = Field(default_factory=list)
+    # §1.2 system strengths (why this system is better than no/old system).
+    strengths: list[str] = Field(default_factory=list)
+    # §1.3 phased development scope. When empty, renderer falls back to
+    # in_scope (first stage) / future_scope (later stages).
+    development_phases: list[DevelopmentPhase] = Field(default_factory=list)
     stakeholders: list[Stakeholder] = Field(default_factory=list)
     references: list[Reference] = Field(default_factory=list)
 
@@ -184,7 +207,8 @@ class UseCase(_Base):
     name: str
     actor: str
     summary: str = ""
-    # Extended (§2.5)
+    # Extended (§2.3 detail)
+    description: Optional[str] = None
     trigger: Optional[str] = None
     main_success_scenario: list[str] = Field(default_factory=list)
     exception: Optional[str] = None
@@ -193,7 +217,11 @@ class UseCase(_Base):
     goal: Optional[str] = None
     precondition: Optional[str] = None
     postcondition: Optional[str] = None
+    # Single-screen kept for backward compat; renderer prefers related_screens
+    # and falls back to [related_screen] when the list is empty.
     related_screen: Optional[str] = None
+    related_screens: list[str] = Field(default_factory=list)
+    business_rules: list[str] = Field(default_factory=list)  # BR-NNN refs
     alternate_scenarios: list[str] = Field(default_factory=list)
     exception_scenarios: list[str] = Field(default_factory=list)
 
@@ -723,6 +751,9 @@ class GlossaryEntry(_Base):
     term_jp: Optional[str] = None
     term_en: Optional[str] = None
     term_vn: Optional[str] = None
+    # §1.5 single-language terminology table abbreviation column ("Viết tắt").
+    # STT (row number) is generated at render time, not stored here.
+    abbreviation: Optional[str] = None
     definition: str = ""
 
 
@@ -932,6 +963,7 @@ class ADR(_Entity):
 class ProjectModel(_Base):
     meta: ProjectMeta
     overview: Overview = Field(default_factory=Overview)
+    system_actors: list[SystemActor] = Field(default_factory=list)
     business_flow: BusinessFlow = Field(default_factory=BusinessFlow)
     functional_requirements: list[FunctionalRequirement] = Field(default_factory=list)
     business_rules: list[BusinessRule] = Field(default_factory=list)

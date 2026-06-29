@@ -138,7 +138,7 @@ def test_render_srs_includes_all_main_sections():
 def test_render_srs_jp_uses_japanese_headings():
     model = _build_minimal_model()
     text = render_srs(model, Language.JP)
-    assert "概要" in text
+    assert "ドキュメントの目的" in text  # §1 Document Purpose (was 概要 Overview)
     assert "機能要件" in text
     assert "非機能要件" in text
 
@@ -146,12 +146,20 @@ def test_render_srs_jp_uses_japanese_headings():
 def test_render_srs_vn_uses_vietnamese_headings():
     model = _build_minimal_model()
     text = render_srs(model, Language.VN)
-    assert "Tổng quan" in text
+    assert "Mục đích tài liệu" in text  # §1 (restructured from "Tổng quan")
+    assert "Luồng nghiệp vụ" in text
     assert "Yêu cầu chức năng" in text
 
 
-def test_render_srs_fr_main_flow_numbered():
+def test_render_srs_uc_basic_flow_numbered():
+    """UC basic flow steps are numbered (FR flows moved into the §2 use cases)."""
+    from lib.normalized_schema import UseCase
     model = _build_minimal_model()
+    model.business_flow.use_cases = [
+        UseCase(id="UC-001", name="Login", actor="End User",
+                main_success_scenario=["Submit creds", "Validate", "Issue session"],
+                related_fr=["FR-001"])
+    ]
     text = render_srs(model, Language.EN)
     assert "1. Submit creds" in text
     assert "2. Validate" in text
@@ -164,11 +172,14 @@ def test_render_srs_screen_index_links_to_per_screen_file():
 
 
 def test_render_srs_emits_h3_anchors_for_diff_engine():
-    """The diff engine relies on H3 headings with FR-NNN/SCREEN-NNN IDs."""
+    """The diff engine relies on H3 headings with FR-NNN/NFR-NNN/SCREEN-NNN IDs.
+
+    §3.2 emits a minimal per-FR stub anchor so `docs-update` can patch FR changes
+    incrementally — even though the verbose detail now lives in the §2 use cases.
+    """
     model = _build_minimal_model()
     text = render_srs(model, Language.EN)
-    # H3 headings (### prefix) for each FR / NFR / SCREEN
-    assert "### FR-001" in text
+    assert "### FR-001" in text  # minimal stub anchor (not verbose detail)
     assert "### NFR-001" in text
     assert "### SCREEN-001" in text
 
@@ -176,14 +187,16 @@ def test_render_srs_emits_h3_anchors_for_diff_engine():
 # --- template-updated 13-section coverage ---
 
 
-def test_render_srs_includes_13_sections_and_appendices():
-    """Template-updated has 13 numbered sections + Appendix A/B."""
+def test_render_srs_includes_13_sections_and_appendix_a():
+    """Restructured SRS has 13 numbered sections + Appendix A (Glossary appendix B removed)."""
     model = _build_minimal_model()
     text = render_srs(model, Language.EN)
     for token in ("## 0.", "## 1.", "## 2.", "## 3.", "## 4.", "## 5.",
                   "## 6.", "## 7.", "## 8.", "## 9.", "## 10.", "## 11.",
-                  "## 12.", "## 13.", "## Appendix A:", "## Appendix B:"):
+                  "## 12.", "## 13.", "## Appendix A:"):
         assert token in text, f"missing section marker: {token!r}"
+    # Appendix B Glossary was removed; terminology now lives in §1.5.
+    assert "## Appendix B:" not in text
 
 
 def test_render_srs_business_rule_section_renders():
@@ -331,6 +344,111 @@ def test_render_srs_revision_history_includes_reviewer_column():
     # Check the revision-history table header
     assert "Reviewer" in text
     assert "Approval Status" in text
+
+
+# --- template restructure: §1 purpose / terminology / actors ---
+
+
+def test_render_srs_section1_terminology_and_actors_tables():
+    """§1 carries a single-language terminology table (with abbreviation) + actors."""
+    from lib.normalized_schema import GlossaryEntry, SystemActor
+    model = _build_minimal_model()
+    model.glossary = [GlossaryEntry(term_vn="Khách hàng", abbreviation="KH", definition="Người mua")]
+    model.system_actors = [SystemActor(name="NVTN", description="Người tạo đơn")]
+    text = render_srs(model, Language.VN)
+    # §1.5 terminology table header (STT | Khái niệm/Thuật ngữ | Viết tắt | Mô tả)
+    assert "Thuật ngữ viết tắt" in text
+    assert "| STT | Khái niệm/Thuật ngữ | Viết tắt | Mô tả |" in text
+    assert "| 1 | Khách hàng | KH | Người mua |" in text
+    # §1.6 system actors table
+    assert "Đối tượng sử dụng hệ thống" in text
+    assert "| NVTN | Người tạo đơn |" in text
+
+
+def test_render_srs_section1_strengths_and_phases():
+    from lib.normalized_schema import DevelopmentPhase
+    model = _build_minimal_model()
+    model.overview.strengths = ["Tự động hóa"]
+    model.overview.development_phases = [
+        DevelopmentPhase(phase="Giai đoạn 1", items=["Tạo đơn"]),
+        DevelopmentPhase(phase="Giai đoạn 2", items=["Tích điểm"]),
+    ]
+    text = render_srs(model, Language.VN)
+    assert "Điểm mạnh của hệ thống" in text
+    assert "Tự động hóa" in text
+    assert "**Giai đoạn 1**" in text and "**Giai đoạn 2**" in text
+
+
+def test_render_srs_uc_detail_has_diagram_and_inline_screens():
+    """Each UC detail auto-generates a Mermaid workflow and links its screens inline."""
+    from lib.normalized_schema import UseCase
+    model = _build_minimal_model()
+    model.business_flow.use_cases = [
+        UseCase(id="UC-001", name="Login", actor="End User",
+                main_success_scenario=["Enter creds", "Submit"],
+                business_rules=["BR-001"], related_screens=["SCREEN-001"])
+    ]
+    text = render_srs(model, Language.EN)
+    assert "Use Case Diagram" in text
+    assert "flowchart TD" in text and "Start" in text
+    # screen linked inline to its per-screen spec
+    assert "(./screen-specs/SCREEN-001-login.md)" in text
+
+
+def test_uc_mermaid_escapes_special_chars():
+    """Mermaid label sanitizer keeps the diagram syntactically valid."""
+    from lib.normalized_schema import UseCase
+    model = _build_minimal_model()
+    model.business_flow.use_cases = [
+        UseCase(id="UC-001", name="X", actor="A",
+                main_success_scenario=['Pick [combo] "x2"', "Confirm | pay"],
+                exception_scenarios=["Out of stock"])
+    ]
+    text = render_srs(model, Language.EN)
+    # Inspect only the generated Mermaid block (the UC list table keeps raw text).
+    mermaid = text[text.index("flowchart TD"):text.index("```", text.index("flowchart TD"))]
+    # special chars replaced inside node labels: [ ] -> ( ), " -> ', | -> /
+    assert "N1[\"Pick (combo) 'x2'\"]" in mermaid
+    assert "Confirm / pay" in mermaid
+    assert '"x2"' not in mermaid  # double quotes downgraded to single inside labels
+
+
+def test_render_srs_backward_compat_without_new_fields():
+    """A ProjectModel lacking the new fields still renders (TBD placeholders)."""
+    model = ProjectModel(meta=ProjectMeta(project_name="Legacy"))
+    text = render_srs(model, Language.VN)
+    assert "Mục đích tài liệu" in text
+    assert "Thuật ngữ viết tắt" in text  # table renders with _TBD_ row
+    assert "## 3." in text
+
+
+# --- update-mode safety (FR is table-rendered, not section-patched) ---
+
+
+def test_srs_roundtrip_preserves_content_byte_identical():
+    """parse_doc → serialize_blocks must round-trip the restructured SRS losslessly.
+
+    Guards the update-mode risk: §1 (purpose/terminology/actors) and the §3 FR
+    table are non-anchored content; a lossy round-trip would silently drop them.
+    """
+    from lib.normalized_schema import UseCase, GlossaryEntry, SystemActor
+    from lib.markdown_ast import parse_doc, serialize_blocks, split_preamble_postamble
+    model = _build_minimal_model()
+    model.glossary = [GlossaryEntry(term_vn="Khách hàng", abbreviation="KH", definition="Người mua")]
+    model.system_actors = [SystemActor(name="NVTN", description="Tạo đơn")]
+    model.business_flow.use_cases = [
+        UseCase(id="UC-001", name="Login", actor="User",
+                main_success_scenario=["A", "B"], related_screens=["SCREEN-001"])
+    ]
+    md = render_srs(model, Language.VN)
+    blocks = parse_doc(md)
+    preamble, postamble = split_preamble_postamble(md, blocks)
+    order = sorted(blocks.keys(), key=lambda sid: blocks[sid].line_start)
+    rebuilt = serialize_blocks(blocks, order, preamble, postamble)
+    assert rebuilt == md, "round-trip dropped or reordered content"
+    # the at-risk §1 content survives inside the preamble
+    assert "Thuật ngữ viết tắt" in rebuilt
+    assert "Đối tượng sử dụng hệ thống" in rebuilt
 
 
 # --- render_screen_spec ---

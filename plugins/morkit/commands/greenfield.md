@@ -18,7 +18,7 @@ The skill will:
   - **G4** `clarification-loop` → `clarification-log.md` *(clarification gate)*
   - **G5** `build-project-model` → validated `project-model.json` 🌉
   - **G6** `/morkit:init --outputs srs` + visualize → `docs/srs.md`, `srs.html` *(stakeholder gate)*
-  - **G7** `/morkit:init --outputs arch,standards,summary,db` → `docs/*.md`
+  - **G7** `/morkit:init --outputs arch,standards,summary,db` → staged render → **per-doc Review Gate (warn-only)**: `[Approve | Sửa tiếp]` per doc → promote to `docs/*.md` (guidelines: light `[OK | Sửa | Bỏ]` confirm)
   - **QA** `docs-reviewer` agent validates the full `docs/` set (cross-refs + BrSE quality + Mermaid) → QA report
 - Enforce the **4 human gates** (G2, G3, G4, G6) and persist each decision into
   `state.json` so the run is resume-able after a kill.

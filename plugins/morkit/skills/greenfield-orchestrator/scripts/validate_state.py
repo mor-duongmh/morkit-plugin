@@ -101,6 +101,21 @@ def _validate_gate(sid: str, gate: Any) -> list[str]:
         errors.append(
             f"stages.{sid}.gate.decision must be one of {sorted(GATE_DECISIONS)}, got {decision!r}"
         )
+    # Optional checklist record: {required:[str], confirmed:[str]} — drives the
+    # advance hard-block. Absent on legacy/no-checklist gates (allowed).
+    if gate.get("checklist") is not None:
+        errors.extend(_validate_checklist(sid, gate["checklist"]))
+    return errors
+
+
+def _validate_checklist(sid: str, checklist: Any) -> list[str]:
+    if not isinstance(checklist, dict):
+        return [f"stages.{sid}.gate.checklist must be an object"]
+    errors: list[str] = []
+    for field in ("required", "confirmed"):
+        val = checklist.get(field, [])
+        if not isinstance(val, list) or not all(isinstance(x, str) for x in val):
+            errors.append(f"stages.{sid}.gate.checklist.{field} must be a list of strings")
     return errors
 
 

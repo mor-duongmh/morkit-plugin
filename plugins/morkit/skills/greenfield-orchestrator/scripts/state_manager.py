@@ -13,7 +13,14 @@ Public API:
     save(state, path) -> None          # atomic
     advance(state) -> dict             # current → done, next → in_progress
     set_stage(state, stage, status, artifact=None) -> dict
-    set_gate(state, stage, decision, note="") -> dict
+    set_gate(state, stage, decision, note="", required=None, confirmed=None) -> dict
+
+Gate hard-block: ``advance`` refuses to leave a gated stage (G2/G3/G4/G6)
+unless its gate ``decision`` is ``proceed`` and every checklist ``required`` id
+is in ``confirmed`` (G4 ``force-close`` may leave with a non-empty note). The
+``required``/``confirmed`` ids come from the per-gate checklist
+(``checklist_loader.py``); this module only enforces the generic subset rule —
+no per-gate business logic lives here.
 """
 from __future__ import annotations
 
@@ -31,6 +38,14 @@ from validate_state import (  # noqa: E402
     STAGES,
     validate_state,
 )
+
+
+class GateNotPassed(ValueError):
+    """Raised by ``advance`` when a gated stage has not cleared its gate.
+
+    Subclasses ``ValueError`` so existing CLI / callers that catch ``ValueError``
+    keep working, while callers that want to react specifically can catch this.
+    """
 
 
 def _now() -> str:
@@ -109,24 +124,65 @@ def set_stage(state: dict, stage: str, status: str, artifact: "str | None" = Non
     return state
 
 
-def set_gate(state: dict, stage: str, decision: str, note: str = "") -> dict:
+def set_gate(
+    state: dict,
+    stage: str,
+    decision: str,
+    note: str = "",
+    required: "list[str] | None" = None,
+    confirmed: "list[str] | None" = None,
+) -> dict:
     if stage not in GATED_STAGES:
         raise ValueError(f"stage {stage!r} has no gate (gated: {sorted(GATED_STAGES)})")
     rec = _ensure(state, stage)
-    rec["gate"] = {"decision": decision, "note": note}
+    gate = {"decision": decision, "note": note}
+    # Only attach checklist when given — keeps legacy/no-checklist gates unchanged.
+    if required is not None or confirmed is not None:
+        gate["checklist"] = {
+            "required": list(required or []),
+            "confirmed": list(confirmed or []),
+        }
+    rec["gate"] = gate
     rec["updated"] = _now()
     state["updated"] = rec["updated"]
     return state
+
+
+def _check_gate(stage: str, gate: dict) -> None:
+    """Raise GateNotPassed unless this gated stage may be left.
+
+    Pass conditions: decision == 'proceed' with every required checklist id
+    confirmed; or (G4 only) decision == 'force-close' with a non-empty note.
+    """
+    decision = gate.get("decision")
+    checklist = gate.get("checklist") or {}
+    required = set(checklist.get("required") or [])
+    confirmed = set(checklist.get("confirmed") or [])
+    if decision == "proceed":
+        missing = required - confirmed
+        if missing:
+            raise GateNotPassed(
+                f"{stage}: required checklist item(s) not confirmed: {sorted(missing)}"
+            )
+        return
+    if stage == "G4" and decision == "force-close":
+        if not (gate.get("note") or "").strip():
+            raise GateNotPassed("G4 force-close requires a note (reason)")
+        return
+    raise GateNotPassed(f"{stage}: gate not passed (decision={decision!r})")
 
 
 def advance(state: dict) -> dict:
     """Mark the current stage done; move to the next and mark it in_progress.
 
     At the last stage (G7) advancing just marks it done (pipeline complete).
+    Gated stages (G2/G3/G4/G6) are hard-blocked until their gate is cleared.
     """
     current = state.get("stage")
     if current not in STAGES:
         raise ValueError(f"current stage {current!r} not in {STAGES}")
+    if current in GATED_STAGES:
+        _check_gate(current, state.get("stages", {}).get(current, {}).get("gate") or {})
     set_stage(state, current, "done")
     idx = STAGES.index(current)
     if idx + 1 < len(STAGES):
@@ -175,9 +231,22 @@ def _cmd_set_stage(args) -> int:
     return 0
 
 
+def _csv(value: "str | None") -> "list[str] | None":
+    if value is None:
+        return None
+    return [x.strip() for x in value.split(",") if x.strip()]
+
+
 def _cmd_set_gate(args) -> int:
     state = load(args.state)
-    set_gate(state, args.stage, args.decision, args.note or "")
+    set_gate(
+        state,
+        args.stage,
+        args.decision,
+        args.note or "",
+        required=_csv(args.checklist_required),
+        confirmed=_csv(args.checklist_confirmed),
+    )
     save(state, args.state)
     print(f"{args.stage} gate → {args.decision}", file=sys.stderr)
     return 0
@@ -211,6 +280,8 @@ def main() -> int:
     pg.add_argument("--stage", required=True, choices=sorted(GATED_STAGES))
     pg.add_argument("--decision", required=True, choices=["pending", "proceed", "adjust", "force-close"])
     pg.add_argument("--note")
+    pg.add_argument("--checklist-required", help="CSV of required item ids (from checklist_loader).")
+    pg.add_argument("--checklist-confirmed", help="CSV of item ids the reviewer confirmed met.")
     pg.set_defaults(func=_cmd_set_gate)
 
     args = p.parse_args()

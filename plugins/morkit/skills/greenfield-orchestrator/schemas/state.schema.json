@@ -42,7 +42,16 @@
                 "type": "string",
                 "enum": ["pending", "proceed", "adjust", "force-close"]
               },
-              "note": { "type": "string" }
+              "note": { "type": "string" },
+              "checklist": {
+                "type": "object",
+                "description": "Per-gate checklist result driving the advance hard-block. Ids come from checklist_loader. Absent on legacy/no-checklist gates.",
+                "additionalProperties": true,
+                "properties": {
+                  "required": { "type": "array", "items": { "type": "string" } },
+                  "confirmed": { "type": "array", "items": { "type": "string" } }
+                }
+              }
             }
           }
         }

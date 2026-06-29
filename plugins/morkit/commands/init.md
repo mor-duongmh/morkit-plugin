@@ -35,22 +35,30 @@ Route on the answer:
 
 **Ask the user which doc types to generate (BEFORE invoking the orchestrator):**
 
-If the user did NOT pass `--outputs` on the command line, you MUST call **AskUserQuestion** with `multiSelect: true` to let them pick which documents to generate. Do not assume — always ask.
+If the user did NOT pass `--outputs` on the command line, you MUST call **AskUserQuestion** to let them pick which documents to generate. Do not assume — always ask.
 
-Question template:
-- question: "Bạn muốn generate những loại tài liệu nào?"
-- header: "Doc types"
+There are 7 doc types but `AskUserQuestion` allows at most **4 options per question**. Send BOTH questions below in a **single AskUserQuestion call** (the `questions` array holds both), each with `multiSelect: true`. Then take the **union** of the two answers as the full selection.
+
+Question 1 — spec & structure docs:
+- question: "Tài liệu spec & cấu trúc nào?"
+- header: "Spec docs"
 - multiSelect: true
 - options:
   - label: "SRS", description: "Software Requirements Specification (BrSE template, 13 sections + screen specs)"
   - label: "API docs", description: "REST endpoints + cURL samples + error codes"
   - label: "DB design", description: "Tables, indexes, Mermaid ERD"
   - label: "System Architecture", description: "arc42-lite (8 sections) + Mermaid component diagram"
+
+Question 2 — standards & design docs:
+- question: "Tài liệu chuẩn & thiết kế nào?"
+- header: "Standards docs"
+- multiSelect: true
+- options:
   - label: "Code Standards", description: "Conventional Commits + auto-extracted lint/format rules"
   - label: "Codebase Summary", description: "README-style: tech stack, repo layout, packages, entry points, LOC by language"
   - label: "Design Guidelines", description: "Design Principles + Patterns + ADRs (MADR format)"
 
-Map the user's selection to the `--outputs` flag:
+Map the user's combined selection (union of both questions) to the `--outputs` flag:
 - SRS → `srs`
 - API docs → `api`
 - DB design → `db`
@@ -84,8 +92,9 @@ Use the **Skill tool** to invoke `docs-hero-orchestrator` with mode `init`, pass
 4. **Plan approval gate**: present a short summary of `docs-plan.md` to the user via **AskUserQuestion** with options: `Proceed`, `Revise plan` (user gives feedback, Claude rewrites the plan), `Abort`. Do NOT skip this gate. Only on `Proceed` continue.
 5. **Apply plan decisions to `project-model.json` BEFORE dispatch**: for each gap whose action is `placeholder`, set the affected field to `<TBD: <reason>>`; for `drop section`, remove the entity; for `assumption`, prefix the description with `[ASSUMPTION] `. This way the existing sub-skills render the right markers without needing new flags.
 6. Dispatch to the selected sub-skills only (parallel where safe). The `generate-srs` sub-skill consumes the `impl_status` / `evidence_refs` populated in step 2 and renders the §3 dashboard + Impl Status column automatically — no extra flag needed.
-7. Render docs to `${PWD}/docs/`
-8. Generate aggregate report; Claude then appends a "Gaps & Risks" section copying the unresolved entries (placeholder + assumption) from `docs-plan.md`.
+7. Render docs. `srs` + `guidelines` render straight to `${PWD}/docs/`; the 5 code-derived docs (`api`, `db`, `arch`, `standards`, `summary`) render to a **staging** dir (`${PWD}/.tmp/staged/`) instead.
+7b. **Review Gate (per-doc loop) — human approval before promote.** For each staged code-derived doc, run the loop defined in `docs-hero-orchestrator/SKILL.md` → "Review Gate (per-doc loop)": `snapshot` baseline → `surface` (section list + ⚠ flags) → **AskUserQuestion `[Approve | Sửa tiếp]`** → on Approve, `promote` into `docs/`; on Sửa tiếp, the reviewer edits the staged file (or gives feedback to re-render) and the loop repeats. `design-guidelines` gets a light one-step confirm `[OK | Sửa | Bỏ]`. **Warn-only:** docs left un-approved are simply not promoted and are reported at the end — coding is never blocked. Re-running `init` resumes (already-approved docs are skipped).
+8. Generate aggregate report over the **promoted** docs; Claude then appends a "Gaps & Risks" section copying the unresolved entries (placeholder + assumption) from `docs-plan.md`.
 9. Spawn the `docs-reviewer` QA agent for cross-reference + BrSE-quality validation. The agent verifies every blocker/warning gap in `docs-plan.md` is either resolved or explicitly carried forward as `<TBD: …>`, and cross-checks that the Implementation Status snapshot in SRS §3 matches the project-model values.
 
 Output files (per selected output):

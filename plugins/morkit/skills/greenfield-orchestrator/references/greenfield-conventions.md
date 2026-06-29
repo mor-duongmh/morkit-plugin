@@ -34,8 +34,13 @@ workspace. The workspace holds only intermediate/BA artifacts.
 | G3 | Analysis | `gap-risk-analysis` | **BA: Proceed/Adjust** | `gap-analysis.md`, `risk-register.md` |
 | G4 | Clarify | `clarification-loop` | **enough-answered/force-close** | `clarification-log.md` |
 | G5 | Bridge | `build-project-model` | — | `project-model.json` |
-| G6 | SRS+Visual | `init --outputs srs` + visualize | **stakeholder review** | `docs/srs.md`, `srs.html` |
-| G7 | DesignDocs | `init --outputs arch,standards,summary,db` | — | `docs/*.md` |
+| G6 | SRS+Visual | `init --outputs srs` + visualize | **BrSE/BA review** | `docs/srs.md`, `srs.html` |
+| G7 | DesignDocs | `init --outputs arch,standards,summary,db` | _review-loop (warn-only soft gate)_ | `docs/*.md` |
+
+The G7 gate is **warn-only**: it is the per-doc Review Gate (staged render →
+`[Approve | Sửa tiếp]` → promote), NOT the `set-gate`/`advance()` checklist engine
+that hard-blocks G2/G3/G4/G6. Skipping review never blocks the run — see
+`docs-hero-orchestrator/SKILL.md` → "Review Gate (per-doc loop)".
 
 Stage order is fixed; gates persist their decision into `state.json` (§3). Stages
 align with `init`'s existing `docs-plan.md` §0–§5 gap/risk flow (reference, don't fork).
@@ -68,8 +73,11 @@ alone. Schema: [`schemas/state.schema.json`](../schemas/state.schema.json).
 - `format` — `brse` | `agile` (user-story render format; default `brse`).
 - `lang` — `JP` | `EN` | `VN` (matches `normalized_schema.Language`).
 - `stages.<Gx>.status` — `pending` | `in_progress` | `done` | `blocked`.
-- `stages.<Gx>.gate` (gated stages **G2, G3, G4, G6**) — `{ decision: pending|proceed|adjust|force-close, note }`.
+- `stages.<Gx>.gate` (gated stages **G2, G3, G4, G6**) — `{ decision: pending|proceed|adjust|force-close, note, checklist? }`.
   G2 uses `proceed` (confirm function list) / `adjust` (run another G2 scoped-Q&A round); `Abort` halts (not persisted), same as G3/G6.
+  Optional `checklist: { required:[id], confirmed:[id] }` records the must-pass subset
+  from the gate checklist ([`gate-checklists/`](gate-checklists/)); `advance` **hard-blocks**
+  until `decision==proceed` and `required ⊆ confirmed` (G4 `force-close` leaves with a note).
 
 Validated by [`scripts/validate_state.py`](../scripts/validate_state.py) on every load.
 
