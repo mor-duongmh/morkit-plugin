@@ -383,3 +383,54 @@ def test_smoke_with_repo_name_prefix():
         md, pending = _propose(cfgp)
         assert pending == ["add-y"]
         assert "**order-service** grpc_rpc: 1 → 3" in md  # short name, resolved via prefix
+
+
+# --- Full-scan mode + repos_root + router-scoped REST ---
+
+from kb_sync_propose import count_rest_routes  # noqa: E402
+
+
+def test_count_rest_routes_scoped_to_router():
+    with tempfile.TemporaryDirectory() as t:
+        d = Path(t) / "bff"; (d / "router").mkdir(parents=True)
+        (d / "router" / "r.go").write_text('r.GET("/a",h)\nr.POST("/b",h)\nx.PUT("/c",h)\n')
+        (d / "outside.go").write_text('r.GET("/z",h)\n')  # NGOÀI router/ → không đếm
+        assert count_rest_routes(d) == 3
+
+
+def test_full_scan_all_repos_detects_drift():
+    with tempfile.TemporaryDirectory() as t:
+        root = Path(t)
+        (root / "knowledge/repos").mkdir(parents=True)
+        (root / "1stop-proto/proto").mkdir(parents=True)
+        (root / "1stop-proto/proto/order.proto").write_text(
+            "service OrderService {\n rpc A(R) returns (S);\n rpc B(R) returns (S);\n}\n")
+        (root / "1stop-order-service").mkdir()
+        (root / "knowledge/catalog.json").write_text(json.dumps({"repos": [
+            {"name": "order-service", "grpc_services": ["OrderService"], "grpc_rpc": 1}]}))
+        cfg = {"repos_glob": "1stop-*", "repo_name_prefix": "1stop-", "catalog": "knowledge/catalog.json",
+               "fact_sheets": "knowledge/repos", "ledger": "knowledge/_sync-ledger.json",
+               "changes": "knowledge/changes", "scanners": ["proto"]}
+        cfgp = root / "knowledge/.kb-sync.json"; cfgp.write_text(json.dumps(cfg))
+        md, groups = _propose(cfgp, all_repos=True)
+        assert groups == ["full-scan"]
+        assert "**order-service** grpc_rpc: 1 → 2" in md  # full-scan, không cần task
+
+
+def test_full_scan_repos_root_parent():
+    """Pack là repo RIÊNG (sibling các repo source) → repos_root='..'."""
+    with tempfile.TemporaryDirectory() as t:
+        parent = Path(t)
+        pack = parent / "1stop-knowledge"; (pack / "knowledge/repos").mkdir(parents=True)
+        (parent / "1stop-proto/proto").mkdir(parents=True)
+        (parent / "1stop-proto/proto/o.proto").write_text(
+            "service OrderService {\n rpc A(R) returns (S);\n}\n")
+        (parent / "1stop-order-service").mkdir()
+        (pack / "knowledge/catalog.json").write_text(json.dumps({"repos": [
+            {"name": "order-service", "grpc_services": ["OrderService"], "grpc_rpc": 5}]}))
+        cfg = {"repos_glob": "1stop-*", "repo_name_prefix": "1stop-", "repos_root": "..",
+               "catalog": "knowledge/catalog.json", "fact_sheets": "knowledge/repos",
+               "ledger": "knowledge/_sync-ledger.json", "changes": "knowledge/tickets", "scanners": ["proto"]}
+        cfgp = pack / "knowledge/.kb-sync.json"; cfgp.write_text(json.dumps(cfg))
+        md, _ = _propose(cfgp, all_repos=True)
+        assert "**order-service** grpc_rpc: 5 → 1" in md  # source=1 (parent), catalog=5
