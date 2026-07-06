@@ -1,6 +1,7 @@
 """Tests for the kb-sync skill scripts."""
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -195,3 +196,59 @@ def test_files_in_task_parses_backticked_paths():
         td = Path(t); _mk_pack(td)
         files = files_in_task(td / "knowledge/changes/task-a")
         assert files == ["1stop-order-service/handler/x.go"]
+
+
+# --- Task 4: kb_sync_apply ---
+
+from kb_sync_apply import (  # noqa: E402
+    apply_catalog, parse_checked, refresh_fact_sheet, update_api_rollup,
+)
+
+_PROPOSAL = """# proposal
+## Task: task-a
+- [x] **order-service** grpc_rpc: 73 → 75  (UPDATE)
+- [ ] **customer-bff** rest_routes: 100 → 109  (UPDATE)
+"""
+
+
+def test_parse_checked_only_ticked():
+    ch = parse_checked(_PROPOSAL)
+    assert len(ch) == 1
+    assert ch[0] == {"repo": "order-service", "type": "grpc_rpc", "old": 73, "new": 75}
+
+
+def test_apply_catalog_updates_number_keeps_prose():
+    with tempfile.TemporaryDirectory() as t:
+        cat = Path(t) / "catalog.json"
+        cat.write_text(json.dumps({"repos": [
+            {"name": "order-service", "grpc_rpc": 73, "role": "orders"}]}))
+        n = apply_catalog(cat, [{"repo": "order-service", "type": "grpc_rpc", "old": 73, "new": 75}])
+        data = json.loads(cat.read_text())
+        assert n == 1
+        assert data["repos"][0]["grpc_rpc"] == 75
+        assert data["repos"][0]["role"] == "orders"  # prose untouched
+
+
+def test_apply_catalog_idempotent():
+    with tempfile.TemporaryDirectory() as t:
+        cat = Path(t) / "catalog.json"
+        cat.write_text(json.dumps({"repos": [{"name": "o", "grpc_rpc": 75}]}))
+        ch = [{"repo": "o", "type": "grpc_rpc", "old": 73, "new": 75}]
+        assert apply_catalog(cat, ch) == 0  # already 75 → no change
+
+
+def test_refresh_fact_sheet_number_and_provenance():
+    with tempfile.TemporaryDirectory() as t:
+        fd = Path(t); (fd / "order-service.md").write_text(
+            "---\nprovenance: extracted 2026-06-29 từ proto\n---\n# order — 73 RPC total\n")
+        ok = refresh_fact_sheet(fd, "order-service",
+                                [{"repo": "order-service", "type": "grpc_rpc", "old": 73, "new": 75}], "2026-07-06")
+        txt = (fd / "order-service.md").read_text()
+        assert ok and "75 RPC" in txt and "2026-07-06" in txt and "2026-06-29" not in txt
+
+
+def test_update_api_rollup():
+    with tempfile.TemporaryDirectory() as t:
+        api = Path(t) / "api.md"; api.write_text("gRPC = 370 RPC total\n")
+        update_api_rollup(api, 372)
+        assert "372 RPC" in api.read_text()
