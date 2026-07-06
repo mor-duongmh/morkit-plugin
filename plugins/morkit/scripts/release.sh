@@ -17,7 +17,7 @@ cd "$ROOT"
 [ "$(git branch --show-current)" = "main" ] || { echo "✗ phải đứng ở nhánh main"; exit 1; }
 git fetch origin --quiet
 git pull --ff-only origin main
-[ -z "$(git status --porcelain)" ] || { echo "✗ working tree không sạch"; exit 1; }
+[ -z "$(git status --porcelain --untracked-files=no)" ] || { echo "✗ có thay đổi tracked chưa commit"; exit 1; }
 git rev-parse "$TAG" >/dev/null 2>&1 && { echo "✗ tag $TAG đã tồn tại"; exit 1; }
 
 # 1. Bump plugin.json version → commit (đây là commit được tag & pin)
