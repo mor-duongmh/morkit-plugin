@@ -141,3 +141,57 @@ def test_run_git_uses_arg_list_no_shell():
         cp = run_git(["rev-parse", "; touch pwned"], cwd=td)
         assert cp.returncode != 0
         assert not (Path(td) / "pwned").exists()
+
+
+# --- Task 3: kb_sync_propose ---
+
+from kb_sync_propose import (  # noqa: E402
+    build_change_list, files_in_task, files_to_repos, list_pending, render_proposal,
+)
+
+
+def _mk_pack(td: Path):
+    (td / "knowledge/changes/task-a").mkdir(parents=True)
+    (td / "knowledge/changes/task-b").mkdir(parents=True)
+    (td / "knowledge/changes/_archive").mkdir(parents=True)
+    (td / "knowledge/changes/task-a/tasks.md").write_text(
+        "## Task 1\n**Files:**\n- Modify: `1stop-order-service/handler/x.go`\n")
+    cfg = {"repos_glob": "1stop-*", "catalog": "knowledge/catalog.json",
+           "fact_sheets": "knowledge/repos", "ledger": "knowledge/_sync-ledger.json",
+           "changes": "knowledge/changes", "scanners": ["proto", "gin_routes"]}
+    return cfg
+
+
+def test_list_pending_excludes_synced_and_archive():
+    with tempfile.TemporaryDirectory() as t:
+        td = Path(t)
+        cfg = _mk_pack(td)
+        ledger = {"synced_tasks": {"task-b": "2026-W27"}}
+        assert list_pending(td, cfg, ledger) == ["task-a"]  # task-b synced, _archive skipped
+
+
+def test_files_to_repos_mapping():
+    files = ["1stop-order-service/handler/x.go", "docs/readme.md", "1stop-customer-bff/r.go"]
+    assert files_to_repos(files, ["1stop-order-service", "1stop-customer-bff"]) == {
+        "1stop-order-service", "1stop-customer-bff"}
+
+
+def test_build_change_list_update_and_add():
+    ch = build_change_list("order-service", {"grpc_rpc": 75, "rest_routes": 10},
+                           {"grpc_rpc": 73})  # rest_routes missing in catalog → ADD
+    kinds = {(c["type"], c["op"], c["old"], c["new"]) for c in ch}
+    assert ("grpc_rpc", "UPDATE", 73, 75) in kinds
+    assert ("rest_routes", "ADD", None, 10) in kinds
+
+
+def test_render_proposal_has_checkboxes_no_kb_write():
+    md = render_proposal({"task-a": [{"repo": "order-service", "type": "grpc_rpc",
+                          "op": "UPDATE", "old": 73, "new": 75}]}, ["task-a"])
+    assert "- [ ]" in md and "73 → 75" in md and "task-a" in md
+
+
+def test_files_in_task_parses_backticked_paths():
+    with tempfile.TemporaryDirectory() as t:
+        td = Path(t); _mk_pack(td)
+        files = files_in_task(td / "knowledge/changes/task-a")
+        assert files == ["1stop-order-service/handler/x.go"]
