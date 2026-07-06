@@ -95,3 +95,49 @@ def test_scan_makefile_flags_postgres_leftover():
         res = scan_makefile(td)
     assert res["commands"]["run"] == "go run main.go"
     assert any("leftover" in w for w in res["warnings"])
+
+
+# --- Task 7: safe_io (implemented early — Task 3/4 depend on it) ---
+
+import pytest  # noqa: E402
+from safe_io import UnsafePathError, resolve_within, run_git, validate_config  # noqa: E402
+
+_GOOD_CFG = {
+    "repos_glob": "1stop-*", "catalog": "knowledge/catalog.json",
+    "fact_sheets": "knowledge/repos", "ledger": "knowledge/_sync-ledger.json",
+    "changes": "knowledge/changes", "scanners": ["proto", "gin_routes"],
+}
+
+
+def test_resolve_within_ok():
+    with tempfile.TemporaryDirectory() as td:
+        assert resolve_within(td, "knowledge/catalog.json") == (Path(td) / "knowledge/catalog.json").resolve()
+
+
+def test_resolve_within_blocks_traversal():
+    with tempfile.TemporaryDirectory() as td:
+        with pytest.raises(UnsafePathError):
+            resolve_within(td, "../../etc/passwd")
+        with pytest.raises(UnsafePathError):
+            resolve_within(td, "/etc/passwd")
+
+
+def test_validate_config_ok():
+    assert validate_config(dict(_GOOD_CFG)) == _GOOD_CFG
+
+
+def test_validate_config_missing_and_wrongtype():
+    bad = dict(_GOOD_CFG); del bad["catalog"]
+    with pytest.raises(ValueError, match="missing required keys"):
+        validate_config(bad)
+    bad2 = dict(_GOOD_CFG); bad2["scanners"] = "proto"
+    with pytest.raises(ValueError, match="must be list"):
+        validate_config(bad2)
+
+
+def test_run_git_uses_arg_list_no_shell():
+    with tempfile.TemporaryDirectory() as td:
+        # a malicious "ref" is passed as ONE literal arg → git errors, no shell exec
+        cp = run_git(["rev-parse", "; touch pwned"], cwd=td)
+        assert cp.returncode != 0
+        assert not (Path(td) / "pwned").exists()
