@@ -114,6 +114,7 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | `/morkit:docs-update` | Apply change/plan vào doc |
 | `/morkit:sync` | Quét codebase, đề xuất update (API / DB / arch / standards / summary) |
 | `/morkit:apply-sync` | Apply đề xuất từ sync |
+| `/morkit:kb-sync` | Sync số liệu/cấu trúc (RPC/route/table/commands) của task vào knowledge pack convention-driven (`knowledge/.kb-sync.json`) + sổ cái tuần. Batch, do PM/lead chạy; propose→tick→apply |
 | `/morkit:doctor` | Health-check docs-hero |
 
 ### Test cases (standalone)
