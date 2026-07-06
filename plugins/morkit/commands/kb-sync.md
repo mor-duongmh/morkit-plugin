@@ -18,10 +18,10 @@ test -f "${PWD}/knowledge/.kb-sync.json" || {
 
 Invoke the **kb-sync** skill. It runs the two-step, human-gated flow:
 
-1. **Propose (read-only)** — collect PENDING tasks (in `knowledge/changes/`, not yet
-   in the ledger), derive scope from each task's `tasks.md` **Files:**, scan in-scope
-   repos from source (proto / Gin / GORM / Makefile), diff vs `catalog.json`, and write
-   `.tmp/kb-sync-proposal.md` with `[ ]` checkboxes grouped by task. **KB untouched.**
+1. **Propose (read-only)** — scan repos from source (proto / router / Makefile), diff vs
+   `catalog.json`, write `.tmp/kb-sync-proposal.md` with `[ ]` checkboxes. **KB untouched.** Hai chế độ:
+   - mặc định (**task-driven**): scope từ `**Files:**` của task PENDING trong `knowledge/changes/`.
+   - `--all` (**full-scan**): quét mọi repo vs catalog (hợp pack repo-riêng như 1stop-knowledge, `repos_root: ".."`).
 
 2. **Human gate** — open the proposal, tick `[x]` the facts to accept.
 
