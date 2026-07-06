@@ -97,7 +97,8 @@ def repo_dirs(workspace: Path, cfg: dict) -> dict[str, Path]:
 def scan_repo_facts(repo_dir: Path, proto_services: dict[str, int], catalog_repo: dict) -> dict:
     """Scan one repo → {rest_routes, grpc_rpc, commands}. grpc via declared services."""
     facts: dict = {}
-    if scan_routes is not None:
+    # Only diff metrics the repo actually tracks (avoid noise for grpc-only / bff-only repos).
+    if scan_routes is not None and "rest_routes" in catalog_repo:
         facts["rest_routes"] = len(scan_routes([str(repo_dir)]))
     declared = catalog_repo.get("grpc_services") or []
     if isinstance(declared, list) and declared and proto_services:
@@ -153,7 +154,12 @@ def propose(config_path: str | Path, only_tasks: list[str] | None = None) -> tup
     if only_tasks:
         pending = [t for t in pending if t in set(only_tasks)]
 
-    rdirs = repo_dirs(workspace, cfg)
+    rdirs = repo_dirs(workspace, cfg)  # dir_name → path (e.g. "1stop-order-service")
+    prefix = cfg.get("repo_name_prefix", "")
+
+    def canon(dirname: str) -> str:  # dir name → catalog/fact-sheet name (e.g. "order-service")
+        return dirname[len(prefix):] if prefix and dirname.startswith(prefix) else dirname
+
     catalog = json.loads(resolve_within(workspace, cfg["catalog"]).read_text(encoding="utf-8"))
     cat_by_name = {r["name"]: r for r in catalog.get("repos", [])}
     proto_services = {s.service: s.rpc_count for s in scan_protos([str(workspace)])} if "proto" in cfg["scanners"] else {}
@@ -165,8 +171,9 @@ def propose(config_path: str | Path, only_tasks: list[str] | None = None) -> tup
         for repo in sorted(repos):
             if repo not in rdirs:
                 continue
-            scanned = scan_repo_facts(rdirs[repo], proto_services, cat_by_name.get(repo, {}))
-            acc.extend(build_change_list(repo, scanned, cat_by_name.get(repo, {})))
+            cname = canon(repo)
+            scanned = scan_repo_facts(rdirs[repo], proto_services, cat_by_name.get(cname, {}))
+            acc.extend(build_change_list(cname, scanned, cat_by_name.get(cname, {})))
         task_changes[task] = acc
     return render_proposal(task_changes, pending), pending
 

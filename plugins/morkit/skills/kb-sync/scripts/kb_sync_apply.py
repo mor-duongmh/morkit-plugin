@@ -19,12 +19,27 @@ _THIS = Path(__file__).resolve().parent
 sys.path.insert(0, str(_THIS))
 from safe_io import resolve_within  # noqa: E402
 from parse_proto import scan_protos, total_rpc  # noqa: E402
+from ledger import (  # noqa: E402
+    append_run, load_ledger, pending_tasks, save_ledger, write_sync_log,
+)
 
 _CHECKED = re.compile(
     r"^\s*-\s*\[x\]\s*\*\*(?P<repo>[^*]+)\*\*\s+(?P<type>\w+):\s*(?P<old>\S+)\s*→\s*(?P<new>\d+)",
     re.MULTILINE,
 )
+_TASK_HDR = re.compile(r"^##\s*Task:\s*(\S+)", re.MULTILINE)
 _PROV = re.compile(r"(provenance:\s*extracted\s+)(\d{4}-\d{2}-\d{2})")
+
+
+def parse_tasks(text: str) -> list[str]:
+    """Task ids present in the proposal (## Task: <id>)."""
+    return _TASK_HDR.findall(text)
+
+
+def _iso_run_id(today: str) -> str:
+    import datetime
+    y, w, _ = datetime.date.fromisoformat(today).isocalendar()
+    return f"{y}-W{w:02d}"
 
 
 def parse_checked(text: str) -> list[dict]:
@@ -77,11 +92,14 @@ def update_api_rollup(api_path: Path, grpc_total: int) -> bool:
     return updated != text
 
 
-def apply(config_path: str | Path, proposal_path: str | Path, today: str) -> dict:
+def apply(config_path: str | Path, proposal_path: str | Path, today: str,
+          synced_by: str = "lead", sha_range: str = "") -> dict:
     cfg_path = Path(config_path).resolve()
     cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
     workspace = cfg_path.parent.parent
-    checked = parse_checked(Path(proposal_path).read_text(encoding="utf-8"))
+    proposal_text = Path(proposal_path).read_text(encoding="utf-8")
+    checked = parse_checked(proposal_text)
+    tasks = parse_tasks(proposal_text)
 
     catalog_path = resolve_within(workspace, cfg["catalog"])
     applied = apply_catalog(catalog_path, checked)
@@ -96,7 +114,18 @@ def apply(config_path: str | Path, proposal_path: str | Path, today: str) -> dic
         grpc_total = total_rpc(scan_protos([str(workspace)]))
         update_api_rollup(api_path, grpc_total)
 
-    return {"applied": applied, "repos": touched_repos, "changes": checked}
+    # Ledger: record this weekly run + re-render SYNC-LOG
+    ledger_path = resolve_within(workspace, cfg["ledger"])
+    ledger = load_ledger(ledger_path)
+    run_id = _iso_run_id(today)
+    append_run(ledger, run_id, today, synced_by, sha_range, tasks, checked)
+    save_ledger(ledger_path, ledger)
+    changes_dir = resolve_within(workspace, cfg["changes"])
+    pending = pending_tasks(changes_dir, ledger)
+    write_sync_log((fact_dir.parent / "SYNC-LOG.md"), ledger, pending, [])
+
+    return {"applied": applied, "repos": touched_repos, "changes": checked,
+            "run_id": run_id, "tasks": tasks, "pending": pending}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -105,9 +134,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--config", required=True)
     ap.add_argument("--proposal", required=True)
     ap.add_argument("--today", default=datetime.date.today().isoformat())
+    ap.add_argument("--by", default="lead", help="who ran this sync (recorded in ledger)")
+    ap.add_argument("--sha-range", default="", help="optional git sha range, e.g. a..b")
     args = ap.parse_args(argv)
-    res = apply(args.config, args.proposal, args.today)
-    print(f"applied {res['applied']} change(s) across {len(res['repos'])} repo(s): {', '.join(res['repos'])}")
+    res = apply(args.config, args.proposal, args.today, synced_by=args.by, sha_range=args.sha_range)
+    print(f"[{res['run_id']}] applied {res['applied']} change(s) across {len(res['repos'])} repo(s): "
+          f"{', '.join(res['repos'])} · {len(res['pending'])} task(s) still pending")
     return 0
 
 

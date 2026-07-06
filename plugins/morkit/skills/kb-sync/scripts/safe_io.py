@@ -19,6 +19,7 @@ REQUIRED_KEYS: dict[str, type] = {
 OPTIONAL_KEYS: dict[str, type] = {
     "api_doc": str,
     "update_api_md": bool,
+    "repo_name_prefix": str,
 }
 
 

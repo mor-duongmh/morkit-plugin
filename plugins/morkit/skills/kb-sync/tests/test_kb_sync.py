@@ -252,3 +252,134 @@ def test_update_api_rollup():
         api = Path(t) / "api.md"; api.write_text("gRPC = 370 RPC total\n")
         update_api_rollup(api, 372)
         assert "372 RPC" in api.read_text()
+
+
+# --- Task 5: ledger ---
+
+from ledger import (  # noqa: E402
+    append_run, compute_drift, load_ledger, pending_tasks, render_sync_log,
+)
+
+
+def test_append_run_maps_tasks_and_sha():
+    led = {"sync_runs": [], "synced_tasks": {}}
+    append_run(led, "2026-W27", "2026-07-06", "lead:duong", "a1b2c3..d4e5f6",
+               ["task-a", "task-b"], [{"repo": "order-service", "type": "grpc_rpc"}])
+    assert len(led["sync_runs"]) == 1
+    assert led["synced_tasks"] == {"task-a": "2026-W27", "task-b": "2026-W27"}
+    assert led["last_sync_sha"] == "d4e5f6"
+    assert led["last_sync"] == "2026-07-06"
+
+
+def test_pending_tasks_after_run():
+    with tempfile.TemporaryDirectory() as t:
+        d = Path(t)
+        for name in ("task-a", "task-b", "_archive"):
+            (d / name).mkdir()
+        led = {"synced_tasks": {"task-a": "2026-W27"}}
+        assert pending_tasks(d, led) == ["task-b"]
+
+
+def test_compute_drift():
+    prov = {"order-service": "2026-06-29", "auth-service": "2026-06-29"}
+    commits = {"order-service": "2026-07-05", "auth-service": "2026-06-20"}
+    assert compute_drift(prov, commits) == ["order-service"]
+
+
+def test_render_sync_log_sections():
+    led = {"last_sync": "2026-07-06", "synced_tasks": {"task-a": "2026-W27"},
+           "sync_runs": [{"run_id": "2026-W27", "date": "2026-07-06",
+                          "synced_by": "lead:duong", "tasks": ["task-a"], "changes": [{}]}]}
+    md = render_sync_log(led, ["task-c"], ["vendor-service"])
+    assert "Đợt sync (theo tuần)" in md and "2026-W27" in md
+    assert "Pending backlog" in md and "task-c" in md
+    assert "⚠️ **vendor-service**" in md
+
+
+# --- Task 6: smoke E2E (propose → apply on a mini pack) ---
+
+from kb_sync_propose import propose as _propose  # noqa: E402
+from kb_sync_apply import apply as _apply  # noqa: E402
+
+
+def _mini_pack(root: Path):
+    (root / "knowledge/repos").mkdir(parents=True)
+    (root / "knowledge/changes/add-x").mkdir(parents=True)
+    (root / "1stop-order-service").mkdir(parents=True)
+    (root / "1stop-proto/proto").mkdir(parents=True)
+    (root / "1stop-proto/proto/order.proto").write_text(
+        "service OrderService {\n  rpc A(R) returns (S);\n  rpc B(R) returns (S);\n}\n")
+    (root / "knowledge/catalog.json").write_text(json.dumps({"repos": [
+        {"name": "1stop-order-service", "grpc_rpc": 1, "grpc_services": ["OrderService"], "role": "orders"}]}))
+    (root / "knowledge/repos/1stop-order-service.md").write_text(
+        "---\nprovenance: extracted 2026-06-29 từ proto\n---\n# order — 1 RPC\n")
+    (root / "knowledge/changes/add-x/tasks.md").write_text(
+        "**Files:**\n- Modify: `1stop-order-service/handler/order.go`\n")
+    cfg = {"repos_glob": "1stop-*", "catalog": "knowledge/catalog.json",
+           "fact_sheets": "knowledge/repos", "ledger": "knowledge/_sync-ledger.json",
+           "changes": "knowledge/changes", "scanners": ["proto", "gin_routes"]}
+    cfgp = root / "knowledge/.kb-sync.json"
+    cfgp.write_text(json.dumps(cfg))
+    return cfgp
+
+
+def test_smoke_propose_then_apply():
+    with tempfile.TemporaryDirectory() as t:
+        root = Path(t)
+        cfgp = _mini_pack(root)
+
+        # PROPOSE — read-only, must NOT touch catalog
+        md, pending = _propose(cfgp)
+        assert pending == ["add-x"]
+        assert "grpc_rpc: 1 → 2" in md
+        assert json.loads((root / "knowledge/catalog.json").read_text())["repos"][0]["grpc_rpc"] == 1
+
+        # user ticks the box
+        md_ticked = md.replace("- [ ]", "- [x]")
+        prop = root / ".tmp/kb-sync-proposal.md"
+        prop.parent.mkdir(parents=True, exist_ok=True)
+        prop.write_text(md_ticked)
+
+        # APPLY
+        res = _apply(cfgp, prop, "2026-07-06", synced_by="lead:test")
+        cat = json.loads((root / "knowledge/catalog.json").read_text())
+        assert cat["repos"][0]["grpc_rpc"] == 2  # updated
+        assert cat["repos"][0]["role"] == "orders"  # prose kept
+        fs = (root / "knowledge/repos/1stop-order-service.md").read_text()
+        assert "2 RPC" in fs and "2026-07-06" in fs
+        assert res["applied"] == 1
+
+        # ledger + SYNC-LOG written; task now marked synced (no longer pending)
+        led = json.loads((root / "knowledge/_sync-ledger.json").read_text())
+        assert led["synced_tasks"] == {"add-x": res["run_id"]}
+        assert len(led["sync_runs"]) == 1 and led["sync_runs"][0]["synced_by"] == "lead:test"
+        assert res["pending"] == []
+        assert (root / "knowledge/SYNC-LOG.md").exists()
+
+        # idempotent: re-proposing finds nothing pending
+        _, pending2 = _propose(cfgp)
+        assert pending2 == []
+
+
+def test_smoke_with_repo_name_prefix():
+    with tempfile.TemporaryDirectory() as t:
+        root = Path(t)
+        (root / "knowledge/repos").mkdir(parents=True)
+        (root / "knowledge/changes/add-y").mkdir(parents=True)
+        (root / "1stop-order-service").mkdir(parents=True)
+        (root / "1stop-proto/proto").mkdir(parents=True)
+        (root / "1stop-proto/proto/order.proto").write_text(
+            "service OrderService {\n  rpc A(R) returns (S);\n  rpc B(R) returns (S);\n  rpc C(R) returns (S);\n}\n")
+        # catalog uses SHORT name; repo dir has 1stop- prefix
+        (root / "knowledge/catalog.json").write_text(json.dumps({"repos": [
+            {"name": "order-service", "grpc_rpc": 1, "grpc_services": ["OrderService"]}]}))
+        (root / "knowledge/changes/add-y/tasks.md").write_text(
+            "**Files:**\n- Modify: `1stop-order-service/handler/x.go`\n")
+        cfg = {"repos_glob": "1stop-*", "catalog": "knowledge/catalog.json",
+               "fact_sheets": "knowledge/repos", "ledger": "knowledge/_sync-ledger.json",
+               "changes": "knowledge/changes", "scanners": ["proto"],
+               "repo_name_prefix": "1stop-"}
+        cfgp = root / "knowledge/.kb-sync.json"; cfgp.write_text(json.dumps(cfg))
+        md, pending = _propose(cfgp)
+        assert pending == ["add-y"]
+        assert "**order-service** grpc_rpc: 1 → 3" in md  # short name, resolved via prefix
