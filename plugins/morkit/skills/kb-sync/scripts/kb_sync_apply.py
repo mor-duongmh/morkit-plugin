@@ -98,6 +98,49 @@ def update_api_rollup(api_path: Path, grpc_total: int) -> bool:
     return updated != text
 
 
+def render_task_summary(task: str, today: str, by: str, repos: list[str],
+                        changes: list[dict], template_ref: str) -> str:
+    """Sinh summary theo schema _TASK_SUMMARY_TEMPLATE.md. Máy điền phần Loại A;
+    phần người (Đã làm, bẫy, link) để placeholder."""
+    rows = "\n".join(
+        f"| `catalog.json` / `repos/{c['repo']}.md` | A | {c['repo']} {c['type']} "
+        f"{'∅' if c['old'] is None else c['old']}→{c['new']} | `kb-sync@{today}` |"
+        for c in changes
+    ) or "| — | — | Không thay đổi knowledge base | — |"
+    drift = "\n".join(f"- {c['repo']} {c['type']}: {c['old']}→{c['new']}"
+                      for c in changes if c.get("old") not in (None,)) or "- Không."
+    return (
+        f"<!-- Sinh bởi kb-sync apply theo {template_ref}. Phần <...> điền tay. -->\n"
+        "---\n"
+        f"task: {task}\n"
+        "sprint: n/a\n"
+        f"date_completed: {today}\n"
+        f"author: {by}\n"
+        f"repos_touched: [{', '.join(repos)}]\n"
+        "pr_code: <...>\n"
+        "pr_knowledge: <...>\n"
+        "status: done\n"
+        "---\n\n"
+        f"# Task Summary — {task}\n\n"
+        "## Đã làm\n- <kết quả 1–3 dòng>\n\n"
+        "## Knowledge base đã cập nhật\n"
+        "| File pack | Loại | Thay đổi | Provenance |\n"
+        "|-----------|:----:|----------|-----------|\n"
+        f"{rows}\n\n"
+        "## Bẫy / bài học mới\n- <gotcha đáng đúc kết, hoặc \"không\">\n\n"
+        "## Drift đã xử  (Loại A)\n"
+        f"{drift}\n\n"
+        "## Liên kết\n- PR code: <...>\n- PR knowledge: <...>\n"
+    )
+
+
+def write_task_summary(tickets_dir: Path, task: str, content: str) -> Path:
+    out = tickets_dir / task / "summary.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(content, encoding="utf-8")
+    return out
+
+
 def apply(config_path: str | Path, proposal_path: str | Path, today: str,
           synced_by: str = "lead", sha_range: str = "", accept_all: bool = False) -> dict:
     cfg_path = Path(config_path).resolve()
@@ -130,8 +173,17 @@ def apply(config_path: str | Path, proposal_path: str | Path, today: str,
     pending = pending_tasks(changes_dir, ledger)
     write_sync_log((fact_dir.parent / "SYNC-LOG.md"), ledger, pending, [])
 
+    # Task summary theo template → knowledge/tickets/<task>/summary.md (nếu cfg có tickets)
+    summary_path = None
+    if cfg.get("tickets"):
+        tickets_dir = resolve_within(workspace, cfg["tickets"])
+        task = tasks[0] if tasks else run_id
+        tpl = cfg.get("task_summary_template", "knowledge/tickets/_TASK_SUMMARY_TEMPLATE.md")
+        content = render_task_summary(task, today, synced_by, touched_repos, checked, tpl)
+        summary_path = str(write_task_summary(tickets_dir, task, content))
+
     return {"applied": applied, "repos": touched_repos, "changes": checked,
-            "run_id": run_id, "tasks": tasks, "pending": pending}
+            "run_id": run_id, "tasks": tasks, "pending": pending, "summary": summary_path}
 
 
 def main(argv: list[str] | None = None) -> int:

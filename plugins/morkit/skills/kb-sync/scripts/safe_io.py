@@ -20,6 +20,9 @@ OPTIONAL_KEYS: dict[str, type] = {
     "api_doc": str,
     "update_api_md": bool,
     "repo_name_prefix": str,
+    "repos_root": str,
+    "tickets": str,
+    "task_summary_template": str,
 }
 
 

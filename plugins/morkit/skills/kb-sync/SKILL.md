@@ -18,9 +18,14 @@ The project declares `knowledge/.kb-sync.json`:
   "repos_root": "..",
   "catalog": "knowledge/catalog.json", "fact_sheets": "knowledge/repos",
   "ledger": "knowledge/_sync-ledger.json", "changes": "knowledge/changes",
+  "tickets": "knowledge/tickets",
+  "task_summary_template": "knowledge/tickets/_TASK_SUMMARY_TEMPLATE.md",
   "api_doc": "api.md", "update_api_md": true,
   "scanners": ["proto","gin_routes","gorm_models","makefile"] }
 ```
+Nếu khai `tickets`, apply ghi **task-summary theo template** vào `tickets/<task>/summary.md`
+(frontmatter + bảng "KB đã cập nhật" máy điền; phần người để `<...>`). Bỏ `tickets` → không ghi.
+
 Any project with this file + a pack (catalog.json + repos/*.md) can use the skill.
 
 **`repos_root`** — nơi chứa các repo source, tương đối với workspace (thư mục cha của `knowledge/`). Hai topology:
