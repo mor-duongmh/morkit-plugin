@@ -51,12 +51,18 @@ Hai chế độ scope:
   ```
 - Cả hai: scan từ SOURCE; diff vs `catalog.json`; ghi proposal checkbox `.tmp/`. **KHÔNG chạm KB.**
 
-**Human gate:** open `.tmp/kb-sync-proposal.md`, tick `[x]` the facts to accept.
+**Human gate (mặc định):** open `.tmp/kb-sync-proposal.md`, tick `[x]` the facts to accept.
 
 **Step 2 — APPLY (writes only checked items):**
 ```bash
 $PY "$S/kb_sync_apply.py" --config knowledge/.kb-sync.json --proposal .tmp/kb-sync-proposal.md
 ```
+
+**Chế độ AUTO — bỏ human-gate (`--yes` / `--accept-all`):** ghi MỌI mục drift mà không cần tick.
+```bash
+$PY "$S/kb_sync_apply.py" --config knowledge/.kb-sync.json --proposal .tmp/kb-sync-proposal.md --yes
+```
+An toàn vì chỉ ghi số tất định (parse_proto/router) + idempotent. **Lưới an toàn = `git diff` trước khi push** (thay cho checkbox). Dùng cho sync hands-free định kỳ.
 - Updates `catalog.json` numbers, refreshes fact-sheet provenance + number tokens,
   rolls up `api.md` totals (if `update_api_md`).
 - Appends a weekly `sync_run` to `_sync-ledger.json`, marks tasks synced,
@@ -64,7 +70,7 @@ $PY "$S/kb_sync_apply.py" --config knowledge/.kb-sync.json --proposal .tmp/kb-sy
 
 ## Guardrails
 
-- **Never auto-tick** the proposal — the human picks what to accept.
+- **Mặc định human-gate**: apply chỉ ghi mục `[x]`. Chế độ `--yes`/`--accept-all` ghi tất cả — chỉ dùng khi user chủ động chọn; lưới an toàn chuyển sang `git diff` trước push.
 - **PROPOSE never writes to the KB** — only `.tmp/`.
 - **Only numeric/structural facts** sync; prose (role, gotchas) stays for fan-out.
 - All KB writes go through `safe_io.resolve_within` — no path escaping the declared dirs.

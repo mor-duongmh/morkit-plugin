@@ -23,11 +23,11 @@ Invoke the **kb-sync** skill. It runs the two-step, human-gated flow:
    - mặc định (**task-driven**): scope từ `**Files:**` của task PENDING trong `knowledge/changes/`.
    - `--all` (**full-scan**): quét mọi repo vs catalog (hợp pack repo-riêng như 1stop-knowledge, `repos_root: ".."`).
 
-2. **Human gate** — open the proposal, tick `[x]` the facts to accept.
+2. **Human gate** (mặc định) — open the proposal, tick `[x]` the facts to accept.
+   **Hoặc bỏ gate**: apply với `--yes` (ghi mọi mục drift, không cần tick) — an toàn nhờ số tất định; review bằng `git diff` trước push.
 
-3. **Apply** — `/morkit:kb-sync` with `--proposal .tmp/kb-sync-proposal.md`: update
-   `catalog.json` + fact-sheet numbers/provenance + `api.md` rollup, append a weekly
-   `sync_run` to `_sync-ledger.json`, re-render `SYNC-LOG.md`.
+3. **Apply** — update `catalog.json` + fact-sheet numbers/provenance + `api.md` rollup,
+   append `sync_run` to `_sync-ledger.json`, re-render `SYNC-LOG.md`.
 
 Cadence: run as a **weekly batch by a PM / team lead**, not per task. Only
 numeric/structural facts sync — prose stays for fan-out.

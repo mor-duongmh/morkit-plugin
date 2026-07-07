@@ -434,3 +434,42 @@ def test_full_scan_repos_root_parent():
         cfgp = pack / "knowledge/.kb-sync.json"; cfgp.write_text(json.dumps(cfg))
         md, _ = _propose(cfgp, all_repos=True)
         assert "**order-service** grpc_rpc: 5 → 1" in md  # source=1 (parent), catalog=5
+
+
+# --- Auto-apply (bỏ human-gate) ---
+
+_PROPOSAL_UNTICKED = """# proposal
+## Task: full-scan
+- [ ] **vendor-service** grpc_rpc: 105 → 91  (UPDATE)
+- [ ] **order-service** grpc_rpc: 73 → 74  (UPDATE)
+"""
+
+
+def test_parse_checked_default_ignores_unticked():
+    from kb_sync_apply import parse_checked
+    assert parse_checked(_PROPOSAL_UNTICKED) == []  # [ ] không tick → bỏ qua
+
+
+def test_parse_checked_accept_all_takes_unticked():
+    from kb_sync_apply import parse_checked
+    got = parse_checked(_PROPOSAL_UNTICKED, accept_all=True)
+    assert {c["repo"] for c in got} == {"vendor-service", "order-service"}
+    assert {c["new"] for c in got} == {91, 74}
+
+
+def test_auto_apply_end_to_end_no_tick():
+    with tempfile.TemporaryDirectory() as t:
+        root = Path(t)
+        cat = root / "knowledge"; (cat / "repos").mkdir(parents=True)
+        (root / "knowledge/catalog.json").write_text(json.dumps({"repos": [
+            {"name": "order-service", "grpc_rpc": 73}]}))
+        cfg = {"repos_glob": "1stop-*", "catalog": "knowledge/catalog.json",
+               "fact_sheets": "knowledge/repos", "ledger": "knowledge/_sync-ledger.json",
+               "changes": "knowledge/changes", "scanners": ["proto"]}
+        cfgp = root / "knowledge/.kb-sync.json"; cfgp.write_text(json.dumps(cfg))
+        prop = root / ".tmp/p.md"; prop.parent.mkdir()
+        prop.write_text("## Task: full-scan\n- [ ] **order-service** grpc_rpc: 73 → 74  (UPDATE)\n")
+        # KHÔNG tick — apply với accept_all
+        res = _apply(cfgp, prop, "2026-07-06", accept_all=True)
+        assert res["applied"] == 1
+        assert json.loads((root / "knowledge/catalog.json").read_text())["repos"][0]["grpc_rpc"] == 74

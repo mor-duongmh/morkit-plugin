@@ -27,6 +27,11 @@ _CHECKED = re.compile(
     r"^\s*-\s*\[x\]\s*\*\*(?P<repo>[^*]+)\*\*\s+(?P<type>\w+):\s*(?P<old>\S+)\s*→\s*(?P<new>\d+)",
     re.MULTILINE,
 )
+# accept-all: khớp mọi mục ứng viên, cả [ ] lẫn [x] (bỏ human-gate)
+_CANDIDATE = re.compile(
+    r"^\s*-\s*\[[ xX]\]\s*\*\*(?P<repo>[^*]+)\*\*\s+(?P<type>\w+):\s*(?P<old>\S+)\s*→\s*(?P<new>\d+)",
+    re.MULTILINE,
+)
 _TASK_HDR = re.compile(r"^##\s*Task:\s*(\S+)", re.MULTILINE)
 _PROV = re.compile(r"(provenance:\s*extracted\s+)(\d{4}-\d{2}-\d{2})")
 
@@ -42,9 +47,10 @@ def _iso_run_id(today: str) -> str:
     return f"{y}-W{w:02d}"
 
 
-def parse_checked(text: str) -> list[dict]:
+def parse_checked(text: str, accept_all: bool = False) -> list[dict]:
     out = []
-    for m in _CHECKED.finditer(text):
+    rx = _CANDIDATE if accept_all else _CHECKED
+    for m in rx.finditer(text):
         old = m.group("old")
         out.append({"repo": m.group("repo").strip(), "type": m.group("type"),
                     "old": None if old == "∅" else int(old) if old.isdigit() else old,
@@ -93,12 +99,12 @@ def update_api_rollup(api_path: Path, grpc_total: int) -> bool:
 
 
 def apply(config_path: str | Path, proposal_path: str | Path, today: str,
-          synced_by: str = "lead", sha_range: str = "") -> dict:
+          synced_by: str = "lead", sha_range: str = "", accept_all: bool = False) -> dict:
     cfg_path = Path(config_path).resolve()
     cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
     workspace = cfg_path.parent.parent
     proposal_text = Path(proposal_path).read_text(encoding="utf-8")
-    checked = parse_checked(proposal_text)
+    checked = parse_checked(proposal_text, accept_all=accept_all)
     tasks = parse_tasks(proposal_text)
 
     catalog_path = resolve_within(workspace, cfg["catalog"])
@@ -136,8 +142,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--today", default=datetime.date.today().isoformat())
     ap.add_argument("--by", default="lead", help="who ran this sync (recorded in ledger)")
     ap.add_argument("--sha-range", default="", help="optional git sha range, e.g. a..b")
+    ap.add_argument("--accept-all", "--yes", action="store_true", dest="accept_all",
+                    help="BỎ human-gate: ghi MỌI mục drift (cả [ ]), không cần tick. "
+                         "An toàn nhờ số tất định + idempotent; review bằng git diff trước push.")
     args = ap.parse_args(argv)
-    res = apply(args.config, args.proposal, args.today, synced_by=args.by, sha_range=args.sha_range)
+    res = apply(args.config, args.proposal, args.today, synced_by=args.by,
+                sha_range=args.sha_range, accept_all=args.accept_all)
     print(f"[{res['run_id']}] applied {res['applied']} change(s) across {len(res['repos'])} repo(s): "
           f"{', '.join(res['repos'])} · {len(res['pending'])} task(s) still pending")
     return 0
