@@ -473,3 +473,36 @@ def test_auto_apply_end_to_end_no_tick():
         res = _apply(cfgp, prop, "2026-07-06", accept_all=True)
         assert res["applied"] == 1
         assert json.loads((root / "knowledge/catalog.json").read_text())["repos"][0]["grpc_rpc"] == 74
+
+
+# --- Task summary theo template ---
+
+from kb_sync_apply import render_task_summary  # noqa: E402
+
+
+def test_render_task_summary_schema():
+    md = render_task_summary("ORD-482", "2026-07-06", "duongmh", ["order-service"],
+                             [{"repo": "order-service", "type": "grpc_rpc", "old": 73, "new": 74}],
+                             "knowledge/tickets/_TASK_SUMMARY_TEMPLATE.md")
+    assert "task: ORD-482" in md and "date_completed: 2026-07-06" in md
+    assert "repos_touched: [order-service]" in md
+    assert "order-service grpc_rpc 73→74" in md          # bảng KB updated
+    assert "## Đã làm" in md and "## Drift đã xử" in md   # đúng schema template
+
+
+def test_apply_writes_task_summary_when_tickets_configured():
+    with tempfile.TemporaryDirectory() as t:
+        root = Path(t); (root / "knowledge/repos").mkdir(parents=True)
+        (root / "knowledge/tickets").mkdir(parents=True)
+        (root / "knowledge/catalog.json").write_text(json.dumps({"repos": [
+            {"name": "order-service", "grpc_rpc": 73}]}))
+        cfg = {"repos_glob": "1stop-*", "catalog": "knowledge/catalog.json",
+               "fact_sheets": "knowledge/repos", "ledger": "knowledge/_sync-ledger.json",
+               "changes": "knowledge/changes", "tickets": "knowledge/tickets", "scanners": ["proto"]}
+        cfgp = root / "knowledge/.kb-sync.json"; cfgp.write_text(json.dumps(cfg))
+        prop = root / ".tmp/p.md"; prop.parent.mkdir()
+        prop.write_text("## Task: ORD-9\n- [x] **order-service** grpc_rpc: 73 → 74  (UPDATE)\n")
+        res = _apply(cfgp, prop, "2026-07-06")
+        sm = Path(res["summary"])
+        assert sm.exists() and sm.name == "summary.md" and sm.parent.name == "ORD-9"
+        assert "task: ORD-9" in sm.read_text() and "grpc_rpc 73→74" in sm.read_text()
