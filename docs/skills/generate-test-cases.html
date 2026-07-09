@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › init</title>
+<title>morkit › skill › generate-test-cases</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,24 +173,29 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › skill › <span class="path">generate-test-cases</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>init</h1>
-  <p class="lede">Cửa chính tạo docs — hỏi loại dự án rồi route: greenfield (từ tài liệu yêu cầu) hoặc brownfield (từ code/ProjectModel sẵn có).</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Skill</span></div>
+  <h1>generate-test-cases</h1>
+  <p class="lede">Cùng tester viết test case vào file Excel của team — hiểu feature, brainstorm độ phủ, chốt phạm vi, rồi mới điền.</p>
 
-  <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:init [tham số]</code></pre>
-  <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
+  <h2>1. Nhiệm vụ</h2>
+  <ul class="duties">
+    <li>Đọc feature từ tài liệu, ảnh, hoặc một URL đang chạy (tuỳ chọn)</li>
+    <li>Brainstorm viewpoint theo hướng <strong>normal / abnormal</strong> trước khi viết</li>
+    <li>Có <strong>cổng chốt phạm vi test</strong> — bạn duyệt rồi skill mới điền vào workbook</li>
+    <li>Mỗi case gồm: description · pre-condition · procedure · expected output</li>
+    <li><em>Chỉ viết spec</em> — không chạy test</li>
+  </ul>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Greenfield: có tài liệu khách hàng/yêu cầu — chạy pipeline BA G0→G7</li>
-  <li>Brownfield: đã có code và/hoặc ProjectModel — render thẳng + quét repo dò trạng thái</li>
+  <li>Khi tester cần viết test case cho một feature</li>
+  <li>Khi cần điền một sheet test case theo template Excel của team</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -199,18 +204,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:init --lang VN</code></pre>
+    <pre><code>$ /morkit:generate-test-cases đăng nhập bằng OTP --url http://localhost:3000</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Hỏi greenfield/brownfield, rồi chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra ở docs/. Chọn 1 ngôn ngữ: JP, EN, VN. /morkit:greenfield là shortcut thẳng nhánh greenfield.</p>
+  <p class="lede" style="font-size:14px;">Đầu ra là workbook Excel đã điền. Skill không chạy test — chỉ viết đặc tả.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/docs-update.html"><div class="ttl">/morkit:docs-update</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/kb-sync.html"><div class="ttl">/morkit:kb-sync</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../skills/generate-srs.html"><div class="ttl">generate-srs</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-api-docs.html"><div class="ttl">generate-api-docs</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-db-design.html"><div class="ttl">generate-db-design</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-system-architecture.html"><div class="ttl">generate-system-architecture</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-code-standards.html"><div class="ttl">generate-code-standards</div><div class="sub">Doc generation · skill</div></a>
+    <a class="related-card" href="../skills/generate-codebase-summary.html"><div class="ttl">generate-codebase-summary</div><div class="sub">Doc generation · skill</div></a>
   </div>
 
   <div class="footer">

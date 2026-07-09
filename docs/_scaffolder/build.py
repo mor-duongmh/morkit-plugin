@@ -6,8 +6,10 @@ Reads:
   - plugins/morkit/commands/<name>.md       (frontmatter: description)
 
 Writes:
-  - docs/skills/<name>.html      (26 pages)
-  - docs/commands/<name>.html    (15 pages)
+  - docs/skills/<name>.html      (one page per skill dir)
+  - docs/commands/<name>.html    (one page per command .md)
+
+docs/index.html and docs/docs.html are hand-maintained — never written here.
 
 Idempotent — safe to run multiple times. Overwrites existing files.
 Run from repo root:
@@ -177,143 +179,6 @@ def render_one(kind: str, slug: str) -> str:
     )
 
 
-def render_overview() -> str:
-    """Render docs/index.html — 5 sections (Cài đặt / Morkit có gì / Slash
-    commands / Plan review gate / Companion tools). No "Workflow điển hình",
-    no License (user decisions)."""
-
-    # Section 2 — Morkit có gì (4 nhóm bảng, link tới detail)
-    def link_skill(slug):
-        return f'<a href="skills/{slug}.html"><code>{slug}</code></a>'
-    def link_cmd(slug):
-        return f'<a href="commands/{slug}.html"><code>/morkit:{slug}</code></a>'
-
-    groups_rows = [
-        ("Spec workflow",
-         ", ".join(link_cmd(s) for s in ["propose", "review", "archive"]),
-         "Tự sinh proposal, design, tasks và checklist để bạn duyệt trước khi cho code chạy."),
-        ("Plan &amp; build",
-         # Most-used 6 skill — 7 skill phụ trợ khác (dispatching-parallel-agents,
-         # using-git-worktrees, finishing-a-development-branch,
-         # verification-before-completion, requesting-code-review,
-         # receiving-code-review, writing-skills) vẫn có trang detail nhưng
-         # không hiện trong overview để tránh nhiễu cho người mới.
-         ", ".join(link_skill(s) for s in [
-            "brainstorming", "writing-plans", "executing-plans",
-            "subagent-driven-development", "test-driven-development",
-            "systematic-debugging",
-         ]),
-         "Suy nghĩ ý tưởng, viết plan, chạy plan từng bước, viết test trước, debug có hệ thống."),
-        ("Code review",
-         ", ".join(link_cmd(s) for s in ["deep-review", "deep-review-doctor", "deep-review-post"]),
-         "Review code chuyên sâu bằng 5 agent AI chạy song song."),
-        ("Doc generation",
-         link_cmd("docs"),
-         "Sinh bộ tài liệu dự án tối ưu cho AI agent: taxonomy + mỏ neo, file nhỏ liên kết chéo (LLM-driven, không Python)."),
-    ]
-    groups_table_rows = "\n".join(
-        f"      <tr><td><strong>{g}</strong></td><td>{items}</td><td>{desc}</td></tr>"
-        for g, items, desc in groups_rows
-    )
-
-    # Section 3 — Danh sách /morkit:* theo 4 nhóm (giống README).
-    # Mỗi row: (kind, slug, purpose). kind ∈ {"command", "skill"} — quyết định
-    # link đi tới commands/<slug>.html hay skills/<slug>.html. User cuối gọi cả
-    # 2 bằng cú pháp /morkit:<slug> giống nhau, không cần phân biệt.
-    #
-    # Plan & build nội bộ là skill — người dùng gọi /morkit:<name> như command.
-    # Có 1 command brainstorming (alias gọi skill cùng tên); 2 command cũ
-    # write-plan/execute-plan vẫn deprecated (chỉ in deprecation warning).
-    sub_sections = [
-        ("Spec workflow", [
-            ("command", "propose [mô tả]", "Sinh đầy đủ proposal, design, tasks và checklist trong một lần chạy."),
-            ("command", "review [tên]",    "Tạo hoặc làm mới checklist duyệt thiết kế cho một change."),
-            ("command", "archive [tên]",   "Đóng một change folder sau khi đã merge và deploy ổn."),
-        ]),
-        ("Plan & build", [
-            ("skill", "brainstorming",               "Suy nghĩ ý tưởng và đọc codebase, không code."),
-            ("skill", "writing-plans",               "Viết plan nhiều bước từ ý tưởng đã chốt."),
-            ("skill", "executing-plans",             "Chạy plan từng bước (bị review-gate chặn cho tới khi human duyệt)."),
-            ("skill", "subagent-driven-development", "Chạy plan song song bằng nhiều subagent — nhanh hơn executing tuần tự."),
-            ("skill", "test-driven-development",     "TDD discipline — viết test trước, code sau, refactor cuối."),
-            ("skill", "systematic-debugging",        "Debug 5 bước có hệ thống — không đoán mò."),
-        ]),
-        ("Code review", [
-            ("command", "deep-review [target]", "Review chuyên sâu trên PR hoặc git diff (5 agent AI chạy song song)."),
-            ("command", "deep-review-doctor",   "Kiểm tra cài đặt Deep Review đã đủ điều kiện chạy chưa."),
-            ("command", "deep-review-post",     "Post báo cáo review lên PR làm comment."),
-        ]),
-        ("Doc generation", [
-            ("command", "docs", "Sinh/cập nhật bộ tài liệu dự án tối ưu cho AI agent. Chế độ: init | update | summarize (LLM-driven, không Python)."),
-        ]),
-    ]
-
-    def render_sub_section(label, rows):
-        body = "\n".join(
-            f'      <tr><td><a href="{kind}s/{slug.split()[0]}.html"><code>/morkit:{slug}</code></a></td><td>{purpose}</td></tr>'
-            for kind, slug, purpose in rows
-        )
-        return f"""  <h3>{label}</h3>
-  <table>
-    <thead><tr><th>Command</th><th>Để làm gì</th></tr></thead>
-    <tbody>
-{body}
-    </tbody>
-  </table>"""
-
-    section3_blocks = "\n\n".join(render_sub_section(label, rows) for label, rows in sub_sections)
-
-    sections = f"""<h2>1. Cài đặt</h2>
-  <p>Cần có: <a href="https://docs.anthropic.com/claude/docs/claude-code" target="_blank" rel="noopener">Claude Code</a> và Node.js từ 18 trở lên.</p>
-  <pre><code>/plugin add marketplace github:mor-duongmh/morkit-plugin
-/plugin install morkit@mor-duongmh</code></pre>
-  <p class="lede" style="font-size:14px;">Cài xong là dùng được luôn — không cần làm gì thêm trong từng dự án.</p>
-
-  <h2>2. morkit có những gì?</h2>
-  <p>Một plugin gói 4 nhóm chức năng, tất cả gọi qua tiền tố <code>/morkit:*</code>:</p>
-  <table>
-    <thead><tr><th>Nhóm</th><th>Bao gồm</th><th>Để làm gì</th></tr></thead>
-    <tbody>
-{groups_table_rows}
-    </tbody>
-  </table>
-  <p class="lede" style="font-size:14px;">Tổng cộng <strong>19 skill + 8 agent chuyên trách + 10 slash command</strong>, tất cả đều có tiền tố <code>/morkit:</code>.</p>
-
-  <h2>3. Danh sách command</h2>
-  <p>Bấm vào tên command để xem giải thích chi tiết, cách gọi và ví dụ.</p>
-
-{section3_blocks}
-
-  <h2>4. Companion tools (Context7 + RTK)</h2>
-  <p>Hai công cụ giúp agent trả lời chính xác hơn và tiết kiệm token. Plugin không cài lặng lẽ — sẽ hỏi bạn trước.</p>
-  <table>
-    <thead><tr><th>Công cụ</th><th>Vai trò</th><th>Cách cài</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><a href="https://github.com/upstash/context7" target="_blank" rel="noopener">Context7</a></td>
-        <td>Trả về tài liệu/API đúng phiên bản cho thư viện, agent không phải đoán.</td>
-        <td>Cài lười — plugin tự gọi <code>npx -y ctx7</code> khi cần.</td>
-      </tr>
-      <tr>
-        <td><a href="https://github.com/rtk-ai/rtk" target="_blank" rel="noopener">RTK</a></td>
-        <td>Nén output của lệnh bash, giảm 60-90% token.</td>
-        <td>Hỏi 1 lần ở phiên đầu — bạn chọn Cài / Bỏ qua / Đừng hỏi lại.</td>
-      </tr>
-    </tbody>
-  </table>
-  <p class="lede" style="font-size:14px;">Context7 đã được bật sẵn trong 6 skill nhóm Lên kế hoạch và 3 skill nhóm Viết spec —
-  agent sẽ tự gọi Context7 thay vì đoán API.</p>
-
-  <p>Cài RTK thủ công:</p>
-  <pre><code>curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
-rtk init -g</code></pre>
-
-  <p>Cài Context7 dạng MCP (đầy đủ tính năng):</p>
-  <pre><code>npx -y ctx7 setup</code></pre>
-"""
-    return T.overview_page(sections_html=sections)
-
-
 def main():
     out_skills = DOCS_DIR / "skills"
     out_commands = DOCS_DIR / "commands"
@@ -340,8 +205,8 @@ def main():
         written += 1
 
     # NOTE: docs/index.html is the hand-maintained "v2 landing" (promoted from the
-    # old docs-v2.html). build.py NO LONGER overwrites it — doing so would clobber
-    # the hand-crafted hub. render_overview() is kept for reference but not called.
+    # old docs-v2.html). build.py never writes it — doing so would clobber the
+    # hand-crafted hub.
 
     # Cleanup orphans: HTML files in out dirs whose source .md no longer exists
     orphans = []

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › init</title>
+<title>morkit › command › scout</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,24 +173,24 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">scout</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
-  <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>init</h1>
-  <p class="lede">Cửa chính tạo docs — hỏi loại dự án rồi route: greenfield (từ tài liệu yêu cầu) hoặc brownfield (từ code/ProjectModel sẵn có).</p>
+  <div style="margin-bottom: 10px;"><span class="tag">Plan & build</span><span class="tag">Command</span></div>
+  <h1>morkit:scout</h1>
+  <p class="lede">Tìm nhanh những file mà một task cần đụng tới — chạy nhiều Explore agent song song, chỉ trả về đường dẫn.</p>
 
   <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:init [tham số]</code></pre>
+  <pre><code>/morkit:scout [tham số]</code></pre>
   <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Greenfield: có tài liệu khách hàng/yêu cầu — chạy pipeline BA G0→G7</li>
-  <li>Brownfield: đã có code và/hoặc ProjectModel — render thẳng + quét repo dò trạng thái</li>
+  <li>Trước khi implement / debug / review trong codebase chưa quen</li>
+  <li>Khi cần định vị một feature mà không muốn nạp cả file vào context</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -199,18 +199,16 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:init --lang VN</code></pre>
+    <pre><code>$ /morkit:scout authentication flow</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Hỏi greenfield/brownfield, rồi chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra ở docs/. Chọn 1 ngôn ngữ: JP, EN, VN. /morkit:greenfield là shortcut thẳng nhánh greenfield.</p>
+  <p class="lede" style="font-size:14px;">Nội dung file nằm lại trong context của sub-agent — bạn chỉ nhận danh sách file kèm mô tả 1 dòng, nên tiết kiệm token.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
-    <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/docs-update.html"><div class="ttl">/morkit:docs-update</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/kb-sync.html"><div class="ttl">/morkit:kb-sync</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/brainstorming.html"><div class="ttl">/morkit:brainstorming</div><div class="sub">Plan &amp; build · command</div></a>
+    <a class="related-card" href="../commands/write-plan.html"><div class="ttl">/morkit:write-plan</div><div class="sub">Plan &amp; build · command</div></a>
+    <a class="related-card" href="../commands/execute-plan.html"><div class="ttl">/morkit:execute-plan</div><div class="sub">Plan &amp; build · command</div></a>
+    <a class="related-card" href="../skills/brainstorming.html"><div class="ttl">brainstorming</div><div class="sub">Plan &amp; build · skill</div></a>
   </div>
 
   <div class="footer">

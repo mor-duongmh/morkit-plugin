@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>morkit › command › init</title>
+<title>morkit › command › kb-sync</title>
 <style>
 :root {
   --bg: #fbf8f2; --bg-elev: #ffffff; --bg-subtle: #f0ece2; --bg-window: #ebe7dd;
@@ -173,24 +173,24 @@ td code { font-size: 12px; }
 <body>
 <main class="page">
   <div class="crumbs">
-    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">init</span></div>
+    <div>morkit › <a href="../index.html">tổng quan</a> › command › <span class="path">kb-sync</span></div>
     <span style="display:flex;align-items:center;gap:8px;">
       <span class="version-mount"></span>
       <button id="themeBtn" class="toggle" type="button">☾ Vesper / Paper</button>
     </span>
   </div>
   <div style="margin-bottom: 10px;"><span class="tag">Doc generation</span><span class="tag">Command</span></div>
-  <h1>init</h1>
-  <p class="lede">Cửa chính tạo docs — hỏi loại dự án rồi route: greenfield (từ tài liệu yêu cầu) hoặc brownfield (từ code/ProjectModel sẵn có).</p>
+  <h1>kb-sync</h1>
+  <p class="lede">Đồng bộ thay đổi của task (RPC / route / bảng / lệnh) vào knowledge pack + sổ ghi theo tuần. PM hoặc team lead chạy theo đợt.</p>
 
   <h2>1. Cách gọi</h2>
-  <pre><code>/morkit:init [tham số]</code></pre>
+  <pre><code>/morkit:kb-sync [tham số]</code></pre>
   <p class="lede" style="font-size:14px;">Gõ trực tiếp trong Claude Code.</p>
 
   <h2>2. Khi nào dùng</h2>
   <ul>
-  <li>Greenfield: có tài liệu khách hàng/yêu cầu — chạy pipeline BA G0→G7</li>
-  <li>Brownfield: đã có code và/hoặc ProjectModel — render thẳng + quét repo dò trạng thái</li>
+  <li>Sau khi một loạt task đã land và knowledge pack chưa cập nhật</li>
+  <li>Khi muốn xem trước drift giữa code và catalog.json trước khi ghi</li>
   </ul>
 
   <h2>3. Ví dụ</h2>
@@ -199,18 +199,18 @@ td code { font-size: 12px; }
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
       <span class="window-title">claude-code · morkit</span>
     </div>
-    <pre><code>$ /morkit:init --lang VN</code></pre>
+    <pre><code>$ /morkit:kb-sync --tasks task-a,task-b</code></pre>
   </div>
-  <p class="lede" style="font-size:14px;">Hỏi greenfield/brownfield, rồi chọn tài liệu muốn sinh (SRS / API / DB / ...). Đầu ra ở docs/. Chọn 1 ngôn ngữ: JP, EN, VN. /morkit:greenfield là shortcut thẳng nhánh greenfield.</p>
+  <p class="lede" style="font-size:14px;">Chỉ đọc trước: xuất .tmp/kb-sync-proposal.md có checkbox để bạn tick, rồi apply. Thêm --all để quét toàn bộ repo, --yes để bỏ human-gate. Cần knowledge/.kb-sync.json.</p>
 
   <h2>4. Xem thêm</h2>
   <div class="related-grid">
     <a class="related-card" href="../commands/setup.html"><div class="ttl">/morkit:setup</div><div class="sub">Doc generation · command</div></a>
+    <a class="related-card" href="../commands/init.html"><div class="ttl">/morkit:init</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/docs-update.html"><div class="ttl">/morkit:docs-update</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/sync.html"><div class="ttl">/morkit:sync</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/apply-sync.html"><div class="ttl">/morkit:apply-sync</div><div class="sub">Doc generation · command</div></a>
     <a class="related-card" href="../commands/doctor.html"><div class="ttl">/morkit:doctor</div><div class="sub">Doc generation · command</div></a>
-    <a class="related-card" href="../commands/kb-sync.html"><div class="ttl">/morkit:kb-sync</div><div class="sub">Doc generation · command</div></a>
   </div>
 
   <div class="footer">

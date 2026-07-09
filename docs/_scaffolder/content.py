@@ -8,7 +8,7 @@ Mỗi entry trong CURATED có 4 field:
 
 Mọi chỉnh sửa nội dung làm tại đây, sau đó chạy
     python3 docs/_scaffolder/build.py
-để regenerate 42 trang HTML.
+để regenerate toàn bộ trang skill + command.
 """
 
 # ----------------------------------------------------------------------
@@ -20,7 +20,7 @@ GROUPS = {
         "skills":   ["propose", "review", "archive"],
     },
     "plan-build": {
-        "commands": ["brainstorming", "write-plan", "execute-plan"],
+        "commands": ["brainstorming", "write-plan", "execute-plan", "scout"],
         "skills": [
             "brainstorming", "writing-plans", "executing-plans",
             "subagent-driven-development", "test-driven-development",
@@ -28,7 +28,7 @@ GROUPS = {
             "using-git-worktrees", "finishing-a-development-branch",
             "verification-before-completion",
             "requesting-code-review", "receiving-code-review",
-            "writing-skills",
+            "writing-skills", "scout",
         ],
     },
     "code-review": {
@@ -36,12 +36,12 @@ GROUPS = {
         "skills":   ["deep-review"],
     },
     "doc-gen": {
-        "commands": ["setup", "init", "docs-update", "sync", "apply-sync", "doctor"],
+        "commands": ["setup", "init", "docs-update", "sync", "apply-sync", "doctor", "kb-sync"],
         "skills": [
             "generate-srs", "generate-api-docs", "generate-db-design",
             "generate-system-architecture", "generate-code-standards",
             "generate-codebase-summary", "generate-design-guidelines",
-            "docs-hero-orchestrator",
+            "generate-test-cases", "docs-hero-orchestrator", "kb-sync",
         ],
     },
     "greenfield": {
@@ -559,6 +559,52 @@ CURATED = {
         "example_args": "(gọi qua /morkit:init / /morkit:docs-update)",
         "example_note": "Khi init, mỗi ADR sẽ có một file riêng tại docs/adr/NNN-slug.md. Skill này không hỗ trợ chế độ sync — guidelines do người viết.",
     },
+    "skills.generate-test-cases": {
+        "lede": "Cùng tester viết test case vào file Excel của team — hiểu feature, brainstorm độ phủ, chốt phạm vi, rồi mới điền.",
+        "details": [
+            "Đọc feature từ tài liệu, ảnh, hoặc một URL đang chạy (tuỳ chọn)",
+            "Brainstorm viewpoint theo hướng <strong>normal / abnormal</strong> trước khi viết",
+            "Có <strong>cổng chốt phạm vi test</strong> — bạn duyệt rồi skill mới điền vào workbook",
+            "Mỗi case gồm: description · pre-condition · procedure · expected output",
+            "<em>Chỉ viết spec</em> — không chạy test",
+        ],
+        "when_to_use": [
+            "Khi tester cần viết test case cho một feature",
+            "Khi cần điền một sheet test case theo template Excel của team",
+        ],
+        "example_args": "đăng nhập bằng OTP --url http://localhost:3000",
+        "example_note": "Đầu ra là workbook Excel đã điền. Skill không chạy test — chỉ viết đặc tả.",
+    },
+    "skills.kb-sync": {
+        "lede": "Giữ knowledge pack khớp với code sau khi task land — chỉ đồng bộ con số và cấu trúc, không tự sửa văn xuôi.",
+        "details": [
+            "Quét từ nguồn: gRPC (<code>.proto</code>) · REST (Gin) · model (GORM) · Makefile",
+            "Đề xuất trước (chỉ đọc) → bạn tick checkbox → apply. KB không bị đụng tới cho tới khi apply",
+            "Cập nhật <code>catalog.json</code> + số liệu fact-sheet + rollup <code>api.md</code>",
+            "Ghi <code>sync_run</code> vào sổ <code>_sync-ledger.json</code> rồi render lại <code>SYNC-LOG.md</code>",
+        ],
+        "when_to_use": [
+            "Khi PM/team lead chạy đồng bộ knowledge pack theo đợt",
+            "Khi cần đối chiếu drift giữa code và catalog trước khi ghi",
+        ],
+        "example_args": "(gọi qua /morkit:kb-sync)",
+        "example_note": "Cần knowledge/.kb-sync.json. Chỉ đồng bộ fact dạng số/cấu trúc — prose luôn do người viết.",
+    },
+    "skills.scout": {
+        "lede": "Định vị file cho một task bằng nhiều Explore agent chạy song song — nội dung file không lọt vào context của bạn.",
+        "details": [
+            "Ước lượng quy mô codebase bằng Grep/Glob, rồi chia cây thư mục thành các lát không chồng nhau",
+            "Mỗi lát một <code>Explore</code> agent, chạy song song",
+            "Gom kết quả, khử trùng lặp đường dẫn → một Scout Report duy nhất",
+            "Bạn chỉ nhận <strong>đường dẫn + mô tả 1 dòng</strong>, không phải nội dung file",
+        ],
+        "when_to_use": [
+            "Trước khi implement / debug / review trong codebase chưa quen",
+            "Khi muốn tiết kiệm context mà vẫn biết cần đụng file nào",
+        ],
+        "example_args": "where is the SRS rendered",
+        "example_note": "Report gồm file liên quan, pattern nhận ra được, và các câu hỏi chưa trả lời.",
+    },
 
     "commands.setup": {
         "lede": "Chạy 1 lần sau khi cài plugin để dựng môi trường Python cho docs-hero.",
@@ -603,6 +649,24 @@ CURATED = {
         ],
         "example_args": "",
         "example_note": "Chuyển các mục được tick thành thay đổi cụ thể rồi chạy update flow chuẩn.",
+    },
+    "commands.kb-sync": {
+        "lede": "Đồng bộ thay đổi của task (RPC / route / bảng / lệnh) vào knowledge pack + sổ ghi theo tuần. PM hoặc team lead chạy theo đợt.",
+        "when_to_use": [
+            "Sau khi một loạt task đã land và knowledge pack chưa cập nhật",
+            "Khi muốn xem trước drift giữa code và catalog.json trước khi ghi",
+        ],
+        "example_args": "--tasks task-a,task-b",
+        "example_note": "Chỉ đọc trước: xuất .tmp/kb-sync-proposal.md có checkbox để bạn tick, rồi apply. Thêm --all để quét toàn bộ repo, --yes để bỏ human-gate. Cần knowledge/.kb-sync.json.",
+    },
+    "commands.scout": {
+        "lede": "Tìm nhanh những file mà một task cần đụng tới — chạy nhiều Explore agent song song, chỉ trả về đường dẫn.",
+        "when_to_use": [
+            "Trước khi implement / debug / review trong codebase chưa quen",
+            "Khi cần định vị một feature mà không muốn nạp cả file vào context",
+        ],
+        "example_args": "authentication flow",
+        "example_note": "Nội dung file nằm lại trong context của sub-agent — bạn chỉ nhận danh sách file kèm mô tả 1 dòng, nên tiết kiệm token.",
     },
     "commands.doctor": {
         "lede": "Kiểm tra cài đặt docs-hero xem có ổn không (Python, venv, dependencies...).",
