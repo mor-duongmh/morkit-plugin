@@ -117,6 +117,11 @@ Plus: using-git-worktrees, finishing-a-development-branch, requesting-code-revie
 | `/morkit:kb-sync` | Sync số liệu/cấu trúc (RPC/route/table/commands) của task vào knowledge pack convention-driven (`knowledge/.kb-sync.json`) + sổ cái tuần. Batch, do PM/lead chạy; propose→tick→apply |
 | `/morkit:doctor` | Health-check docs-hero |
 
+### Từ SRS ra Jira (standalone)
+| Command | Việc |
+|---|---|
+| `/morkit:to-jira --model <project-model.json>` | Phân rã SRS thành ticket Jira — 1 Story / FunctionalRequirement, 1 Task / NFR. Sinh `task-breakdown.md` cho người thật sửa + ký (`status: approved`), rồi push lên Jira Server/DC. Chạy lại **không nhân đôi backlog**: `jira-map.json` nhớ FR nào ra ticket nào; SRS không đổi → 0 API call. Sửa summary tay được giữ qua các lần chạy sau. Cần `JIRA_BASE_URL` / `JIRA_PROJECT_KEY` / `JIRA_PAT`. Nối tiếp `/morkit:greenfield` nhưng dùng được cả brownfield. |
+
 ### Test cases (standalone)
 | Command | Việc |
 |---|---|
