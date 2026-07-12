@@ -51,6 +51,10 @@ GROUPS = {
             "generate-user-stories", "gap-risk-analysis", "clarification-loop",
         ],
     },
+    "export": {
+        "commands": ["to-jira"],
+        "skills":   ["srs-to-jira"],
+    },
     "misc": {
         "commands": [],
         "skills":   ["using-morkit"],
@@ -63,6 +67,7 @@ GROUP_LABELS = {
     "code-review": "Code review",
     "doc-gen":     "Doc generation",
     "greenfield":  "Greenfield pipeline",
+    "export":      "Export & Integration",
     "misc":        "Khác",
 }
 
@@ -784,5 +789,34 @@ CURATED = {
         ],
         "example_args": "--workspace morkit/output/greenfield/acme",
         "example_note": "Sinh/cập nhật clarification-log.md. Re-run trên cùng workspace tiếp tục đúng chỗ đang dở — không cần state store ngoài.",
+    },
+
+    # ====================================================================
+    # NHÓM 7 — EXPORT & INTEGRATION (Jira, etc)
+    # ====================================================================
+    "commands.to-jira": {
+        "lede": "Phân rã SRS thành ticket Jira — một Story per FunctionalRequirement, một Task per NFR. Sinh task-breakdown.md cho người thật sửa + ký (status: approved), rồi push lên Jira Server/Data Center. Chạy lại không nhân đôi backlog.",
+        "when_to_use": [
+            "Sau khi /morkit:greenfield hoàn tất hoặc có ProjectModel JSON sẵn",
+            "Khi cần push SRS requirements lên Jira dưới dạng tickets",
+        ],
+        "example_args": "--model project-model.json --lang VN",
+        "example_note": "Sinh task-breakdown.md (người duyệt + sign), rồi push. Re-run không phát sinh ticket trùng nhờ jira-map.json tracking.",
+    },
+    "skills.srs-to-jira": {
+        "lede": "Phân rã một ProjectModel JSON thành Jira issues trên Jira Server/Data Center — một Story per FR, một Task per NFR. Dựng task-breakdown.md cho reviewer ký, rồi push. Idempotent — re-run không nhân đôi backlog.",
+        "details": [
+            "<strong>3 bước:</strong>",
+            "<ol><li>Render ProjectModel → tasks.json (cơ học, không sáng tạo)</li><li>Sinh task-breakdown.md — người sửa + sign <code>status: approved</code></li><li>Push → Jira, ghi vào jira-map.json (FR-id → issue key)</li></ol>",
+            "<strong>Idempotent:</strong> SRS không thay đổi + jira-map.json nhớ mapping → re-run 0 API call",
+            "<strong>Brownfield:</strong> không chỉ từ /morkit:greenfield — bất kỳ project-model.json nào cũng dùng được",
+            "Cần env: <code>JIRA_BASE_URL</code> + <code>JIRA_PROJECT_KEY</code> + <code>JIRA_PAT</code> (Jira Server/DC)",
+        ],
+        "when_to_use": [
+            "Khi SRS đã chốt và cần tạo Jira tickets từ requirements",
+            "Sau /morkit:greenfield G7 hoặc khi có ProjectModel JSON từ bất kỳ flow nào",
+        ],
+        "example_args": "--model morkit/output/greenfield/acme/project-model.json --lang VN",
+        "example_note": "Sinh task-breakdown.md ở current dir; reviewer sửa + đặt status: approved; skill push lên Jira. Mapping lưu lại trong jira-map.json.",
     },
 }
