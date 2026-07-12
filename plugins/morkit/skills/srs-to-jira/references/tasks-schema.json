@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "srs-to-jira tasks.json",
+  "description": "Contract between the mapper (phase 1) and the diff/gate (phase 2). Written only by build_tasks.py; never hand-edited.",
+  "type": "object",
+  "required": ["meta", "warnings", "tasks"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["lang", "skip_nfr", "model_path", "model_sha256", "deprecated_ids"],
+      "additionalProperties": false,
+      "properties": {
+        "lang": {"enum": ["JP", "EN", "VN"]},
+        "skip_nfr": {
+          "type": "boolean",
+          "description": "Recorded so the diff does NOT report filtered-out NFRs as orphaned issues."
+        },
+        "model_path": {"type": "string"},
+        "model_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Digest of the source project-model.json. The map binds to it so two different SRS cannot share one Jira project map."
+        },
+        "deprecated_ids": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Entities with status=deprecated. Not ticketed. Distinct from orphaned: the SRS retired them on purpose."
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "description": "Surfaced in the approval gate so the reviewer sees thin requirements BEFORE the tickets exist.",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "field", "kind"],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {"type": "string"},
+          "field": {"type": "string"},
+          "kind": {
+            "enum": ["tbd", "missing", "empty_body"],
+            "description": "tbd = a <TBD: ...> placeholder was dropped; missing = field absent; empty_body = nothing to put in the issue."
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "issue_type", "summary", "description", "priority", "labels", "source_hash"],
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "pattern": "^(FR|NFR)-[A-Z0-9_-]+$",
+            "description": "Join key across tasks.json, task-breakdown.md and jira-map.json."
+          },
+          "issue_type": {"enum": ["Story", "Task"]},
+          "summary": {"type": "string", "minLength": 1, "maxLength": 255},
+          "description": {"type": "string"},
+          "priority": {
+            "type": ["string", "null"],
+            "enum": ["High", "Medium", "Low", "Lowest", null],
+            "description": "Already mapped to the JIRA name. `Mid` (a ProjectModel value) must never appear here."
+          },
+          "labels": {
+            "type": "array",
+            "minItems": 2,
+            "items": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$", "maxLength": 255},
+            "description": "Always ['morkit-srs', 'morkit-id-<SOURCE_ID>']. Recovery strips the 'morkit-id-' prefix to recover source_id, so the prefix is type-neutral and MUST NOT be changed."
+          },
+          "source_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "description": "sha256(summary + NUL + description) of the MACHINE-RENDERED content. Drives the diff. Distinct from jira-map.json's pushed_hash, which records what was actually sent — keeping them separate is what stops a reviewer's hand-edit from being reverted on the next run."
+          }
+        }
+      }
+    }
+  }
+}
