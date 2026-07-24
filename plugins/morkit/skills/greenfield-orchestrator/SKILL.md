@@ -162,6 +162,21 @@ greenfield-generated docs get an identical gate. Surface the report path to the
 user (including any docs left un-promoted by the warn-only review gate), then
 `state_manager set-stage G7 done "$PWD/docs"`.
 
+## Optional next step (print it; do NOT run it)
+
+Once the run is `done`, print — as plain text, nothing more:
+
+```
+Next (optional): /morkit:to-jira --model "$WS/project-model.json" --lang <lang>
+```
+
+`srs-to-jira` turns the same validated model into Jira issues. It is **not** a stage:
+no `G8`, no touching `state.json`, `state_manager.py` or `state.schema.json`. Two
+reasons. This file is thin glue and holds no business logic — a stage here would mean
+the state machine knowing about Jira. And writing to someone's live issue tracker is
+not something to chain automatically onto the end of a long pipeline; a human starts
+that, deliberately, when they are ready.
+
 ## Visualize (G6, stakeholder-facing)
 
 `srs.html` is produced **deterministically by the render backend** — the same

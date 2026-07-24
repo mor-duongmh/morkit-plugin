@@ -1,6 +1,17 @@
 .DS_Store
 node_modules/
 *.log
+
+# Credentials. srs-to-jira reads JIRA_PAT from the environment and its SKILL.md shows
+# a shell block — which is exactly how a token ends up in a committed .env.
+.env
+.env.*
+
+# srs-to-jira workspace: jira-map.json carries the internal Jira hostname and
+# tasks.json carries the whole SRS. The skill also drops a `*` .gitignore in here on
+# first run, so it stays private inside a customer's repo too.
+morkit/output/jira/
+
 .preview/
 .claude-flow/
 .claude/launch.json

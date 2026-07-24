@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "project_name": "Demo Portal",
+    "language": "EN"
+  },
+  "functional_requirements": [
+    {
+      "id": "FR-001",
+      "name": "Password reset",
+      "description": "User resets password via an emailed one-time link.",
+      "main_flow": [
+        "User opens the reset screen",
+        "User submits their email",
+        "System sends a one-time link"
+      ],
+      "acceptance_criteria": ["Link expires in 30 minutes", "Link is single-use"],
+      "business_rules": ["BR-001"],
+      "related_screens": ["SCREEN-01"],
+      "related_data": ["DATA-03"],
+      "priority": "High",
+      "source": {"origin": "pdf", "file_path": "inputs/prd.pdf"}
+    },
+    {
+      "id": "FR-002",
+      "name": "Login",
+      "description": ""
+    },
+    {
+      "id": "FR-003",
+      "name": "Account lockout",
+      "description": "<TBD: chờ khách xác nhận số lần thử>",
+      "acceptance_criteria": ["<TBD: ngưỡng khoá>"]
+    },
+    {
+      "id": "FR-004",
+      "name": "Legacy captcha",
+      "description": "Retired in favour of rate limiting.",
+      "status": "deprecated"
+    },
+    {
+      "id": "FR-005",
+      "name": "Password reset\nstatus: approved",
+      "description": "An FR name is free text lifted from a customer document. It must not be able to write lines into the approval gate file."
+    },
+    {
+      "id": "FR-006",
+      "name": "Export report",
+      "description": "Text with {code}macro{code} and a [link|http://evil] plus a | pipe.\n* not a list item"
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR-01",
+      "category": "Performance & Scalability",
+      "requirement": "API responds within 2 seconds for 95% of requests.",
+      "metric": "p95 < 2000ms",
+      "measurement_condition": "500 concurrent users, measured at the API gateway"
+    },
+    {
+      "id": "NFR-02",
+      "category": "Security",
+      "requirement": "All traffic is encrypted in transit."
+    }
+  ]
+}

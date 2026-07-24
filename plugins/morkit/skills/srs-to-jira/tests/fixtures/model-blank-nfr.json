@@ -1,0 +1,10 @@
+{
+  "meta": {"project_name": "Blank NFR", "language": "EN"},
+  "non_functional_requirements": [
+    {
+      "id": "NFR-09",
+      "category": "Other",
+      "requirement": ""
+    }
+  ]
+}

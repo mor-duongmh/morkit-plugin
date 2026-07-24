@@ -64,4 +64,26 @@ else
     echo "mmdc: not installed (optional) — agent uses syntax sanity check fallback"
 fi
 
+# --- Jira (optional; only /morkit:to-jira needs it) ---
+# Reports names and status, never a value. Checking here means a BrSE finds out they
+# need a token now, rather than halfway through pushing an SRS.
+JIRA_CFG="${CLAUDE_PLUGIN_ROOT:-}/skills/srs-to-jira/scripts/jira_config.py"
+if [ -x "${VENV}/bin/python3" ] && [ -f "$JIRA_CFG" ]; then
+    if JIRA_OUT=$("${VENV}/bin/python3" "$JIRA_CFG" check 2>/dev/null); then
+        JIRA_PROJ=$(echo "$JIRA_OUT" | "${VENV}/bin/python3" -c 'import json,sys; print(json.load(sys.stdin)["project"])')
+        echo "Jira: OK (project $JIRA_PROJ) — /morkit:to-jira ready"
+    else
+        JIRA_PROBS=$(echo "$JIRA_OUT" | "${VENV}/bin/python3" -c \
+            'import json,sys; print("; ".join(json.load(sys.stdin)["file"]["problems"]))' 2>/dev/null)
+        if [ -n "$JIRA_PROBS" ]; then
+            echo "Jira: UNSAFE CONFIG — $JIRA_PROBS"
+        else
+            echo "Jira: not configured (optional — only /morkit:to-jira needs it)"
+            echo "      The skill will walk you through setting it up when you run it."
+        fi
+    fi
+else
+    echo "Jira: SKIP (venv or CLAUDE_PLUGIN_ROOT missing)"
+fi
+
 echo "=== done ==="

@@ -263,6 +263,14 @@ HEADINGS: dict[str, dict[str, str]] = {
     "performance_notes": {"JP": "性能備考", "EN": "Performance Notes", "VN": "Ghi chú hiệu năng"},
     "security": {"JP": "セキュリティ", "EN": "Security", "VN": "Bảo mật"},
     "erd": {"JP": "ER図", "EN": "Entity Relationship Diagram", "VN": "Sơ đồ ERD"},
+    # --- Issue-tracker export (srs-to-jira) ---
+    "requirement": {"JP": "要件", "EN": "Requirement", "VN": "Yêu cầu"},
+    "metric": {"JP": "指標", "EN": "Metric", "VN": "Chỉ số"},
+    "measurement_condition": {"JP": "測定条件", "EN": "Measurement Condition", "VN": "Điều kiện đo"},
+    "category": {"JP": "カテゴリ", "EN": "Category", "VN": "Phân loại"},
+    "related_data": {"JP": "関連データ", "EN": "Related Data", "VN": "Dữ liệu liên quan"},
+    "notes": {"JP": "備考", "EN": "Notes", "VN": "Ghi chú"},
+    "source": {"JP": "出典", "EN": "Source", "VN": "Nguồn"},
 }
 
 
