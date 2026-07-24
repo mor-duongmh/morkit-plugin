@@ -47,8 +47,8 @@ When ready to implement, run `/morkit:executing-plans` (blocked until review-che
 
    Edit the three files (Edit tool) replacing template placeholders with substantive content:
    - `proposal.md`: Why, What changes (concrete bullets), Impact (affected components/users/migration), Out of scope.
-   - `design.md`: Architecture, **Tech Stack** (REQUIRED — verify libraries via Context7 if uncertain), Data model, API contract, Open questions.
-   - `tasks.md`: keep the task-list header line, Goal/Architecture/Tech Stack summary matching design.md, File Structure (New / Modified / Deleted), and Task N blocks each with `**Files:**` + TDD `- [ ]` checkboxes.
+   - `design.md`: Architecture; **Tech Stack** — *delta only* (list NEW/CHANGED dependencies; for unchanged stack point to `docs/codebase-summary.md` instead of restating; greenfield fallback if no `docs/`; verify new libs via Context7 if uncertain); **Anchors** (`file:symbol`/`file:line` the change hooks into); **Contracts** (new/changed signatures, DTO/JSON shapes, endpoints, enums, DB columns); **Acceptance criteria** (verifiable assertions); Data model; API contract; Open questions.
+   - `tasks.md`: keep the task-list header line; Goal/Architecture/Tech Stack summary matching design.md; File Structure (New / Modified / Deleted); and Task N blocks each with a stable slug in the heading (`## Task N: <title> {#<slug>}`), a `**Status:** pending` line, `**Files:**`, and TDD `- [ ]` checkboxes.
 
 4. **Validate the tasks.md**
 
@@ -67,6 +67,8 @@ When ready to implement, run `/morkit:executing-plans` (blocked until review-che
    Auto-detects variant (BE/FE × Feature/BugFix/Refactor) from proposal+tasks signals. Override with `--variant <id>` if user specifies.
 
    On fetch failure (no network, Google Doc unreachable, no cache): report the error verbatim and tell the user to run `/morkit:review` manually with `--variant`.
+
+   **Then fill the tailored section.** Open the generated `<root>/<name>/review-checklist.md`, find `## Tailored checks (per task)`, and replace its placeholder bullet with **≥1 concrete confirmation per task** from `tasks.md`, each citing that task's slug — e.g. `- [ ] {#verify-webhook} confirm SePay signature verification + idempotency`. Leave every item **UNCHECKED** (`- [ ]`); you may pre-mark clearly-inapplicable baseline items as `- [N/A] … — <reason>`. Do NOT tick any box — the human gate owns that decision.
 
 6. **Report**
 
