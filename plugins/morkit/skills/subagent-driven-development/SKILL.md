@@ -122,6 +122,10 @@ Use the least powerful model that can handle each role to conserve cost and incr
 > (e.g. `security`, `migration`, `architecture`), and file-count signals. When working
 > outside the claude-plugins repo, the harness is inactive; apply this guidance manually.
 
+## Keeping task Status current
+
+Each `## Task N` in `tasks.md` carries a `**Status:**` line (enum `pending | in_progress | blocked | done`), separate from the TDD sub-step checkboxes. As the controller, update it alongside TodoWrite: set `in_progress` when you dispatch a task's implementer, `done` once BOTH reviews (spec compliance then code quality) pass, and `blocked` if you escalate that task to the human.
+
 ## Handling Implementer Status
 
 Implementer subagents report one of four statuses. Handle each appropriately:

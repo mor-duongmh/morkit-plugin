@@ -34,10 +34,12 @@ If a doc is missing, skip it silently — do NOT block on missing docs and do NO
 ### Step 2: Execute Tasks
 
 For each task:
-1. Mark as in_progress
+1. Mark as in_progress — in TodoWrite AND set that task's `**Status:**` line in `tasks.md` to `in_progress`
 2. Follow each step exactly (plan has bite-sized steps)
 3. Run verifications as specified
-4. Mark as completed
+4. Mark as completed — in TodoWrite AND set that task's `**Status:**` line to `done`
+
+Task-level status uses the enum `pending | in_progress | blocked | done` and lives on each `## Task N` heading's `**Status:**` line (separate from the TDD sub-step checkboxes). If you hit a blocker and stop, set that task's `**Status:**` to `blocked`.
 
 ### Step 3: Complete Development
 

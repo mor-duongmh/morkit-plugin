@@ -2,13 +2,14 @@
 # validate-tasks.sh — validate a tasks.md against the morkit-driven schema.
 # Replaces `npx openspec schema validate`.
 #
-# Rules (R1-R6):
+# Rules (R1-R7):
 #   R1: tasks.md contains line `> **For agentic workers:** REQUIRED SUB-SKILL`
 #   R2: at least one heading matching `^## Task \d+:`
 #   R3: every Task block contains line `**Files:**`
 #   R4: every Task block contains ≥1 `- [ ]` or `- [x]` checkbox
 #   R5: total checkbox count across the file ≥ 3
 #   R6: companion .meta.json (if present in same dir) has schema_version == validator's
+#   R7: every Task block has a task-level Status line (soft/advisory — warns, never fails)
 #
 # Usage:
 #   validate-tasks.sh <tasks.md>
@@ -32,9 +33,9 @@ TARGET=""
 
 print_usage() {
     cat <<'EOF'
-Usage: validate-tasks.sh [--rule R1|R2|R3|R4|R5|R6] [--explain] <tasks.md>
+Usage: validate-tasks.sh [--rule R1|R2|R3|R4|R5|R6|R7] [--explain] <tasks.md>
 
-Validates tasks.md against the morkit-driven schema. Rules R1-R6 are checked
+Validates tasks.md against the morkit-driven schema. Rules R1-R7 are checked
 in order. First failure exits non-zero.
 
 Options:
@@ -69,6 +70,12 @@ R5 Minimum checkbox count
 R6 Schema version match
    If a sibling `.meta.json` exists, its `schema_version` field matches the
    validator's MORKIT_SCHEMA_VERSION.
+
+R7 Task status line (soft / advisory — never fails validation)
+   Each `## Task` block should contain a line matching:
+   `**Status:** pending|in_progress|blocked|done`
+   Missing Status lines print a warning but do not fail the run (back-compat
+   with changes authored before this rule existed).
 EOF
 }
 
@@ -212,10 +219,34 @@ check_R6() {
     fi
 }
 
+# R7 is soft/advisory (back-compat): changes authored before this rule have no
+# Status lines and must still validate. A future --strict mode could harden
+# this into a real failure; out of scope here.
+check_R7() {
+    local missing=""
+    local block
+    local idx=0
+    while IFS= read -r -d '' block; do
+        idx=$((idx + 1))
+        if ! grep -qE '^\*\*Status:\*\*[[:space:]]*(pending|in_progress|blocked|done)[[:space:]]*$' <<< "$block"; then
+            local title
+            title=$(grep -m1 -E '^## Task [0-9]+:' <<< "$block" || echo "Task $idx")
+            missing+="  - $title (block $idx)"$'\n'
+        fi
+    done < <(iter_task_blocks)
+    if [[ -n "$missing" ]]; then
+        {
+            echo "⚠ R7 — task block(s) missing task-level Status line (soft, back-compat):"
+            printf '%s' "$missing"
+        } >&2
+    fi
+    return 0
+}
+
 # ---------------------------------------------------------------------------
 # Run rules in order, short-circuit on first failure
 # ---------------------------------------------------------------------------
-RULES=(R1 R2 R3 R4 R5 R6)
+RULES=(R1 R2 R3 R4 R5 R6 R7)
 FAILED=0
 
 for r in "${RULES[@]}"; do

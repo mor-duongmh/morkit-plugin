@@ -6,7 +6,19 @@
 
 ## Tech Stack
 
-<!-- REQUIRED. List libraries / frameworks / runtimes touched, with versions when relevant. Verify via Context7 if uncertain. -->
+<!-- Delta only — list NEW / CHANGED dependencies (libraries, frameworks, runtimes) this change adds or bumps, with versions. Unchanged stack: point to docs/codebase-summary.md instead of restating. Greenfield fallback (no docs/ yet): note the minimal stack. Verify new libs via Context7 if uncertain. -->
+
+-
+
+## Anchors
+
+<!-- Where this change hooks into existing code: file:symbol or file:line references the implementer must touch. -->
+
+-
+
+## Contracts
+
+<!-- New/changed interfaces to verify against: function signatures, DTO/JSON shapes, endpoint request/response, enums, DB columns with types. -->
 
 -
 
@@ -17,6 +29,12 @@
 ## API contract
 
 <!-- Endpoints, payloads, status codes. Skip if not applicable. -->
+
+## Acceptance criteria
+
+<!-- Verifiable assertions: how a dev confirms each requirement is met (test passes, command output, observable behavior). -->
+
+-
 
 ## Open questions
 
