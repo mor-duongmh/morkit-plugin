@@ -183,6 +183,14 @@ cat > "$TARGET" <<EOF
 
 ${SECTION}
 
+## Tailored checks (per task)
+
+<!-- filled by /morkit:propose Step 5 -->
+<!-- One or more confirmations per task, each citing the task slug {#slug} from tasks.md.
+     Legend: \`- [ ]\` todo · \`- [x]\` confirmed · \`- [N/A] <item> — <reason>\` not applicable — state the reason instead of leaving it blank. -->
+
+-
+
 ---
 
 ## Overall Decision
